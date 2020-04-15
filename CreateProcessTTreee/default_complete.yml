@@ -1,0 +1,21 @@
+case: Dspp # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
+conversion: # pkl
+  mc:
+    activate: true
+  data:
+    activate: true
+skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
+  mc:
+    activate: true
+  data:
+    activate: true
+merging: # pkl_skimmed_merge_for_ml (pklskml)
+  mc:
+    activate: true
+  data:
+    activate: true
+mergingperiods: # pkl_skimmed_merge_for_ml_all
+  mc:
+    activate: true
+  data:
+    activate: true
