@@ -90,9 +90,9 @@ BsITS2:
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
       pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_v2] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_v2
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_v2
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
@@ -102,9 +102,9 @@ BsITS2:
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
       pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_v2] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_v2
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_v2
       mcreweights: [mcreweights]
 
   ml:
@@ -129,8 +129,8 @@ BsITS2:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlplot_hipe4ml # to be removed
-    mlout: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlout_hipe4ml # to be removed
+    mlplot: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlplot_hipe4ml_v2 # to be removed
+    mlout: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlout_hipe4ml_v2 # to be removed
 
     opt:
       isFONLLfromROOT: false
