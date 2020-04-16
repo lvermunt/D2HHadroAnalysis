@@ -85,12 +85,13 @@ class Optimiser:
         #variables
         self.v_all = data_param["variables"]["var_all"]
         self.v_train = training_var
-        self.v_bound = data_param["variables"]["var_boundaries"]
+        self.v_bound = data_param["variables"].get("var_boundaries", None)
         self.v_sig = data_param["variables"]["var_signal"]
         self.v_invmass = data_param["variables"]["var_inv_mass"]
         self.v_cuts = data_param["variables"].get("var_cuts", [])
-        self.v_corrx = data_param["variables"]["var_correlation"][0]
-        self.v_corry = data_param["variables"]["var_correlation"][1]
+        self.v_corr = data_param["variables"].get("var_correlation", [None, None])
+        self.v_corrx = self.v_corr[0]
+        self.v_corry = self.v_corr[1]
         self.v_isstd = data_param["bitmap_sel"]["var_isstd"]
         self.v_ismcsignal = data_param["bitmap_sel"]["var_ismcsignal"]
         self.v_ismcprompt = data_param["bitmap_sel"]["var_ismcprompt"]
@@ -101,6 +102,7 @@ class Optimiser:
         self.p_typean = typean
         self.p_nbkg = data_param["ml"]["nbkg"]
         self.p_nsig = data_param["ml"]["nsig"]
+        self.v_fracbkgoversig = data_param["ml"].get("fracbkgoversig", None)
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
         self.p_binmin = binmin
@@ -221,14 +223,12 @@ class Optimiser:
         self.df_bkg["ismcfd"] = 0
         self.df_bkg["ismcbkg"] = 0
 
-
-        if self.p_nsig > len(self.df_sig):
-            self.logger.warning("There are not enough signal events")
-        if self.p_nbkg > len(self.df_bkg):
-            self.logger.warning("There are not enough background events")
-
         self.p_nsig = min(len(self.df_sig), self.p_nsig)
         self.p_nbkg = min(len(self.df_bkg), self.p_nbkg)
+        if self.p_nsig < self.p_nbkg and self.v_fracbkgoversig is not None:
+            self.p_nbkg = self.v_fracbkgoversig * self.p_nsig
+            if len(self.df_bkg) < self.p_nbkg:
+                self.p_nbkg = len(self.df_bkg)
 
         self.logger.info("Used number of signal events is %d", self.p_nsig)
         self.logger.info("Used number of background events is %d", self.p_nbkg)
@@ -265,26 +265,26 @@ class Optimiser:
         pickle.dump(self.df_ytrain, openfile(filename_ytrain, "wb"), protocol=4)
 
     def do_corr(self):
-        imageIO_vardist_all = vardistplot(self.df_sigtrain, self.df_bkgtrain,
-                                          self.v_all, self.dirmlplot,
-                                          self.p_binmin, self.p_binmax)
-        imageIO_vardist_train = vardistplot(self.df_sigtrain, self.df_bkgtrain,
-                                            self.v_train, self.dirmlplot,
-                                            self.p_binmin, self.p_binmax)
-        imageIO_scatterplot = scatterplot(self.df_sigtrain, self.df_bkgtrain,
-                                          self.v_corrx, self.v_corry,
-                                          self.dirmlplot, self.p_binmin, self.p_binmax)
-        imageIO_corr_sig_all = correlationmatrix(self.df_sigtrain, self.v_all, "Signal",
-                                                 self.dirmlplot, self.p_binmin, self.p_binmax)
-        imageIO_corr_bkg_all = correlationmatrix(self.df_bkgtrain, self.v_all, "Background",
-                                                 self.dirmlplot, self.p_binmin, self.p_binmax)
-        imageIO_corr_sig_train = correlationmatrix(self.df_sigtrain, self.v_train, "Signal",
-                                                   self.dirmlplot, self.p_binmin, self.p_binmax)
-        imageIO_corr_bkg_train = correlationmatrix(self.df_bkgtrain, self.v_train, "Background",
-                                                   self.dirmlplot, self.p_binmin, self.p_binmax)
-        return imageIO_vardist_all, imageIO_vardist_train, imageIO_scatterplot, \
-                  imageIO_corr_sig_all, imageIO_corr_bkg_all, imageIO_corr_sig_train, \
-                  imageIO_corr_bkg_train
+        vardistplot(self.df_sigtrain, self.df_bkgtrain,
+                    self.v_all, self.dirmlplot,
+                    self.p_binmin, self.p_binmax)
+        vardistplot(self.df_sigtrain, self.df_bkgtrain,
+                    self.v_train, self.dirmlplot,
+                    self.p_binmin, self.p_binmax)
+        correlationmatrix(self.df_sigtrain, self.v_all, "Signal",
+                          self.dirmlplot, self.p_binmin, self.p_binmax)
+        correlationmatrix(self.df_bkgtrain, self.v_all, "Background",
+                          self.dirmlplot, self.p_binmin, self.p_binmax)
+        correlationmatrix(self.df_sigtrain, self.v_train, "Signal",
+                          self.dirmlplot, self.p_binmin, self.p_binmax)
+        correlationmatrix(self.df_bkgtrain, self.v_train, "Background",
+                          self.dirmlplot, self.p_binmin, self.p_binmax)
+        if self.v_corrx is None or self.v_corry is None:
+            self.logger.warning("var_correlation is not set in the database, skipping scatterplot...")
+        else:
+            scatterplot(self.df_sigtrain, self.df_bkgtrain,
+                        self.v_corrx, self.v_corry,
+                        self.dirmlplot, self.p_binmin, self.p_binmax)
 
     def loadmodels(self):
         classifiers_scikit, names_scikit, _ = getclf_scikit(self.db_model)
@@ -379,6 +379,9 @@ class Optimiser:
         perform_plot_gridsearch(clfs_names_all, out_dirs)
 
     def do_boundary(self):
+        if self.v_bound is None:
+            self.logger.warning("var_boundaries is not set in the database, returning...")
+            return
         classifiers_scikit_2var, names_2var, _ = getclf_scikit(self.db_model)
         classifiers_keras_2var, names_keras_2var, _ = getclf_keras(self.db_model, 2)
         classifiers_2var = classifiers_scikit_2var+classifiers_keras_2var

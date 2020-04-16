@@ -182,13 +182,15 @@ def merge_method_max(listfiles, namemerged, maxlength):
     Merge list of dataframes into one
     """
     dflist = []
+    sumcand = 0
     for myfilename in listfiles:
         myfile = openfile(myfilename, "rb")
         df = pickle.load(myfile)
+        sumcand = sumcand + len(df)
         dflist.append(df)
-        if len(dflist) > maxlength:
+        if sumcand > maxlength:
             print("Max length of", maxlength, "reached for", namemerged)
-            print("Total length is", len(dflist), "so stopping merging")
+            print("Total length is", sumcand, "so stopping merging")
             break
     dftot = pd.concat(dflist)
     pickle.dump(dftot, openfile(namemerged, "wb"), protocol=4)

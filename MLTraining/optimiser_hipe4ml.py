@@ -65,7 +65,7 @@ class Optimiserhipe4ml:
         # parameters
         self.p_nbkg = data_param["ml"]["nbkg"]
         self.p_nsig = data_param["ml"]["nsig"]
-        self.v_fracbkgoversig = data_param["ml"]["fracbkgoversig"]
+        self.v_fracbkgoversig = data_param["ml"].get("fracbkgoversig", None)
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
         self.p_binmin = binmin
@@ -80,7 +80,6 @@ class Optimiserhipe4ml:
 
         # dataframes
         self.df_mc = None
-        self.df_mcgen = None
         self.df_data = None
         self.df_sig = None
         self.df_bkg = None
@@ -124,19 +123,14 @@ class Optimiserhipe4ml:
         self.logger.info("Prepare Sample for hipe4ml")
         self.df_data = pickle.load(openfile(self.f_reco_data, "rb"))
         self.df_mc = pickle.load(openfile(self.f_reco_mc, "rb"))
-        self.df_mcgen = pickle.load(openfile(self.f_gen_mc, "rb"))
         self.df_data = selectdfquery(self.df_data, self.p_evtsel)
         self.df_mc = selectdfquery(self.df_mc, self.p_evtsel)
-        self.df_mcgen = selectdfquery(self.df_mcgen, self.p_evtsel)
 
         self.df_data = selectdfquery(self.df_data, self.p_triggersel_data)
         self.df_mc = selectdfquery(self.df_mc, self.p_triggersel_mc)
-        self.df_mcgen = selectdfquery(self.df_mcgen, self.p_triggersel_mc)
 
-        self.df_mcgen = self.df_mcgen.query(self.p_presel_gen_eff)
         arraydf = [self.df_data, self.df_mc]
         self.df_mc = seldf_singlevar(self.df_mc, self.v_bin, self.p_binmin, self.p_binmax)
-        self.df_mcgen = seldf_singlevar(self.df_mcgen, self.v_bin, self.p_binmin, self.p_binmax)
         self.df_data = seldf_singlevar(self.df_data, self.v_bin, self.p_binmin, self.p_binmax)
 
         self.df_sig, self.df_bkg = arraydf[self.p_tagsig], arraydf[self.p_tagbkg]
@@ -151,7 +145,7 @@ class Optimiserhipe4ml:
 
         self.p_nsig = min(len(self.df_sig), self.p_nsig)
         self.p_nbkg = min(len(self.df_bkg), self.p_nbkg)
-        if self.p_nsig < self.p_nbkg:
+        if self.p_nsig < self.p_nbkg and self.v_fracbkgoversig is not None:
             self.p_nbkg = self.v_fracbkgoversig * self.p_nsig
             if len(self.df_bkg) < self.p_nbkg:
                 self.p_nbkg = len(self.df_bkg)

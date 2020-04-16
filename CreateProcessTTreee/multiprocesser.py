@@ -29,11 +29,13 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
         self.mcordata = mcordata
         self.prodnumber = len(datap["multi"][self.mcordata]["unmerged_tree_dir"])
         self.p_period = datap["multi"][self.mcordata]["period"]
-        self.p_seedmerge = datap["multi"][self.mcordata]["seedmerge"]
         self.p_fracmerge = datap["multi"][self.mcordata]["fracmerge"]
-        self.p_maxfiles = datap["multi"][self.mcordata]["maxfiles"]
-        self.p_chunksizeunp = datap["multi"][self.mcordata]["chunksizeunp"]
-        self.p_chunksizeskim = datap["multi"][self.mcordata]["chunksizeskim"]
+        self.p_seedmerge = datap["multi"][self.mcordata].get("seedmerge", [12] * len(self.p_period))
+        self.p_maxfiles = datap["multi"][self.mcordata].get("maxfiles", [-1] * len(self.p_period))
+        self.p_chunksizeunp = datap["multi"][self.mcordata].get("chunksizeunp", [100] * len(self.p_period))
+        self.p_chunksizeskim = datap["multi"][self.mcordata].get("chunksizeskim", [100] * len(self.p_period))
+        self.p_maxfracmerge = datap["multi"][self.mcordata].get("max_frac_merge", [0] * len(self.p_period))
+        self.v_max_ncand_merge = datap["multi"].get("max_ncand_merge", -1)
         self.p_nparall = datap["multi"][self.mcordata]["nprocessesparallel"]
         self.lpt_anbinmin = datap["sel_skim_binmin"]
         self.lpt_anbinmax = datap["sel_skim_binmax"]
@@ -104,12 +106,18 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
 
     def multi_mergeml_allperiods(self):
         for indexp in range(self.prodnumber):
-            self.process_listsample[indexp].process_mergeforml()
+            if self.v_max_ncand_merge < 0:
+                self.process_listsample[indexp].process_mergeforml()
+            else:
+                self.process_listsample[indexp].process_mergeforml_max()
 
     def multi_mergeml_allinone(self):
         for ipt in range(self.p_nptbins):
             merge_method(self.lptper_recoml[ipt], self.lpt_recoml_mergedallp[ipt])
-            if self.mcordata == "mc":
-                merge_method(self.lptper_genml[ipt], self.lpt_genml_mergedallp[ipt])
-        merge_method(self.lper_evtml, self.f_evtml_mergedallp)
-        merge_method(self.lper_evtorigml, self.f_evtorigml_mergedallp)
+
+        if self.v_max_ncand_merge < 0:
+            for ipt in range(self.p_nptbins):
+                if self.mcordata == "mc":
+                    merge_method(self.lptper_genml[ipt], self.lpt_genml_mergedallp[ipt])
+            merge_method(self.lper_evtml, self.f_evtml_mergedallp)
+            merge_method(self.lper_evtorigml, self.f_evtorigml_mergedallp)

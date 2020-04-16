@@ -65,46 +65,9 @@ Dspp:
               mult_gen, mult_gen_v0a, mult_gen_v0c, perc_v0m]
     var_gen: [y_cand, pt_cand, cand_type, run_number, ev_id, ev_id_ext]
     var_evt_match: [run_number, ev_id, ev_id_ext]
-    var_training: [[d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3, max_norm_d0d0exp],
-                   [d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3, max_norm_d0d0exp]]
-
-    var_boundaries: [d_len_xy, cos_PiKPhi_3]
-    var_correlation:
-      - [d_len_xy]
-      - [cos_PiKPhi_3]
+    var_training: [d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3, max_norm_d0d0exp]
     var_signal: signal
     var_inv_mass: inv_mass
-    var_cuts:
-        - [pt_prong0, lt, null]
-        - [pt_prong1, lt, null]
-        - [pt_prong2, lt, null]
-    plot_options:
-      prob_cut_scan:
-        pt_prong0:
-          xlim:
-            - 0
-            - 10
-        pt_prong1:
-          xlim:
-            - 0
-            - 10
-        pt_prong2:
-          xlim:
-            - 0
-            - 10
-      eff_cut_scan:
-        pt_prong0:
-          xlim:
-            - 0
-            - 10
-        pt_prong1:
-          xlim:
-            - 0
-            - 10
-        pt_prong2:
-          xlim:
-            - 0
-            - 10
 
   files_names:
     namefile_unmerged_tree: AnalysisResults.root
@@ -125,13 +88,12 @@ Dspp:
     crossfilename: "cross_section_tot.root"
 
   multi:
+    #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
+    max_ncand_merge: 500
     data:
       nprocessesparallel: 50
-      maxfiles : [-1,-1] #list of periods -1
-      chunksizeunp : [100,100] #list of periods 100
-      chunksizeskim: [100,100] #list of periods 100
       fracmerge : [1.0,1.0] #list of periods
-      seedmerge: [12,12] #list of periods
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC16pp,LHC17pp] #list of periods
       unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/374_20200304-2028/merged,
                           /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/375_20200304-2028/merged] #list of periods
@@ -147,11 +109,9 @@ Dspp:
                     ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2017] #list of periods
     mc:
       nprocessesparallel: 50
-      maxfiles : [-1,-1] #list of periods
-      chunksizeunp : [100,100] #list of periods
       chunksizeskim: [1000,1000] #list of periods
       fracmerge : [1.0,1.0] #list of periods
-      seedmerge: [12,12] #list of periods
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC16pp,LHC17pp] #list of periods
       unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_1/merged,
                           /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_2/merged] #list of periods
@@ -210,14 +170,14 @@ Dspp:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth':3, 'learning_rate':0.0238, 'n_estimators':1028, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':4, 'tree_method':hist},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':4, 'tree_method':hist}]
+    hipe4ml_hyper_pars: [{'max_depth':3, 'learning_rate':0.0238, 'n_estimators':1028, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist}]
     #hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':1, 'tree_method':hist},
     #                     {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':1, 'tree_method':hist}]
     #                     # list of dicts of hyperparameters (one for each pT bin)
     hyper_par_opt:
       do_hyp_opt: True # whether to do the parameter optimization
-      njobs: 2         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
+      njobs: 3         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5        # number of folds used in cross validation
       initpoints: 5    # steps of random exploration you want to perform
       niter: 5         # steps for bayesian optimization

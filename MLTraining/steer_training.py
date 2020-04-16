@@ -84,6 +84,8 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
     raahp = data_param[case]["ml"]["opt"]["raahp"]
     mltype = data_param[case]["ml"]["mltype"]
     training_vars = data_param[case]["variables"]["var_training"]
+    if not isinstance(training_vars[0], list):
+        training_vars = [training_vars for _ in range(len(binminarray))]
 
     mlout = data_param[case]["ml"]["mlout"]
     mlplot = data_param[case]["ml"]["mlplot"]

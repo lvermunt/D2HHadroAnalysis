@@ -50,8 +50,6 @@ BsITS2:
               max_norm_d0d0exp, inv_mass_Ds, pt_Ds, y_Ds, d_len_Ds, d_len_xy_Ds, norm_dl_xy_Ds, cos_p_Ds, cos_p_xy_Ds,
               imp_par_xy_Ds, dca_Ds, sig_vert_Ds, delta_mass_KK_Ds, cos_PiDs_Ds, cos_PiKPhi_3_Ds, max_norm_d0d0exp_Ds,
               inv_mass, pt_cand, phi_cand, cand_type, y_cand, eta_prong0, eta_prong1, eta_prong2, eta_prong3, run_number, ev_id]
-              #nsigTPC_Pi_0, nsigTPC_K_0, nsigTOF_Pi_0, nsigTOF_K_0, nsigTPC_Pi_1, nsigTPC_K_1, nsigTOF_Pi_1, nsigTOF_K_1,
-              #nsigTPC_Pi_2, nsigTPC_K_2, nsigTOF_Pi_2, nsigTOF_K_2, nsigTPC_Pi_3, nsigTPC_K_3, nsigTOF_Pi_3, nsigTOF_K_3]
     var_evt:
        data: [centrality, z_vtx_reco, n_vtx_contributors, n_tracks, is_ev_rej, run_number,
               ev_id, n_tracklets] #ev_id_ext, n_tracklets_corr
@@ -59,50 +57,9 @@ BsITS2:
               ev_id, n_tracklets, z_vtx_gen] #ev_id_ext, n_tracklets_corr
     var_gen: [y_cand, pt_cand, cand_type, run_number, ev_id, eta_cand, phi_cand, dau_in_acc]
     var_evt_match: [run_number, ev_id] #ev_id_ext
-    var_training: [[cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds],
-                   [cos_p, imp_par_prod,
-                    inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds]]
-
-    var_boundaries: [cos_t_star, pt_prong0]
-    var_correlation:
-      - [cos_t_star]
-      - [pt_prong0]
+    var_training: [cos_p, imp_par_prod, inv_mass_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, sig_vert_Ds, cos_PiDs_Ds]
     var_signal: signal
     var_inv_mass: inv_mass
-    var_cuts: 
-        - [pt_prong0, lt, null]
-        - [pt_prong1, lt, null]
-
-    plot_options:
-      prob_cut_scan:
-        pt_prong0:
-          xlim: 
-            - 0
-            - 10
-        pt_prong1:
-          xlim: 
-            - 0
-            - 10
-      eff_cut_scan:
-        pt_prong0:
-          xlim: 
-            - 0
-            - 10
-        pt_prong1:
-          xlim: 
-            - 0
-            - 10
 
   files_names:
     namefile_unmerged_tree: AnalysisResults.root
@@ -123,13 +80,12 @@ BsITS2:
     crossfilename: "cross_section_tot.root"
 
   multi:
+    #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
+    max_ncand_merge: 500000
     data:
       nprocessesparallel: 50
-      maxfiles : [-1] #list of periods
-      chunksizeunp : [100] #list of periods
-      chunksizeskim: [100] #list of periods
-      fracmerge : [0.1] #list of periods    #0.1  #used before 0.01, 0.05, 0.10, 0.10, 0.10
-      seedmerge: [12] #list of periods
+      fracmerge: [0.1] #list of periods
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
@@ -140,11 +96,8 @@ BsITS2:
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
-      maxfiles : [-1] #list of periods
-      chunksizeunp : [100] #list of periods
-      chunksizeskim: [100] #list of periods
-      fracmerge : [1.0] #list of periods
-      seedmerge: [12] #list of periods
+      fracmerge: [1.0] #list of periods
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
@@ -153,6 +106,7 @@ BsITS2:
       pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot
       pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot
       mcreweights: [mcreweights]
+
   ml:
     evtsel: null #is_ev_rej==0 (not applied for ITS Upgrade studies)
     triggersel:
@@ -200,20 +154,19 @@ BsITS2:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':-1, 'tree_method':hist}]
+    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.036, 'n_estimators': 651,  'min_child_weight': 2.25, 'subsample': 0.873, 'colsample_bytree': 0.886, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.074, 'n_estimators': 1490, 'min_child_weight': 1.04, 'subsample': 0.822, 'colsample_bytree': 0.961, 'n_jobs':-1, 'tree_method':hist}]
     hyper_par_opt:
-      do_hyp_opt: True # whether to do the parameter optimization
-      njobs: -1          # number of parallel jobs used in hyper-parameter optimization, -1. to use all
+      do_hyp_opt: False # whether to do the parameter optimization
+      njobs: -1         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5         # number of folds used in cross validation
-      initpoints: 5     # steps of random exploration you want to perform
-      niter: 5          # steps for bayesian optimization
+      initpoints: 10    # steps of random exploration you want to perform
+      niter: 20         # steps for bayesian optimization
       bayes_opt_config: {'max_depth': !!python/tuple [2, 6],
                          'learning_rate': !!python/tuple [0.01, 0.1],
                          'n_estimators': !!python/tuple [300, 1500],

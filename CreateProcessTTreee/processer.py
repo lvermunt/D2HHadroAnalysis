@@ -27,7 +27,7 @@ import uproot
 
 from machine_learning_hep.utilities import create_folder_struc, openfile
 from machine_learning_hep.utilities import list_folders, createlist
-from machine_learning_hep.utilities import merge_method
+from machine_learning_hep.utilities import merge_method, merge_method_max
 from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df
 from machine_learning_hep.utilities_selection import selectfidacc, selectdfquery, seldf_singlevar
 
@@ -62,6 +62,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.p_chunksizeskim = p_chunksizeskim
         self.p_maxprocess = p_maxprocess
         self.p_dofullevtmerge = datap["dofullevtmerge"]
+        self.v_max_ncand_merge = datap["multi"]["max_ncand_merge"]
+        self.p_max_frac_merge = datap["multi"][self.mcordata]["max_frac_merge"]
 
         #namefile root
         self.n_root = datap["files_names"]["namefile_unmerged_tree"]
@@ -93,8 +95,13 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.b_mcrefl = datap["bitmap_sel"]["ismcrefl"]
 
         #variables name
+        self.lpt_anbinmin = datap["sel_skim_binmin"]
+        self.lpt_anbinmax = datap["sel_skim_binmax"]
+        self.p_nptbins = len(self.lpt_anbinmin)
         self.v_all = datap["variables"]["var_all"]
         self.v_train = datap["variables"]["var_training"]
+        if not isinstance(self.v_train[0], list):
+            self.v_train = [self.v_train for _ in range(self.p_nptbins)]
         self.v_evt = datap["variables"]["var_evt"][self.mcordata]
         self.v_gen = datap["variables"]["var_gen"]
         self.v_evtmatch = datap["variables"]["var_evt_match"]
@@ -107,9 +114,6 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.v_ismcrefl = datap["bitmap_sel"]["var_ismcrefl"]
         self.v_var_binning = datap["var_binning"]
         self.nprongs = datap["nprongs"]
-        self.lpt_anbinmin = datap["sel_skim_binmin"]
-        self.lpt_anbinmax = datap["sel_skim_binmax"]
-        self.p_nptbins = len(self.lpt_anbinmin)
 
         #list of files names
         self.l_path = None
@@ -289,6 +293,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             merge_method(self.l_evtorig, self.f_totevtorig)
 
     def process_mergeforml(self):
+        print("doing merging", self.mcordata, self.period)
         nfiles = len(self.mptfiles_recosk[0])
         if nfiles == 0:
             print("increase the fraction of merged files or the total number")
@@ -307,3 +312,16 @@ class Processer: # pylint: disable=too-many-instance-attributes
         list_sel_evtorig = [self.l_evtorig[j] for j in filesel]
         merge_method(list_sel_evt, self.f_evt_ml)
         merge_method(list_sel_evtorig, self.f_evtorig_ml)
+
+    def process_mergeforml_max(self):
+        print("doing merging_max", self.mcordata, self.period)
+        nfiles = len(self.mptfiles_recosk[0])
+        if nfiles == 0:
+            print("increase the fraction of merged files or the total number")
+            print(" of files you process")
+        rd.seed(self.p_rd_merge)
+        for ipt in range(self.p_nptbins):
+            ntomerge = (int)(nfiles * self.p_max_frac_merge[ipt])
+            filesel = rd.sample(range(0, nfiles), ntomerge)
+            list_sel_recosk = [self.mptfiles_recosk[ipt][j] for j in filesel]
+            merge_method_max(list_sel_recosk, self.lpt_reco_ml[ipt], self.v_max_ncand_merge)
