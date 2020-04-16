@@ -183,14 +183,16 @@ def merge_method_max(listfiles, namemerged, maxlength):
     """
     dflist = []
     sumcand = 0
+    iter = 0
     for myfilename in listfiles:
         myfile = openfile(myfilename, "rb")
         df = pickle.load(myfile)
         sumcand = sumcand + len(df)
+        iter = iter + 1
         dflist.append(df)
         if sumcand > maxlength:
             print("Max length of", maxlength, "reached for", namemerged)
-            print("Total length is", sumcand, "so stopping merging")
+            print("Total length is", sumcand, "so stopping merging after iterations =", iter)
             break
     dftot = pd.concat(dflist)
     pickle.dump(dftot, openfile(namemerged, "wb"), protocol=4)

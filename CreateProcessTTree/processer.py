@@ -26,11 +26,11 @@ import pandas as pd
 import uproot
 
 from machine_learning_hep.utilities import create_folder_struc, openfile
-from machine_learning_hep.utilities import list_folders, createlist
+from machine_learning_hep.utilities import list_folders, createlist, appendmainfoldertolist
 from machine_learning_hep.utilities import merge_method, merge_method_max
 from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df
 from machine_learning_hep.utilities_selection import selectfidacc, selectdfquery, seldf_singlevar
-
+from machine_learning_hep.ml_functions import apply
 
 class Processer: # pylint: disable=too-many-instance-attributes
     # Class Attribute
@@ -41,7 +41,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
     def __init__(self, case, datap, mcordata, p_maxfiles,
                  d_root, d_pkl, d_pklsk, d_pkl_ml, p_period,
                  p_chunksizeunp, p_chunksizeskim, p_maxprocess,
-                 p_frac_merge, p_rd_merge):
+                 p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged):
 
         self.datap = datap
         self.case = case
@@ -153,6 +153,43 @@ class Processer: # pylint: disable=too-many-instance-attributes
             self.mptfiles_gensk = [createlist(self.d_pklsk, self.l_path,
                                     self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
 
+        #Variables for ML applying
+        self.p_modelname = datap["mlapplication"]["modelname"]
+        self.lpt_model = datap["mlapplication"]["modelsperptbin"]
+        self.lpt_modhandler_hipe4ml = datap["mlapplication"]["modelsperptbin_hipe4ml"]
+        self.dirmodel = datap["ml"]["mlout"]
+        self.lpt_model = appendmainfoldertolist(self.dirmodel, self.lpt_model)
+        self.lpt_modhandler_hipe4ml = appendmainfoldertolist(self.dirmodel, self.lpt_modhandler_hipe4ml)
+
+        self.doml = datap["doml"]
+        if not self.doml:
+            datap["mlapplication"]["probcutpresel"][self.mcordata] = [0 for _ in self.lpt_anbinmin]
+            datap["mlapplication"]["probcutoptimal"] = [0 for _ in self.lpt_anbinmin]
+        self.lpt_probcutpre = datap["mlapplication"]["probcutpresel"][self.mcordata]
+        self.lpt_probcutfin = datap["mlapplication"]["probcutoptimal"]
+        if self.lpt_probcutfin < self.lpt_probcutpre:
+            print("FATAL error: probability cut final must be tighter!")
+
+        self.d_pkl_dec = d_pkl_dec
+        self.d_pkl_decmerged = d_pkl_decmerged
+
+        self.lpt_recodec = None
+        if self.doml is True:
+            self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
+                               (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
+        else:
+            self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_std.pkl" % \
+                               (self.lpt_anbinmin[i], self.lpt_anbinmax[i])) \
+                                                    for i in range(self.p_nptbins)]
+        self.mptfiles_recoskmldec = [createlist(self.d_pkl_dec, self.l_path, \
+                                     self.lpt_recodec[ipt]) for ipt in range(self.p_nptbins)]
+        self.lpt_recodecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_recodec[ipt])
+                                  for ipt in range(self.p_nptbins)]
+        if self.mcordata == "mc":
+            self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_gensk[ipt])
+                                     for ipt in range(self.p_nptbins)]
+
     def unpack(self, file_index):
         treeevtorig = uproot.open(self.l_root[file_index])[self.n_treeevt]
         try:
@@ -262,6 +299,45 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 pickle.dump(dfgensk, openfile(self.mptfiles_gensk[ipt][file_index], "wb"),
                             protocol=4)
 
+    def applymodel(self, file_index):
+        for ipt in range(self.p_nptbins):
+            if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
+                if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
+                    continue
+            dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
+            if self.doml is True:
+                if os.path.isfile(self.lpt_model[ipt]) is False:
+                    print("Model file not present in bin %d" % ipt)
+                mod = pickle.load(openfile(self.lpt_model[ipt], 'rb'))
+                dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
+                                   dfrecosk, self.v_train[ipt])
+                probvar = "y_test_prob" + self.p_modelname
+                dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
+            else:
+                dfrecoskml = dfrecosk.query("isstd == 1")
+            pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
+                        protocol=4)
+
+    def applymodel_hipe4ml(self, file_index):
+        for ipt in range(self.p_nptbins):
+            if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
+                if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
+                    continue
+            dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
+            if self.doml is True:
+                if os.path.isfile(self.lpt_modhandler_hipe4ml[ipt]) is False:
+                    print("hipe4ml model file not present in bin %d" % ipt)
+                modhandler = pickle.load(openfile(self.lpt_modhandler_hipe4ml[ipt], 'rb'))
+                mod = modhandler.get_original_model()
+                dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
+                                   dfrecosk, self.v_train[ipt])
+                probvar = "y_test_prob" + self.p_modelname
+                dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
+            else:
+                dfrecoskml = dfrecosk.query("isstd == 1")
+            pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
+                        protocol=4)
+
     @staticmethod
     def callback(ex):
         print(ex)
@@ -291,6 +367,18 @@ class Processer: # pylint: disable=too-many-instance-attributes
         if self.p_dofullevtmerge is True:
             merge_method(self.l_evt, self.f_totevt)
             merge_method(self.l_evtorig, self.f_totevtorig)
+
+    def process_applymodel_par(self):
+        print("doing apply model", self.mcordata, self.period)
+        create_folder_struc(self.d_pkl_dec, self.l_path)
+        arguments = [(i,) for i in range(len(self.mptfiles_recosk[0]))]
+        self.parallelizer(self.applymodel, arguments, self.p_chunksizeskim)
+
+    def process_applymodel_hipe4ml_par(self):
+        print("doing apply model", self.mcordata, self.period)
+        create_folder_struc(self.d_pkl_dec, self.l_path)
+        arguments = [(i,) for i in range(len(self.mptfiles_recosk[0]))]
+        self.parallelizer(self.applymodel_hipe4ml, arguments, self.p_chunksizeskim)
 
     def process_mergeforml(self):
         print("doing merging", self.mcordata, self.period)
@@ -325,3 +413,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
             filesel = rd.sample(range(0, nfiles), ntomerge)
             list_sel_recosk = [self.mptfiles_recosk[ipt][j] for j in filesel]
             merge_method_max(list_sel_recosk, self.lpt_reco_ml[ipt], self.v_max_ncand_merge)
+
+    def process_mergedec(self):
+        for ipt in range(self.p_nptbins):
+            merge_method(self.mptfiles_recoskmldec[ipt], self.lpt_recodecmerged[ipt])
+            if self.mcordata == "mc":
+                merge_method(self.mptfiles_gensk[ipt], self.lpt_gendecmerged[ipt])

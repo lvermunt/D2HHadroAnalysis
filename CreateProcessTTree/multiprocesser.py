@@ -49,6 +49,9 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
         self.dlper_pklml = datap["multi"][self.mcordata]["pkl_skimmed_merge_for_ml"]
         self.d_pklml_mergedallp = datap["multi"][self.mcordata]["pkl_skimmed_merge_for_ml_all"]
         self.d_pklevt_mergedallp = datap["multi"][self.mcordata]["pkl_evtcounter_all"]
+        self.dlper_reco_modapp = datap["mlapplication"][self.mcordata]["pkl_skimmed_dec"]
+        self.dlper_reco_modappmerged = \
+                datap["mlapplication"][self.mcordata]["pkl_skimmed_decmerged"]
 
         #namefiles pkl
         self.v_var_binning = datap["var_binning"]
@@ -90,7 +93,9 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
                                    self.dlper_pklml[indexp],
                                    self.p_period[indexp], self.p_chunksizeunp[indexp],
                                    self.p_chunksizeskim[indexp], self.p_nparall,
-                                   self.p_fracmerge[indexp], self.p_seedmerge[indexp])
+                                   self.p_fracmerge[indexp], self.p_seedmerge[indexp],
+                                   self.dlper_reco_modapp[indexp],
+                                   self.dlper_reco_modappmerged[indexp])
             self.process_listsample.append(myprocess)
 
     def multi_unpack_allperiods(self):
@@ -121,3 +126,15 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
                     merge_method(self.lptper_genml[ipt], self.lpt_genml_mergedallp[ipt])
             merge_method(self.lper_evtml, self.f_evtml_mergedallp)
             merge_method(self.lper_evtorigml, self.f_evtorigml_mergedallp)
+
+    def multi_apply_allperiods(self):
+        for indexp in range(self.prodnumber):
+            self.process_listsample[indexp].process_applymodel_par()
+
+    def multi_apply_hipe4ml_allperiods(self):
+        for indexp in range(self.prodnumber):
+            self.process_listsample[indexp].process_applymodel_hipe4ml_par()
+
+    def multi_mergeapply_allperiods(self):
+        for indexp in range(self.prodnumber):
+            self.process_listsample[indexp].process_mergedec()

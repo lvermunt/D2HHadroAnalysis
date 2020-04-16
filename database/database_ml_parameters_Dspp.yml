@@ -207,6 +207,8 @@ Dspp:
     modelname: xgboost
     modelsperptbin: [xgboost_classifierDspp_dfselection_pt_cand_1.0_8.0.sav,
                      xgboost_classifierDspp_dfselection_pt_cand_8.0_24.0.sav]
+    modelsperptbin_hipe4ml: [ModelHandler_pT_1_8.pickle,
+                             ModelHandler_pT_8_24.pickle]
     probcutpresel:
       data: [0.3,0.3] #list of nbins
       mc: [0.3,0.3] #list of nbins

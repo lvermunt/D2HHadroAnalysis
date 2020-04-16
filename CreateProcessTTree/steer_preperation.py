@@ -25,8 +25,8 @@ from pkg_resources import resource_stream
 # To set batch mode immediately
 from ROOT import gROOT  # pylint: disable=import-error, no-name-in-module
 
-from CreateProcessTTreee.multiprocesser import MultiProcesser
-from CreateProcessTTreee.processer import Processer
+from CreateProcessTTree.multiprocesser import MultiProcesser
+from CreateProcessTTree.processer import Processer
 from machine_learning_hep.logger import configure_logger, get_logger
 from machine_learning_hep.utilities import checkdirlist, checkdir
 from machine_learning_hep.utilities import checkmakedirlist, checkmakedir

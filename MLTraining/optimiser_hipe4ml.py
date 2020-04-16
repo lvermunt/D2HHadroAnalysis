@@ -289,4 +289,3 @@ class Optimiserhipe4ml:
         figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
                    f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
         featuresimportancefig.savefig(figname)
-

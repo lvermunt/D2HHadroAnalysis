@@ -16,7 +16,7 @@
 main script for doing data processing, machine learning and analysis
 """
 
-from CreateProcessTTree.steer_preperation import main
+from CreateProcessTTree.steer_application import main
 
 main()
 
