@@ -65,6 +65,7 @@ class Optimiserhipe4ml:
         # parameters
         self.p_nbkg = data_param["ml"]["nbkg"]
         self.p_nsig = data_param["ml"]["nsig"]
+        self.v_fracbkgoversig = data_param["ml"]["fracbkgoversig"]
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
         self.p_binmin = binmin
@@ -148,13 +149,12 @@ class Optimiserhipe4ml:
         self.df_bkg["ismcfd"] = 0
         self.df_bkg["ismcbkg"] = 0
 
-        if self.p_nsig > len(self.df_sig):
-            self.logger.warning("There are not enough signal events")
-        if self.p_nbkg > len(self.df_bkg):
-            self.logger.warning("There are not enough background events")
-
         self.p_nsig = min(len(self.df_sig), self.p_nsig)
         self.p_nbkg = min(len(self.df_bkg), self.p_nbkg)
+        if self.p_nsig < self.p_nbkg:
+            self.p_nbkg = self.v_fracbkgoversig * self.p_nsig
+            if len(self.df_bkg) < self.p_nbkg:
+                self.p_nbkg = len(self.df_bkg)
 
         self.logger.info("Used number of signal events is %d", self.p_nsig)
         self.logger.info("Used number of background events is %d", self.p_nbkg)
