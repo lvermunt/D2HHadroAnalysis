@@ -223,8 +223,10 @@ class Optimiserhipe4ml:
         self.ypredtest_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[2],
                                                               self.raw_output_hipe4ml)
 
-        modelfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pickle'
-        self.p_hipe4ml_model.dump_model_handler(modelfile)
+        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
+        self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
+        modelfile = f'{self.dirmlout}/Model_pT_{self.p_binmin}_{self.p_binmax}.model'
+        self.p_hipe4ml_model.dump_original_model(modelfile)
 
         self.logger.info("Training + testing hipe4ml: Done!")
         self.logger.info("Time elapsed = %.3f", time.time() - t0)

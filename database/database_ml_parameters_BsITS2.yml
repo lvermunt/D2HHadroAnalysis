@@ -22,10 +22,10 @@ BsITS2:
   sel_cen_unp: null
   #sel_good_evt_unp: "is_ev_rej == 0" #not applied for ITS Upgrade studies
   sel_good_evt_unp: null
-  sel_reco_skim: [null, null, null, null, null, null, null]
-  sel_gen_skim: [null, null, null, null, null, null, null]
-  sel_skim_binmin: [0,2,4,6,8,12,16] #list of nbins
-  sel_skim_binmax: [2,4,6,8,12,16,24] #list of nbins
+  sel_reco_skim: [null, null, null, null, null]
+  sel_gen_skim: [null, null, null, null, null]
+  sel_skim_binmin: [0,4,8,12,16] #list of nbins
+  sel_skim_binmax: [4,8,12,16,24] #list of nbins
   var_binning: pt_cand
   dofullevtmerge: false
   bitmap_sel:
@@ -85,26 +85,26 @@ BsITS2:
     data:
       nprocessesparallel: 50
       fracmerge: [0.1] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_v2] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_v2
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_v2
+      pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk_v3] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_v3] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_v3
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_v3
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
       fracmerge: [1.0] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_v2] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_v2
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_v2
+      pkl_skimmed: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_v3] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_v3] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_v3
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_v3
       mcreweights: [mcreweights]
 
   ml:
@@ -123,14 +123,14 @@ BsITS2:
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
-    binmin: [0,2,4,6,8,12,16] #list of nbins
-    binmax: [2,4,6,8,12,16,24] #list of nbins
+    binmin: [0,4,8,12,16] #list of nbins
+    binmax: [4,8,12,16,24] #list of nbins
     mltype: BinaryClassification
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlplot_hipe4ml_v2 # to be removed
-    mlout: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlout_hipe4ml_v2 # to be removed
+    mlplot: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlplot_hipe4ml_v3 # to be removed
+    mlout: /data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/mlout_hipe4ml_v3 # to be removed
 
     opt:
       isFONLLfromROOT: false
@@ -146,7 +146,7 @@ BsITS2:
       num_steps: 111 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
-      raahp: [1,1,1,1,1,1,1] #list of nbins
+      raahp: [1,1,1,1,1] #list of nbins
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
 
   hipe4ml:
@@ -154,13 +154,11 @@ BsITS2:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.036, 'n_estimators': 651,  'min_child_weight': 2.25, 'subsample': 0.873, 'colsample_bytree': 0.886, 'n_jobs':-1, 'tree_method':hist},
+    hipe4ml_hyper_pars: [{'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
-                         {'max_depth': 5, 'learning_rate': 0.088, 'n_estimators': 1490, 'min_child_weight': 1.33, 'subsample': 0.876, 'colsample_bytree': 0.975, 'n_jobs':-1, 'tree_method':hist}]
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist}]
     hyper_par_opt:
       do_hyp_opt: False # whether to do the parameter optimization
       njobs: -1         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
@@ -177,27 +175,23 @@ BsITS2:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_v3] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_v3] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_v3] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_v3] #list of periods
     modelname: xgboost
-    modelsperptbin: [xgboost_classifierBsITS2_dfselection_pt_cand_0.0_2.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_2.0_4.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_4.0_6.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_6.0_8.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_8.0_12.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_12.0_16.0.sav,
-                     xgboost_classifierBsITS2_dfselection_pt_cand_16.0_24.0.sav]
-    modelsperptbin_hipe4ml: [ModelHandler_pT_0_2.pickle,
-                             ModelHandler_pT_2_4.pickle,
-                             ModelHandler_pT_4_6.pickle,
-                             ModelHandler_pT_6_8.pickle,
-                             ModelHandler_pT_8_12.pickle,
-                             ModelHandler_pT_12_16.pickle,
-                             ModelHandler_pT_16_24.pickle]
-    probcutpresel: 
+    modelsperptbin: [Model_pT_0_4.model,
+                     Model_pT_4_8.model,
+                     Model_pT_8_12.model,
+                     Model_pT_12_16.model,
+                     Model_pT_16_24.model]
+    modelsperptbin_hipe4ml: [ModelHandler_pT_0_4.model,
+                             ModelHandler_pT_4_8.model,
+                             ModelHandler_pT_8_12.model,
+                             ModelHandler_pT_12_16.model,
+                             ModelHandler_pT_16_24.model]
+    probcutpresel:
       data: [0.5,0.5,0.5,0.5,0.3,0.3,0.3] #list of nbins
       mc: [0.5,0.5,0.5,0.5,0.3,0.3,0.3] #list of nbins
     #probcutoptimal: [0.9995,0.9994,0.999,0.999,0.999,0.996,0.989] #list of nbins

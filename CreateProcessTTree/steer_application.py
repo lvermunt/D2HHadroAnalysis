@@ -106,9 +106,9 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
 
     #perform the analysis flow
     if doapplydata is True:
-        mymultiprocessdata.multi_apply_hipe4ml_allperiods()
+        mymultiprocessdata.multi_apply_allperiods()
     if doapplymc is True:
-        mymultiprocessmc.multi_apply_hipe4ml_allperiods()
+        mymultiprocessmc.multi_apply_allperiods()
     if domergeapplydata is True:
         mymultiprocessdata.multi_mergeapply_allperiods()
     if domergeapplymc is True:
