@@ -19,41 +19,41 @@ Methods to: choose, train and apply ML models
 import pickle
 
 import pandas as pd
-from keras.wrappers.scikit_learn import KerasClassifier
+#from keras.wrappers.scikit_learn import KerasClassifier
 import xgboost as xgb
 
-import machine_learning_hep.templates.templates_keras as templates_keras
-import machine_learning_hep.templates.templates_scikit as templates_scikit
+#import machine_learning_hep.templates.templates_keras as templates_keras
+#import machine_learning_hep.templates.templates_scikit as templates_scikit
 import machine_learning_hep.templates.templates_xgboost as templates_xgboost
 from machine_learning_hep.logger import get_logger
 
 pd.options.mode.chained_assignment = None
 
-def getclf_scikit(model_config):
-
-    logger = get_logger()
-    logger.debug("Load scikit models")
-
-    if "scikit" not in model_config:
-        logger.debug("No scikit models found")
-        return [], []
-
-    classifiers = []
-    names = []
-    grid_search_params = []
-
-    for c in model_config["scikit"]:
-        if model_config["scikit"][c]["activate"]:
-            try:
-                model = getattr(templates_scikit, c)(model_config["scikit"][c]["central_params"])
-                classifiers.append(model)
-                names.append(c)
-                grid_search_params.append(model_config["scikit"][c].get("grid_search", {}))
-                logger.info("Added scikit model %s", c)
-            except AttributeError:
-                logger.critical("Could not load scikit model %s", c)
-
-    return classifiers, names, grid_search_params
+#def getclf_scikit(model_config):
+#
+#    logger = get_logger()
+#    logger.debug("Load scikit models")
+#
+#    if "scikit" not in model_config:
+#        logger.debug("No scikit models found")
+#        return [], []
+#
+#    classifiers = []
+#    names = []
+#    grid_search_params = []
+#
+#    for c in model_config["scikit"]:
+#        if model_config["scikit"][c]["activate"]:
+#            try:
+#                model = getattr(templates_scikit, c)(model_config["scikit"][c]["central_params"])
+#                classifiers.append(model)
+#                names.append(c)
+#                grid_search_params.append(model_config["scikit"][c].get("grid_search", {}))
+#                logger.info("Added scikit model %s", c)
+#            except AttributeError:
+#                logger.critical("Could not load scikit model %s", c)
+#
+#    return classifiers, names, grid_search_params
 
 
 def getclf_xgboost(model_config):
@@ -83,32 +83,32 @@ def getclf_xgboost(model_config):
     return classifiers, names, grid_search_params
 
 
-def getclf_keras(model_config, length_input):
-
-    logger = get_logger()
-    logger.debug("Load keras models")
-
-    if "keras" not in model_config:
-        logger.debug("No keras models found")
-        return [], []
-
-    classifiers = []
-    names = []
-
-    for c in model_config["keras"]:
-        if model_config["keras"][c]["activate"]:
-            try:
-                classifiers.append(KerasClassifier(build_fn=lambda name=c: \
-                    getattr(templates_keras, name)(model_config["keras"][name], length_input), \
-                                               epochs=model_config["keras"][c]["epochs"], \
-                                               batch_size=model_config["keras"][c]["batch_size"], \
-                                               verbose=0))
-                names.append(c)
-                logger.info("Added keras model %s", c)
-            except AttributeError:
-                logger.critical("Could not load keras model %s", c)
-
-    return classifiers, names, []
+#def getclf_keras(model_config, length_input):
+#
+#    logger = get_logger()
+#    logger.debug("Load keras models")
+#
+#    if "keras" not in model_config:
+#        logger.debug("No keras models found")
+#        return [], []
+#
+#    classifiers = []
+#    names = []
+#
+#    for c in model_config["keras"]:
+#        if model_config["keras"][c]["activate"]:
+#            try:
+#                classifiers.append(KerasClassifier(build_fn=lambda name=c: \
+#                    getattr(templates_keras, name)(model_config["keras"][name], length_input), \
+#                                               epochs=model_config["keras"][c]["epochs"], \
+#                                               batch_size=model_config["keras"][c]["batch_size"], \
+#                                               verbose=0))
+#                names.append(c)
+#                logger.info("Added keras model %s", c)
+#            except AttributeError:
+#                logger.critical("Could not load keras model %s", c)
+#
+#    return classifiers, names, []
 
 
 def set_num_trees(classifiers_, x_train_, y_train_, nfold_, num_early_stopping_, seed_):
@@ -209,16 +209,16 @@ def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_):
 
 def savemodels(names_, trainedmodels_, folder_, suffix_):
     for name, model in zip(names_, trainedmodels_):
-        if "keras" in name:
-            architecture_file = folder_+"/"+name+suffix_+"_architecture.json"
-            weights_file = folder_+"/"+name+suffix_+"_weights.h5"
-            arch_json = model.model.to_json()
-            with open(architecture_file, 'w') as json_file:
-                json_file.write(arch_json)
-            model.model.save_weights(weights_file)
-        if "scikit" in name:
-            fileoutmodel = folder_+"/"+name+suffix_+".sav"
-            pickle.dump(model, open(fileoutmodel, 'wb'), protocol=4)
+        #if "keras" in name:
+        #    architecture_file = folder_+"/"+name+suffix_+"_architecture.json"
+        #    weights_file = folder_+"/"+name+suffix_+"_weights.h5"
+        #    arch_json = model.model.to_json()
+        #    with open(architecture_file, 'w') as json_file:
+        #        json_file.write(arch_json)
+        #    model.model.save_weights(weights_file)
+        #if "scikit" in name:
+        #    fileoutmodel = folder_+"/"+name+suffix_+".sav"
+        #    pickle.dump(model, open(fileoutmodel, 'wb'), protocol=4)
         if "xgboost" in name:
             fileoutmodel = folder_+"/"+name+suffix_+".sav"
             pickle.dump(model, open(fileoutmodel, 'wb'), protocol=4)
