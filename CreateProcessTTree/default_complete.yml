@@ -23,9 +23,11 @@ mergingperiods: # pkl_skimmed_merge_for_ml_all
 mlapplication:
   data:
     doapply: true # pkl_skimmed_dec (pklskdec)
+    doapplymodelhandler: false #for hipe4ml package
     domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
     docontinueafterstop: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)
   mc:
     doapply: true # pkl_skimmed_dec (pklskdec)
+    doapplymodelhandler: false #for hipe4ml package
     domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
     docontinueafterstop: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)

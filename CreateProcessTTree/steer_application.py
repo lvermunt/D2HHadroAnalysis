@@ -56,6 +56,8 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
 
     doapplydata = data_config["mlapplication"]["data"]["doapply"]
     doapplymc = data_config["mlapplication"]["mc"]["doapply"]
+    doapplydatamodelhandler = data_config["mlapplication"]["data"]["doapplymodelhandler"]
+    doapplymcmodelhandler = data_config["mlapplication"]["mc"]["doapplymodelhandler"]
     domergeapplydata = data_config["mlapplication"]["data"]["domergeapply"]
     domergeapplymc = data_config["mlapplication"]["mc"]["domergeapply"]
     docontinueapplydata = data_config["mlapplication"]["data"]["docontinueafterstop"]
@@ -106,9 +108,15 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
 
     #perform the analysis flow
     if doapplydata is True:
-        mymultiprocessdata.multi_apply_allperiods()
+        if doapplydatamodelhandler is True:
+            mymultiprocessdata.multi_apply_hipe4ml_allperiods()
+        else:
+            mymultiprocessdata.multi_apply_allperiods()
     if doapplymc is True:
-        mymultiprocessmc.multi_apply_allperiods()
+        if doapplydatamodelhandler is True:
+            mymultiprocessmc.multi_apply_hipe4ml_allperiods()
+        else:
+            mymultiprocessmc.multi_apply_allperiods()
     if domergeapplydata is True:
         mymultiprocessdata.multi_mergeapply_allperiods()
     if domergeapplymc is True:
