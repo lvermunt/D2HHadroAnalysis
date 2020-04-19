@@ -81,9 +81,12 @@ BsITS2:
 
   multi:
     #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
+    #Sometimes an issue occurs ("parallel_for failed: invalid configuration argument") when chunksize is larger than nprocesses
     max_ncand_merge: 500000
     data:
       nprocessesparallel: 50
+      chunksizeunp: [50] #list of periods
+      chunksizeskim: [50] #list of periods
       fracmerge: [0.1] #list of periods
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
@@ -96,6 +99,8 @@ BsITS2:
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
+      chunksizeunp: [50] #list of periods
+      chunksizeskim: [50] #list of periods
       fracmerge: [1.0] #list of periods
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
