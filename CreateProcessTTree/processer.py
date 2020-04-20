@@ -28,7 +28,7 @@ import uproot
 from machine_learning_hep.utilities import create_folder_struc, openfile
 from machine_learning_hep.utilities import list_folders, createlist, appendmainfoldertolist
 from machine_learning_hep.utilities import merge_method, merge_method_max
-from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df
+from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df, selectdfrunlist
 from machine_learning_hep.utilities_selection import selectfidacc, selectdfquery, seldf_singlevar
 from machine_learning_hep.ml_functions import apply
 
@@ -38,7 +38,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
 
     # Initializer / Instance Attributes
     # pylint: disable=too-many-statements, too-many-arguments
-    def __init__(self, case, datap, mcordata, p_maxfiles,
+    def __init__(self, case, datap, run_param, mcordata, p_maxfiles,
                  d_root, d_pkl, d_pklsk, d_pkl_ml, p_period,
                  p_chunksizeunp, p_chunksizeskim, p_maxprocess,
                  p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged):
@@ -57,6 +57,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.p_frac_merge = p_frac_merge
         self.p_rd_merge = p_rd_merge
         self.period = p_period
+        self.runlist = run_param[self.period]
         self.p_maxfiles = p_maxfiles
         self.p_chunksizeunp = p_chunksizeunp
         self.p_chunksizeskim = p_chunksizeskim
@@ -200,6 +201,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             print('I am sorry, I am dying ...\n \n \n')
             sys.exit()
 
+        dfevtorig = selectdfrunlist(dfevtorig, self.runlist, "run_number")
         dfevtorig = selectdfquery(dfevtorig, self.s_cen_unp)
         dfevtorig = dfevtorig.reset_index(drop=True)
         pickle.dump(dfevtorig, openfile(self.l_evtorig[file_index], "wb"), protocol=4)
@@ -215,6 +217,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             print('I am sorry, I am dying ...\n \n \n')
             sys.exit()
 
+        dfreco = selectdfrunlist(dfreco, self.runlist, "run_number")
         dfreco = selectdfquery(dfreco, self.s_reco_unp)
         dfreco = pd.merge(dfreco, dfevt, on=self.v_evtmatch)
 
@@ -257,6 +260,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         if self.mcordata == "mc":
             treegen = uproot.open(self.l_root[file_index])[self.n_treegen]
             dfgen = treegen.pandas.df(branches=self.v_gen)
+            dfgen = selectdfrunlist(dfgen, self.runlist, "run_number")
             dfgen = pd.merge(dfgen, dfevtorig, on=self.v_evtmatch)
             dfgen = selectdfquery(dfgen, self.s_gen_unp)
             dfgen[self.v_isstd] = np.array(tag_bit_df(dfgen, self.v_bitvar,

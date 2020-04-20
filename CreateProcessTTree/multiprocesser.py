@@ -87,7 +87,7 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
 
         self.process_listsample = []
         for indexp in range(self.prodnumber):
-            myprocess = proc_class(self.case, self.datap, self.mcordata,
+            myprocess = proc_class(self.case, self.datap, self.run_param, self.mcordata,
                                    self.p_maxfiles[indexp], self.dlper_root[indexp],
                                    self.dlper_pkl[indexp], self.dlper_pklsk[indexp],
                                    self.dlper_pklml[indexp],
