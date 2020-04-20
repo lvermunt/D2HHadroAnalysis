@@ -9,3 +9,4 @@ analysis:
   masshisto: false
   effhisto: false
   probscan: true
+  fitbackpars: true

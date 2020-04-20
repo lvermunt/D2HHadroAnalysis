@@ -60,6 +60,7 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
     dohistomass = data_config["analysis"]["masshisto"]
     doefficiency = data_config["analysis"]["effhisto"]
     doprobscan = data_config["analysis"]["probscan"]
+    dofitbackpars = data_config["analysis"]["fitbackpars"]
 
     dirresultsdata = data_param[case]["analysis"][typean]["data"]["results"]
     dirresultsmc = data_param[case]["analysis"][typean]["mc"]["results"]
@@ -78,16 +79,19 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
         counter = counter + checkdir(dirresultsdatatot)
 
     if counter < 0:
-        sys.exit()
+        if doprobscan is True:
+            sys.exit()
+        else:
+            logger.warning("Directories already exists (see above), but no new prob scan")
+    else:
+        # check and create directories
+        if doanalysismc is True:
+            checkmakedirlist(dirresultsmc)
+            checkmakedir(dirresultsmctot)
 
-    # check and create directories
-    if doanalysismc is True:
-        checkmakedirlist(dirresultsmc)
-        checkmakedir(dirresultsmctot)
-
-    if doanalysisdata is True:
-        checkmakedirlist(dirresultsdata)
-        checkmakedir(dirresultsdatatot)
+        if doanalysisdata is True:
+            checkmakedirlist(dirresultsdata)
+            checkmakedir(dirresultsdatatot)
 
     ana_class = AnalyserITSUpgrade
     ana_mgr = AnalyserManager(ana_class, data_param[case], case, typean)
@@ -100,6 +104,8 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
         analyse_steps.append("efficiency")
     if doprobscan is True:
         analyse_steps.append("probability_scan")
+    if dofitbackpars is True:
+        analyse_steps.append("parametrise_background_scan")
 
     # Now do the analysis
     ana_mgr.analyse(*analyse_steps)

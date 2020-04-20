@@ -21,10 +21,11 @@ import pickle
 import math
 # pylint: disable=unused-wildcard-import, wildcard-import
 from array import array
+from numpy import isnan
 from root_numpy import fill_hist  # pylint: disable=import-error, no-name-in-module
 
 # pylint: disable=import-error, no-name-in-module, unused-import
-from ROOT import TFile, TH1F, TCanvas
+from ROOT import TFile, TH1F, TCanvas, TF1, TGraph, gPad, TGaxis, gStyle
 
 from Analysis.analyser import Analyser
 from machine_learning_hep.logger import get_logger
@@ -54,6 +55,11 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.probscan_max = datap["analysis"][self.typean]["probscan_max"]
         self.n_probscan = datap["analysis"][self.typean]["n_probscan"]
         self.a_probscan = [[] for _ in range(self.p_nptfinbins)]
+        self.a_probscan_bin = [[] for _ in range(self.p_nptfinbins)]
+        self.fpar1func = datap["analysis"][self.typean].get("probscan_func_par1", "pol2")
+        self.n_bkgentrfits = datap["analysis"][self.typean].get("probscan_nfits", 8)
+        self.v_fitsplit = datap["analysis"][self.typean].get("probscan_length_fits", 0.005)
+        self.minbc = datap["analysis"][self.typean].get("probscan_min_binc", 100)
 
         #ML model variables
         self.p_modelname = datap["mlapplication"]["modelname"]
@@ -89,9 +95,13 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         #output files
         self.d_resultsallpdata = datap["analysis"][self.typean]["data"]["resultsallp"]
         self.n_filemass_name = datap["files_names"]["histofilename"]
+        self.n_filemass_namefit = "backgroundparameterfit.root"
+        self.n_filepars_probscanfit = "parametrised_bkgpars.root"
         self.n_fileeff_temp = "efficiencies.root"
         self.n_fileeff_name = datap["files_names"]["efffilename"]
         self.n_filemass_probscan = os.path.join(self.d_resultsallpdata, self.n_filemass_name)
+        self.n_filemass_probscanfit = os.path.join(self.d_resultsallpdata, self.n_filemass_namefit)
+        self.n_file_params = os.path.join(self.d_resultsallpdata, self.n_filepars_probscanfit)
         self.n_fileeff_probscan = os.path.join(self.d_resultsallpdata, self.n_fileeff_temp)
         self.n_fileeff_probscanfinal = os.path.join(self.d_resultsallpdata, self.n_fileeff_name)
 
@@ -121,6 +131,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.p_bin_width = datap["analysis"][self.typean]['bin_width']
         self.p_num_bins = int(round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) / \
                                     self.p_bin_width))
+        self.p_bkgfunc = datap["analysis"][self.typean]["bkgfunc"]
+        self.bkg_fmap = {"kExpo": "expo", "kLin": "pol1", "Pol2": "pol2"}
+        self.rebins = datap["analysis"][self.typean]["rebin"]
+        self.binwidth = [None for _ in range(self.p_nptfinbins)]
 
     def define_probscan_limits(self):
         """
@@ -133,8 +147,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         for ipt in range(self.p_nptfinbins):
             step = (self.probscan_max[ipt] - self.probscan_min[ipt])/(self.n_probscan)
+            self.a_probscan_bin[ipt].append(self.probscan_min[ipt] - 0.5 * step)
             for iscan in range(self.n_probscan + 1):
                 self.a_probscan[ipt].append(self.probscan_min[ipt] + iscan * step)
+                self.a_probscan_bin[ipt].append(self.probscan_min[ipt] + (iscan + 0.5) * step)
 
         self.logger.info("Array for probability scan set. Using the following ML selections:")
         for ipt in range(self.p_nptfinbins):
@@ -319,6 +335,8 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         lfileeff = TFile.Open(self.n_fileeff_probscan, "READ")
         fileout = TFile(self.n_fileeff_probscanfinal, "RECREATE")
 
+        self.logger.info("Doing final eff histo for period %s", self.p_period)
+
         for icv in range(len(self.a_probscan[0])):
 
             if self.lvar2_binmin is None:
@@ -342,7 +360,12 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         fileout.Close()
 
+
     def probability_scan(self):
+        """
+        Function to run full probability scan in one go
+        """
+
         if self.p_period is "merged":
             self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
             return
@@ -350,3 +373,333 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.probscan_mass_histo()
         self.probscan_eff()
         self.probscan_eff_histo()
+
+
+    def fit_invmassbkg_scan(self):
+        """
+        Fit background with TF1, and parametrise the background parameters
+        """
+
+        # Define limits first
+        self.define_probscan_limits()
+        self.logger.info("\n\nArray for probability histo binning set:")
+        for ipt in range(self.p_nptfinbins):
+             print("pT bin:", ipt, ":", self.a_probscan_bin[ipt])
+
+        fmass = TFile.Open(self.n_filemass_probscan, "READ")
+        fileout = TFile(self.n_filemass_probscanfit, "RECREATE")
+
+        self.logger.info("Fitting background mass spectra for %s", self.p_period)
+        hpar0 = []
+        hpar1 = []
+        hpar2 = []
+        hentr = []
+        for ipt in range(self.p_nptfinbins):
+
+            hpar0.append(TH1F("hpar0_%d" % ipt,
+                              "%d < #it{p}_{T} < %d GeV/#it{c};ML probability;Background par0" %
+                              (self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt]),
+                              self.n_probscan + 1, array("d", self.a_probscan_bin[ipt])))
+            hpar1.append(TH1F("hpar1_%d" % ipt,
+                              "%d < #it{p}_{T} < %d GeV/#it{c};ML probability;Background par1" %
+                              (self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt]),
+                              self.n_probscan + 1, array("d", self.a_probscan_bin[ipt])))
+            hpar2.append(TH1F("hpar2_%d" % ipt,
+                              "%d < #it{p}_{T} < %d GeV/#it{c};ML probability;Background par2" %
+                              (self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt]),
+                              self.n_probscan + 1, array("d", self.a_probscan_bin[ipt])))
+            hentr.append(TH1F("hentr_%d" % ipt,
+                              "%d < #it{p}_{T} < %d GeV/#it{c};ML probability;Background Entries" %
+                              (self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt]),
+                              self.n_probscan + 1, array("d", self.a_probscan_bin[ipt])))
+
+            hpar0[ipt].SetStats(0)
+            hpar1[ipt].SetStats(0)
+            hpar2[ipt].SetStats(0)
+            hentr[ipt].SetStats(0)
+
+            for isc in range(len(self.a_probscan[ipt])):
+                suffix = "%s%d_%d_%d" % (self.v_var_binning,
+                                         self.lpt_finbinmin[ipt],
+                                         self.lpt_finbinmax[ipt], isc)
+                hbkg = fmass.Get("hmass_bkg" + suffix)
+                fbkg = TF1("fbkg" + suffix, self.bkg_fmap[self.p_bkgfunc[ipt]],
+                           self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+
+                hbkg.Rebin(self.rebins[ipt])
+                self.binwidth[ipt] = hbkg.GetBinWidth(1)
+                hbkg.Fit("fbkg" + suffix, "R,E,+,0")
+
+                bkgentries = hbkg.GetEntries()
+                bkgpar0 = fbkg.GetParameter(0)
+                bkgparerr0 = fbkg.GetParError(0)
+                bkgpar1 = fbkg.GetParameter(1)
+                bkgparerr1 = fbkg.GetParError(1)
+                if fbkg.GetNpar() == 3:
+                    bkgpar2 = fbkg.GetParameter(2)
+                    bkgparerr2 = fbkg.GetParError(2)
+                if fbkg.GetNpar() > 3:
+                    self.logger.warning("N parameters > 3 not supported!")
+
+                hentr[ipt].SetBinContent(hentr[ipt].FindBin(self.a_probscan[ipt][isc]), bkgentries)
+                hentr[ipt].SetBinError(hentr[ipt].FindBin(self.a_probscan[ipt][isc]), math.sqrt(bkgentries))
+                if not isnan(bkgpar0) and not isnan(bkgpar1):
+                    hpar0[ipt].SetBinContent(hpar0[ipt].FindBin(self.a_probscan[ipt][isc]), bkgpar0)
+                    hpar0[ipt].SetBinError(hpar0[ipt].FindBin(self.a_probscan[ipt][isc]), bkgparerr0)
+                    hpar1[ipt].SetBinContent(hpar1[ipt].FindBin(self.a_probscan[ipt][isc]), bkgpar1)
+                    hpar1[ipt].SetBinError(hpar1[ipt].FindBin(self.a_probscan[ipt][isc]), bkgparerr1)
+                    if fbkg.GetNpar() == 3:
+                        hpar2[ipt].SetBinContent(hpar2[ipt].FindBin(self.a_probscan[ipt][isc]), bkgpar2)
+                        hpar2[ipt].SetBinError(hpar2[ipt].FindBin(self.a_probscan[ipt][isc]), bkgparerr2)
+
+        fileout.cd()
+        for ipt in range(self.p_nptfinbins):
+            hentr[ipt].Write()
+            hpar0[ipt].Write()
+            hpar1[ipt].Write()
+            hpar2[ipt].Write()
+
+        self.logger.info("\n\nBackground fitting finished, saved in %s\n\n", self.n_filemass_probscanfit)
+
+
+    def fit_bkgparams_2_scan(self):
+        """
+        Function to fit+parametrise the bkg fit parameters versus ML probability
+
+        FIXME: Make less chaotic (although it does the job)...
+        """
+
+        # Define limits first
+        self.define_probscan_limits()
+
+        fpars = TFile(self.n_filemass_probscanfit, "READ")
+        fileout = TFile(self.n_file_params, "RECREATE")
+
+        self.logger.info("Fitting background mass spectra for %s", self.p_period)
+        TGaxis.SetMaxDigits(3)
+        gStyle.SetOptStat(0000)
+
+        fpar1 = []
+        fpar1low = []
+        fpar1high = []
+        gpar0cent = []
+        gpar0low = []
+        gpar0high = []
+        for ipt in range(self.p_nptfinbins):
+            canv = TCanvas("c_%d" % ipt, "c_%d" % ipt, 1350, 400)
+            canv.Divide(3)
+
+            hpar0 = fpars.Get("hpar0_%d" % ipt)
+            hpar1 = fpars.Get("hpar1_%d" % ipt)
+            hentr = fpars.Get("hentr_%d" % ipt)
+
+            canv.cd(3)
+            hpar0.Draw("ep")
+            gPad.SetTickx()
+            gPad.SetTicky()
+            hpar0.GetXaxis().SetRangeUser(self.probscan_min[ipt], self.probscan_max[ipt])
+
+            canv.cd(2)
+            hpar1.Draw("ep")
+            fpar1.append(TF1("fpar1_%d" % ipt, self.fpar1func, self.probscan_min[ipt],
+                             self.probscan_max[ipt]))
+            hpar1.Fit("fpar1_%d" % ipt, "R,+")
+            gPad.SetTickx()
+            gPad.SetTicky()
+            hpar1.GetXaxis().SetRangeUser(self.probscan_min[ipt], self.probscan_max[ipt])
+            hpar1.GetYaxis().SetRangeUser(-2, 2)
+
+            fpar1low.append(fpar1[ipt].Clone("%slow" % fpar1[ipt].GetName()))
+            fpar1high.append(fpar1[ipt].Clone("%shigh" % fpar1[ipt].GetName()))
+            fpar1low[ipt].SetLineStyle(2)
+            fpar1high[ipt].SetLineStyle(2)
+            for ipar in range(fpar1[ipt].GetNpar()):
+                if fpar1[ipt].GetParameter(ipar) < 0:
+                    fpar1low[ipt].SetParameter(ipar, fpar1[ipt].GetParameter(ipar) -
+                                               fpar1[ipt].GetParError(ipar))
+                    fpar1high[ipt].SetParameter(ipar, fpar1[ipt].GetParameter(ipar) +
+                                                fpar1[ipt].GetParError(ipar))
+                else:
+                    fpar1low[ipt].SetParameter(ipar, fpar1[ipt].GetParameter(ipar) +
+                                               fpar1[ipt].GetParError(ipar))
+                    fpar1high[ipt].SetParameter(ipar, fpar1[ipt].GetParameter(ipar) -
+                                                fpar1[ipt].GetParError(ipar))
+            fpar1low[ipt].Draw("same")
+            fpar1high[ipt].Draw("same")
+
+            canv.cd(1)
+            hentr.Draw("ep")
+            gPad.SetTickx()
+            gPad.SetTicky()
+            hentr.GetXaxis().SetRangeUser(self.probscan_min[ipt], self.probscan_max[ipt])
+            fentrall = TF1("fentr_%d" % ipt, "pol2", self.probscan_min[ipt],
+                           self.probscan_max[ipt])
+            fentrall.SetLineStyle(4)
+            hentr.Fit("fentr_%d" % ipt, "R,+")
+
+            fentr = []
+            fentrfull = []
+            fentrlow = []
+            fentrhigh = []
+            ranges_k = []
+            minprob_forfit = self.probscan_max[ipt] - self.n_bkgentrfits * self.v_fitsplit
+            ranges_k.append(minprob_forfit)
+            for k in range(self.n_bkgentrfits):
+                fentr.append(TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                                 minprob_forfit + k * self.v_fitsplit,
+                                 minprob_forfit + (k + 1) * self.v_fitsplit))
+                ranges_k.append(minprob_forfit + (k + 1) * self.v_fitsplit)
+                fentr[k].SetLineColor(k+1)
+                hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
+
+                #shift ranges a bit for when fit fails
+                if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
+                    fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                                   minprob_forfit + (k - 0.1) * self.v_fitsplit,
+                                   minprob_forfit + (k + 0.9) * self.v_fitsplit)
+                    ranges_k[k+1] = minprob_forfit + (k + 0.9) * self.v_fitsplit
+                    hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
+
+                    if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
+                        fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                                       minprob_forfit + (k - 0.2) * self.v_fitsplit,
+                                       minprob_forfit + (k + 0.8) * self.v_fitsplit)
+                        ranges_k[k+1] = minprob_forfit + (k + 0.8) * self.v_fitsplit
+                        hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
+                fentr[k].Draw("same")
+
+                fentrfull.append(TF1("%sfull" % fentr[k].GetName(), "pol2",
+                                     self.probscan_min[ipt], self.probscan_max[ipt]))
+                fentrlow.append(fentr[k].Clone("%slow" % fentr[k].GetName()))
+                fentrhigh.append(fentr[k].Clone("%shigh" % fentr[k].GetName()))
+                fentrfull[k].SetLineColor(k+1)
+                fentrfull[k].SetLineStyle(2)
+                fentrlow[k].SetLineStyle(2)
+                fentrhigh[k].SetLineStyle(2)
+                for ipar in range(fentr[k].GetNpar()):
+                    fentrfull[k].SetParameter(ipar, fentr[k].GetParameter(ipar))
+                    if fentr[k].GetParameter(ipar) < 0:
+                        fentrlow[k].SetParameter(ipar, fentr[k].GetParameter(ipar) -
+                                                 fentr[k].GetParError(ipar))
+                        fentrhigh[k].SetParameter(ipar, fentr[k].GetParameter(ipar) +
+                                                  fentr[k].GetParError(ipar))
+                    else:
+                        fentrlow[k].SetParameter(ipar, fentr[k].GetParameter(ipar) +
+                                                 fentr[k].GetParError(ipar))
+                        fentrhigh[k].SetParameter(ipar, fentr[k].GetParameter(ipar) -
+                                                  fentr[k].GetParError(ipar))
+                #fentrlow[k].Draw("same")
+                #fentrhigh[k].Draw("same")
+                fentrfull[k].Draw("same")
+
+            gpar0cent.append(TGraph(0))
+            gpar0low.append(TGraph(0))
+            gpar0high.append(TGraph(0))
+            minbc = 9999.
+            minfit = 9999.
+            maxfit = -1.
+            for isc in range(self.n_probscan):
+                mlcut = self.a_probscan[ipt][isc]
+                k = -1
+                for it_k in range(self.n_bkgentrfits):
+                    if ranges_k[it_k] < mlcut:
+                        k = k + 1
+
+                fbc = hentr.GetBinContent(hentr.FindBin(mlcut))
+                if fbc < minbc and fbc > 0: minbc = fbc
+                if fbc <= 0: fbc = minbc
+
+                par0new = self.calculate_par0(ipt, fpar1[ipt].Eval(mlcut), fbc)
+
+                #Add here the code for defining lower and upper limits (a mess...)
+                if k >= 0:
+                    flow = hentr.GetBinContent(hentr.FindBin(mlcut))
+                    fhigh = hentr.GetBinContent(hentr.FindBin(mlcut))
+                    havezero = False
+                    havenallzero = True
+                    for z in range(k):
+                        if fentr[z].Eval(mlcut) < flow and fentr[z].Eval(mlcut) > 0:
+                            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
+                                flow = fentr[z].Eval(mlcut)
+                            elif fentr[z].Eval(mlcut) > 0.5 * fbc:
+                                flow = fentr[z].Eval(mlcut)
+                        if fentr[z].Eval(mlcut) > fhigh:
+                            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
+                                fhigh = fentr[z].Eval(mlcut)
+                            elif fentr[z].Eval(mlcut) > 1.5 * fbc:
+                                fhigh = fentr[z].Eval(mlcut)
+                        if fentr[z].Eval(mlcut) == 0:
+                            havezero = True
+                        if fentr[z].Eval(mlcut) > 0:
+                            havenallzero = False
+
+                    if flow < minfit and flow > 0: minfit = flow
+                    if flow <= 0 and minfit != 9999: flow = minfit
+                    if havezero and minfit < 9999: flow = minfit
+                    if flow <= 0 and minfit == 9999: flow = fbc
+                    if fhigh > 0: maxfit = fhigh
+                    if havenallzero and maxfit != -1: fhigh = maxfit
+
+                    par0low = self.calculate_par0(ipt, fpar1low[ipt].Eval(mlcut), flow)
+                    par0high = self.calculate_par0(ipt, fpar1high[ipt].Eval(mlcut), fhigh)
+                else:
+                    bcmin = hentr.GetBinContent(hentr.FindBin(mlcut)) - \
+                            hentr.GetBinError(hentr.FindBin(mlcut))
+                    bcmax = hentr.GetBinContent(hentr.FindBin(mlcut)) + \
+                            hentr.GetBinError(hentr.FindBin(mlcut))
+                    par0low = self.calculate_par0(ipt, fpar1low[ipt].Eval(mlcut), bcmin)
+                    par0high = self.calculate_par0(ipt, fpar1high[ipt].Eval(mlcut), bcmax)
+
+                if par0low > par0new: par0low = par0new
+                if par0high < par0new: par0high = par0new
+                gpar0cent[ipt].SetPoint(isc, mlcut, par0new)
+                gpar0low[ipt].SetPoint(isc, mlcut, par0low)
+                gpar0high[ipt].SetPoint(isc, mlcut, par0high)
+
+            canv.cd(3)
+            gpar0cent[ipt].SetLineColor(2)
+            gpar0low[ipt].SetLineColor(2)
+            gpar0high[ipt].SetLineColor(2)
+            gpar0cent[ipt].SetLineWidth(2)
+            gpar0high[ipt].SetLineWidth(2)
+            gpar0low[ipt].SetLineWidth(2)
+            gpar0high[ipt].SetLineStyle(2)
+            gpar0low[ipt].SetLineStyle(2)
+            gpar0cent[ipt].Draw("same l")
+            gpar0low[ipt].Draw("same l")
+            gpar0high[ipt].Draw("same l")
+
+            fileout.cd()
+            canv.Write("BkgFits_parametrised_%d" % ipt)
+
+        for ipt in range(self.p_nptfinbins):
+            fpar1[ipt].Write("fpar1cent_%d" % ipt)
+            fpar1low[ipt].Write("fpar1low_%d" % ipt)
+            fpar1high[ipt].Write("fpar1high_%d" % ipt)
+            gpar0cent[ipt].Write("gpar0cent_%d" % ipt)
+            gpar0low[ipt].Write("gpar0low_%d" % ipt)
+            gpar0high[ipt].Write("gpar0high_%d" % ipt)
+        fileout.Close()
+
+        self.logger.info("\n\nBackground parametrising finished, saved in %s\n\n", self.n_file_params)
+
+
+    def calculate_par0(self, ipt, fpar1, fbc):
+        if fpar1 == 0:
+            return math.log(self.binwidth[ipt] * fbc)
+        else:
+            numerator = self.binwidth[ipt] * fpar1 * fbc
+            denominator = math.exp(fpar1 * self.p_mass_fit_lim[1]) - math.exp(fpar1 * self.p_mass_fit_lim[0])
+            return math.log(numerator / denominator)
+
+
+    def parametrise_background_scan(self):
+        """
+        Function to run full background parametrisation in one go
+        """
+
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+        self.fit_invmassbkg_scan()
+        self.fit_bkgparams_2_scan()

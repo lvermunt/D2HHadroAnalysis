@@ -181,10 +181,10 @@ BsITS2:
   mlapplication:
     data:
       pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_v3] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_v3] #list of periods
+      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/skpkldecmerged_v3noerror] #list of periods
     mc:
       pkl_skimmed_dec: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_v3] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_v3] #list of periods
+      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/skpkldecmerged_v3noerror_mc] #list of periods
     modelname: xgboost
     modelsperptbin: [Model_pT_0_4.model,
                      Model_pT_4_8.model,
@@ -209,12 +209,16 @@ BsITS2:
     cctype: -1
     sigmav0: -1
     inputfonllpred: null
-    dir_general_plots: /data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/analysis_plots
+    dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
 
     MBvspt:
-      probscan_min: [0.9, 0.9, 0.9, 0.9, 0.9]
+      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95]
       probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 100
+      n_probscan: 500
+      probscan_func_par1: "pol2"
+      probscan_nfits: 8
+      probscan_length_fits: 0.001
+      probscan_min_binc: 100
 
       proc_type: ITSUpgrade
       useperiod: [1]
@@ -241,12 +245,12 @@ BsITS2:
 
       data:
         runselection: [LHC19h1b2]
-        results: [/data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_final] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_final
+        results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/resultsMBvspt_final] #list of periods
+        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/resultstotMBvspt_final
       mc:
         runselection: [LHC19h1b2]
-        results: [/data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultsMBvspt_final] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultstotMBvspt_final
+        results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
+        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
 
       # The global mass limits
       mass_fit_lim: [5.066, 5.666] # region for the fit of the invariant mass distribution [GeV/c^2]
@@ -255,7 +259,7 @@ BsITS2:
       # Decide whether to take the sigma from MC or data for individual fits
       init_fits_from: [data, data, data, data, data, data, data] # data or mc
       sgnfunc: [kGaus,kGaus,kGaus,kGaus,kGaus,kGaus,kGaus]
-      bkgfunc: [Pol2,Pol2,Pol2,Pol2,Pol2,Pol2,Pol2]
+      bkgfunc: [kExpo,kExpo,kExpo,kExpo,kExpo,kExpo,kExpo]
       masspeak: 5.366
       massmin: [5.066,5.066,5.066,5.066,5.066,5.066,5.066]
       massmax: [5.666,5.666,5.666,5.666,5.666,5.666,5.666]
