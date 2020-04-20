@@ -13,6 +13,7 @@ For MLHEP:
 ```
 pip3 install PyYaml
 pip3 install numba
+pip3 install --no-binary :all: root_numpy
 ```
 Extra for MLHEP (commented out at the moment):
 ```

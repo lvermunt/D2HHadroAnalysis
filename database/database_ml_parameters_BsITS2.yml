@@ -27,7 +27,7 @@ BsITS2:
   sel_skim_binmin: [0,4,8,12,16] #list of nbins
   sel_skim_binmax: [4,8,12,16,24] #list of nbins
   var_binning: pt_cand
-  dofullevtmerge: false
+  dofullevtmerge: true
   bitmap_sel:
     use: True
     var_name: cand_type
@@ -212,6 +212,10 @@ BsITS2:
     dir_general_plots: /data/DerivedResults/BskAnyITS2/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/analysis_plots
 
     MBvspt:
+      probscan_min: [0.9, 0.9, 0.9, 0.9, 0.9]
+      probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
+      n_probscan: 100
+
       proc_type: ITSUpgrade
       useperiod: [1]
       plotbin: [1]
@@ -219,18 +223,14 @@ BsITS2:
       fprompt_from_mb: null
       corresp_mb_typean: null
       corrEffMult: [null]
-      sel_binmin2: [-999999] #list of nbins
-      sel_binmax2: [999999] #list of nbins  
-      var_binning2: n_tracklets #n_tracklets_corr_sub
-      var_binning2_gen: n_tracklets #n_tracklets_corr
       nbinshisto: 200
       minvaluehisto: -0.5
       maxvaluehisto: 199.5
       triggereff: [1]
       triggereffunc: [0]
       triggerbit: NOTRIG
-      sel_an_binmin: [0,2,4,6,8,12,16]
-      sel_an_binmax: [2,4,6,8,12,16,24]
+      sel_an_binmin: [0,4,8,12,16]
+      sel_an_binmax: [4,8,12,16,24]
       binning_matching: [0,1,2,3,4,5,6]
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
       evtsel: null #is_ev_rej==0 (not applied for ITS Upgrade)

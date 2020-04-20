@@ -106,4 +106,4 @@ class AnalyserManager:
         if failed_steps:
             self.logger.error("Following analysis steps could not be found:")
             for fs in failed_steps:
-                print(f"Analyser class: {fs[0]}, anqalysis step: {fs[1]}")
+                print(f"Analyser class: {fs[0]}, analysis step: {fs[1]}")

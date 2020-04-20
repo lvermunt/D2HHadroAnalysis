@@ -17,24 +17,27 @@ main script for doing final stage analysis
 """
 # pylint: disable=too-many-lines
 import os
+import pickle
+import math
 # pylint: disable=unused-wildcard-import, wildcard-import
 from array import array
+from root_numpy import fill_hist  # pylint: disable=import-error, no-name-in-module
 
 # pylint: disable=import-error, no-name-in-module, unused-import
 from ROOT import TFile, TH1F, TCanvas
 
 from Analysis.analyser import Analyser
 from machine_learning_hep.logger import get_logger
-from machine_learning_hep.utilities_selection import getnormforselevt
+from machine_learning_hep.utilities import openfile
+from machine_learning_hep.utilities_selection import getnormforselevt, seldf_singlevar
 
 
 class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
     species = "analyser"
-    def __init__(self, datap, typean, period, run_param):
-        super().__init__(datap, typean, period, run_param)
+    def __init__(self, datap, case, typean, period):
+        super().__init__(datap, case, typean, period)
         self.logger = get_logger()
 
-        self.run_param = run_param
         self.typean = typean
         self.p_period = datap["multi"]["data"]["period"][period] if period is not None \
                 else "merged"
@@ -72,18 +75,19 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                           (self.v_var_binning, self.lpt_finbinmin[i], self.lpt_finbinmax[i])) \
                           for i in range(self.p_nptfinbins)]
 
-        self.d_pkl_decmerged_mc = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][period]
-        self.d_pkl_decmerged_data = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][period]
-        self.lpt_recodecmerged_data = [join(self.d_pkl_decmerged_data,
-                                       self.lpt_recodec_data[ipt]) for ipt in range(self.p_nptfinbins)]
-        self.lpt_recodecmerged_mc = [join(self.d_pkl_decmerged_mc, self.lpt_recodec_mc[ipt])
+        self.d_pkl_decmerged_mc = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][period] \
+            if period is not None else "./"
+        self.d_pkl_decmerged_data = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][period] \
+            if period is not None else "./"
+        self.lpt_recodecmerged_data = [os.path.join(self.d_pkl_decmerged_data, self.lpt_recodec_data[ipt])
+                                       for ipt in range(self.p_nptfinbins)]
+        self.lpt_recodecmerged_mc = [os.path.join(self.d_pkl_decmerged_mc, self.lpt_recodec_mc[ipt])
                                      for ipt in range(self.p_nptfinbins)]
         self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged_mc, self.lpt_gensk[ipt])
-                                     for ipt in range(self.p_nptfinbins)]
+                                 for ipt in range(self.p_nptfinbins)]
 
         #output files
-        self.d_resultsallpdata = datap["analysis"][typean]["data"]["results"][period] \
-                if period is not None else datap["analysis"][typean]["data"]["resultsallp"]
+        self.d_resultsallpdata = datap["analysis"][self.typean]["data"]["resultsallp"]
         self.n_filemass_name = datap["files_names"]["histofilename"]
         self.n_fileeff_temp = "efficiencies.root"
         self.n_fileeff_name = datap["files_names"]["efffilename"]
@@ -97,8 +101,16 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.s_trigger_mc = datap["analysis"][self.typean]["triggersel"]["mc"]
         self.s_trigger_data = datap["analysis"][self.typean]["triggersel"]["data"]
 
+        #Names for bitmap selections
+        self.v_isstd = datap["bitmap_sel"]["var_isstd"]
+        self.v_ismcsignal = datap["bitmap_sel"]["var_ismcsignal"]
+        self.v_ismcprompt = datap["bitmap_sel"]["var_ismcprompt"]
+        self.v_ismcfd = datap["bitmap_sel"]["var_ismcfd"]
+        self.v_ismcbkg = datap["bitmap_sel"]["var_ismcbkg"]
+        self.v_ismcrefl = datap["bitmap_sel"]["var_ismcrefl"]
+
         #to get number of analysed events (actually not analysed, but used when merging)
-        self.n_evt = data_param["files_names"]["namefile_evt"]
+        self.n_evt = datap["files_names"]["namefile_evt"]
         self.n_evtorig = datap["files_names"]["namefile_evtorig"]
         self.d_pklevt_mergedallp_data = datap["multi"]["data"]["pkl_evtcounter_all"]
         self.f_evt_mergedallp = os.path.join(self.d_pklevt_mergedallp_data, self.n_evt)
@@ -109,7 +121,6 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.p_bin_width = datap["analysis"][self.typean]['bin_width']
         self.p_num_bins = int(round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) / \
                                     self.p_bin_width))
-
 
     def define_probscan_limits(self):
         """
@@ -142,17 +153,18 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         myfile = TFile.Open(self.n_filemass_probscan, "recreate")
 
-        self.logger.info("Doing mass histo for period", self.p_period)
+        self.logger.info("Doing mass histo for period %s", self.p_period)
 
-        df_evt_all = pickle.load(openfile(self.f_evt_mergedallp, "rb"))
-        nselevt = len(df_evt_all.query("is_ev_rej==0"))
-        normevt = getnormforselevt(df_evt_all)
-        hNorm = TH1F("hEvForNorm", ";;Normalisation", 2, 0.5, 2.5)
-        hNorm.GetXaxis().SetBinLabel(1, "normsalisation factor")
-        hNorm.GetXaxis().SetBinLabel(2, "selected events")
-        hNorm.SetBinContent(1, normevt)
-        hNorm.SetBinContent(2, nselevt)
-        hNorm.Write()
+        #FIXME temporary commented, need to rerun with dofullevtmerge = true
+        #df_evt_all = pickle.load(openfile(self.f_evt_mergedallp, "rb"))
+        #nselevt = len(df_evt_all.query("is_ev_rej==0"))
+        #normevt = getnormforselevt(df_evt_all)
+        #hNorm = TH1F("hEvForNorm", ";;Normalisation", 2, 0.5, 2.5)
+        #hNorm.GetXaxis().SetBinLabel(1, "normsalisation factor")
+        #hNorm.GetXaxis().SetBinLabel(2, "selected events")
+        #hNorm.SetBinContent(1, normevt)
+        #hNorm.SetBinContent(2, nselevt)
+        #hNorm.Write()
 
         for ipt in range(self.p_nptfinbins):
             bin_id = self.bin_matching[ipt]
@@ -182,11 +194,22 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                                              self.lpt_finbinmax[ipt], isc)
                     h_invmass = TH1F("hmass" + suffix, "", self.p_num_bins,
                                      self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_sig = TH1F("hmass_sig" + suffix, "", self.p_num_bins,
+                                         self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_bkg = TH1F("hmass_bkg" + suffix, "", self.p_num_bins,
+                                         self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
 
-                    fill_hist(h_invmass, df_bin.inv_mass)
+                    df_sig = df[df[self.v_ismcbkg] == 0]
+                    df_bkg = df[df[self.v_ismcbkg] == 1]
+
+                    fill_hist(h_invmass, df.inv_mass)
+                    fill_hist(h_invmass_sig, df_sig.inv_mass)
+                    fill_hist(h_invmass_bkg, df_bkg.inv_mass)
 
                     myfile.cd()
                     h_invmass.Write()
+                    h_invmass_sig.Write()
+                    h_invmass_bkg.Write()
                 else:
                     self.logger.fatal("2nd binning to be implemented (code exists)")
             h_isc_match.Write()
@@ -211,7 +234,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         h_gen_fd = []
         h_sel_fd = []
 
-        self.logger.info("Doing eff histo for period", self.p_period)
+        self.logger.info("Doing eff histo for period %s", self.p_period)
 
         for ipt in range(self.p_nptfinbins):
             bin_id = self.bin_matching[ipt]
@@ -289,10 +312,14 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         Similar as efficiency(self) in analyzer.py
         """
+
+        # Define limits first
+        self.define_probscan_limits()
+
         lfileeff = TFile.Open(self.n_fileeff_probscan, "READ")
         fileout = TFile(self.n_fileeff_probscanfinal, "RECREATE")
 
-        for icv in range(len(self.a_probscan[ipt])):
+        for icv in range(len(self.a_probscan[0])):
 
             if self.lvar2_binmin is None:
                 suffix = "_%d" % (icv)
@@ -306,11 +333,20 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                 h_sel_fd.Divide(h_sel_fd, h_gen_fd, 1.0, 1.0, "B")
 
                 fileout.cd()
-                h_sel_pr.SetName("eff_mult" + suffix)
-                h_sel_fd.SetName("eff_fd_mult" + suffix)
+                h_sel_pr.SetName("eff" + suffix)
+                h_sel_fd.SetName("eff_fd" + suffix)
                 h_sel_pr.Write()
                 h_sel_fd.Write()
             else:
                 self.logger.fatal("2nd binning to be implemented (code exists)")
 
         fileout.Close()
+
+    def probability_scan(self):
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+        self.define_probscan_limits()
+        self.probscan_mass_histo()
+        self.probscan_eff()
+        self.probscan_eff_histo()

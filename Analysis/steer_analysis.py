@@ -41,7 +41,7 @@ except Exception as e: # pylint: disable=broad-except
     print("##############################")
 
 
-def do_entire_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many-locals, too-many-statements, too-many-branches
+def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many-locals, too-many-statements, too-many-branches
 
     # Disable any graphical stuff. No TCanvases opened and shown by default
     gROOT.SetBatch(True)
@@ -57,6 +57,9 @@ def do_entire_analysis(data_config: dict, data_param: dict): # pylint: disable=t
     typean = data_config["analysis"]["type"]
     doanalysismc = data_config["analysis"]["mc"]["activate"]
     doanalysisdata = data_config["analysis"]["data"]["activate"]
+    dohistomass = data_config["analysis"]["masshisto"]
+    doefficiency = data_config["analysis"]["effhisto"]
+    doprobscan = data_config["analysis"]["probscan"]
 
     dirresultsdata = data_param[case]["analysis"][typean]["data"]["results"]
     dirresultsmc = data_param[case]["analysis"][typean]["mc"]["results"]
@@ -87,7 +90,7 @@ def do_entire_analysis(data_config: dict, data_param: dict): # pylint: disable=t
         checkmakedir(dirresultsdatatot)
 
     ana_class = AnalyserITSUpgrade
-    ana_mgr = AnalyserManager(ana_class, data_param[case], case, typean, run_param)
+    ana_mgr = AnalyserManager(ana_class, data_param[case], case, typean)
 
     # Collect all desired analysis steps
     analyse_steps = []
@@ -96,7 +99,7 @@ def do_entire_analysis(data_config: dict, data_param: dict): # pylint: disable=t
     if doefficiency is True:
         analyse_steps.append("efficiency")
     if doprobscan is True:
-        analyse_steps.append("probscan")
+        analyse_steps.append("probability_scan")
 
     # Now do the analysis
     ana_mgr.analyse(*analyse_steps)
