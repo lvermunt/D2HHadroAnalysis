@@ -106,7 +106,7 @@ BsITS2:
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
       pkl: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_fine #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_fine] #list of periods
       pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_fine] #list of periods
       pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_fine
       pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_fine
