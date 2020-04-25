@@ -12,7 +12,7 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-BsITS2:
+BsITS3:
   nprongs: 4
   doml: true
   mass: 5.366
@@ -71,9 +71,9 @@ BsITS2:
     namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl
     namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl
     namefile_mcweights: mcweights.root
-    treeoriginreco: 'PWGHF_TreeCreatorITS2/tree_Bs'
-    treeorigingen: 'PWGHF_TreeCreatorITS2/tree_Bs_gen'
-    treeoriginevt: 'PWGHF_TreeCreatorITS2/tree_event_char'
+    treeoriginreco: 'PWGHF_TreeCreatorITS3/tree_Bs'
+    treeorigingen: 'PWGHF_TreeCreatorITS3/tree_Bs_gen'
+    treeoriginevt: 'PWGHF_TreeCreatorITS3/tree_event_char'
     treeoutput: "Bstree"
     histofilename: "masshisto.root"
     efffilename: "effhisto.root"
@@ -91,11 +91,11 @@ BsITS2:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_BsITSUpgrade/TTree_BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_coarse
+      pkl: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk_coarse] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_coarse] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_coarse
+      pkl_evtcounter_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_coarse
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
@@ -105,11 +105,11 @@ BsITS2:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_BsITSUpgrade/TTree_BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_coarse
+      pkl: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_coarse] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_coarse] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_coarse
+      pkl_evtcounter_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_coarse
       mcreweights: [mcreweights]
 
   ml:
@@ -134,8 +134,8 @@ BsITS2:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlplot_hipe4ml_coarse # to be removed
-    mlout: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlout_hipe4ml_coarse # to be removed
+    mlplot: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlplot_hipe4ml_coarse # to be removed
+    mlout: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlout_hipe4ml_coarse # to be removed
 
     opt:
       isFONLLfromROOT: false
@@ -180,11 +180,11 @@ BsITS2:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_coarse] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_coarse] #list of periods
     modelname: xgboost
     modelsperptbin: [Model_pT_0_4.model,
                      Model_pT_4_8.model,

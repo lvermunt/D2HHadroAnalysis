@@ -12,7 +12,7 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-BsITS2:
+BsITS3_fine:
   nprongs: 4
   doml: true
   mass: 5.366
@@ -21,10 +21,10 @@ BsITS2:
   sel_gen_unp: "pt_cand>0 and abs(z_vtx_gen)<10"
   sel_cen_unp: null
   sel_good_evt_unp: null #"is_ev_rej == 0" #not applied for ITS Upgrade studies
-  sel_reco_skim: [null, null, null, null, null]
-  sel_gen_skim: [null, null, null, null, null]
-  sel_skim_binmin: [0,4,8,12,16] #list of nbins
-  sel_skim_binmax: [4,8,12,16,24] #list of nbins
+  sel_reco_skim: [null, null, null, null, null, null, null]
+  sel_gen_skim: [null, null, null, null, null, null, null]
+  sel_skim_binmin: [0,2,4,6,8,12,16] #list of nbins
+  sel_skim_binmax: [2,4,6,8,12,16,24] #list of nbins
   var_binning: pt_cand
   dofullevtmerge: true
   bitmap_sel:
@@ -71,9 +71,9 @@ BsITS2:
     namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl
     namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl
     namefile_mcweights: mcweights.root
-    treeoriginreco: 'PWGHF_TreeCreatorITS2/tree_Bs'
-    treeorigingen: 'PWGHF_TreeCreatorITS2/tree_Bs_gen'
-    treeoriginevt: 'PWGHF_TreeCreatorITS2/tree_event_char'
+    treeoriginreco: 'PWGHF_TreeCreatorITS3/tree_Bs'
+    treeorigingen: 'PWGHF_TreeCreatorITS3/tree_Bs_gen'
+    treeoriginevt: 'PWGHF_TreeCreatorITS3/tree_event_char'
     treeoutput: "Bstree"
     histofilename: "masshisto.root"
     efffilename: "effhisto.root"
@@ -88,28 +88,28 @@ BsITS2:
       chunksizeunp: [50] #list of periods
       chunksizeskim: [50] #list of periods
       fracmerge: [0.1] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
-      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_BsITSUpgrade/TTree_BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_coarse
+      unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/merged] #list of periods
+      pkl: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklsk_fine] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/pklskml_fine] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_mltot_fine
+      pkl_evtcounter_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/ITS2Upgr_19_bkg_evttot_fine
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
       chunksizeunp: [50] #list of periods
       chunksizeskim: [50] #list of periods
       fracmerge: [1.0] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
-      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_BsITSUpgrade/TTree_BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_coarse
+      unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
+      pkl: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklsk_fine] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/pklskml_fine] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_mltot_fine
+      pkl_evtcounter_all: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/ITS2Upgr_19_sig_evttot_fine
       mcreweights: [mcreweights]
 
   ml:
@@ -128,14 +128,14 @@ BsITS2:
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
-    binmin: [0,4,8,12,16] #list of nbins
-    binmax: [4,8,12,16,24] #list of nbins
+    binmin: [0,2,4,6,8,12,16] #list of nbins
+    binmax: [2,4,6,8,12,16,24] #list of nbins
     mltype: BinaryClassification
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlplot_hipe4ml_coarse # to be removed
-    mlout: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlout_hipe4ml_coarse # to be removed
+    mlplot: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlplot_hipe4ml_fine # to be removed
+    mlout: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlout_hipe4ml_fine # to be removed
 
     opt:
       isFONLLfromROOT: false
@@ -151,7 +151,7 @@ BsITS2:
       num_steps: 111 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
-      raahp: [1,1,1,1,1] #list of nbins
+      raahp: [1,1,1,1,1,1,1] #list of nbins
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
 
   hipe4ml:
@@ -160,6 +160,8 @@ BsITS2:
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
     hipe4ml_hyper_pars: [{'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
+                         {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
@@ -180,28 +182,32 @@ BsITS2:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_fine] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_fine] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_fine] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_fine] #list of periods
     modelname: xgboost
-    modelsperptbin: [Model_pT_0_4.model,
-                     Model_pT_4_8.model,
+    modelsperptbin: [Model_pT_0_2.model,
+                     Model_pT_2_4.model,
+                     Model_pT_4_6.model,
+                     Model_pT_6_8.model,
                      Model_pT_8_12.model,
                      Model_pT_12_16.model,
                      Model_pT_16_24.model]
-    modelsperptbin_hipe4ml: [ModelHandler_pT_0_4.model,
-                             ModelHandler_pT_4_8.model,
+    modelsperptbin_hipe4ml: [ModelHandler_pT_0_2.model,
+                             ModelHandler_pT_2_4.model,
+                             ModelHandler_pT_4_6.model,
+                             ModelHandler_pT_6_8.model,
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
     probcutpresel:
-      data: [0.7,0.7,0.7,0.7,0.7] #list of nbins
-      mc: [0.7,0.7,0.7,0.7,0.7] #list of nbins
+      data: [0.7,0.7,0.7,0.7,0.7,0.7,0.7] #list of nbins
+      mc: [0.7,0.7,0.7,0.7,0.7,0.7,0.7] #list of nbins
     #probcutoptimal: [0.9995,0.9994,0.999,0.999,0.999,0.996,0.989] #list of nbins
     #probcutoptimal: [0.99,0.99,0.99,0.99,0.99,0.99,0.99] #list of nbins
-    probcutoptimal: [0.9995,0.9995,0.9995,0.9995,0.9995] #list of nbins
+    probcutoptimal: [0.9995,0.9995,0.9995,0.9995,0.9995,0.9995,0.9995] #list of nbins
 
   analysis:
     indexhptspectrum: -1
@@ -212,12 +218,12 @@ BsITS2:
     dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
 
     MBvspt:
-      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95]
-      probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
+      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95]
+      probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
       n_probscan: 5000
       probscan_func_par1: "pol2"
       probscan_nfits: 8
-      probscan_length_fits: 0.0005
+      probscan_length_fits: 0.001
       probscan_min_binc: 100
 
       proc_type: ITSUpgrade
@@ -233,8 +239,8 @@ BsITS2:
       triggereff: [1]
       triggereffunc: [0]
       triggerbit: NOTRIG
-      sel_an_binmin: [0,4,8,12,16]
-      sel_an_binmax: [4,8,12,16,24]
+      sel_an_binmin: [0,2,4,6,8,12,16]
+      sel_an_binmax: [2,4,6,8,12,16,24]
       binning_matching: [0,1,2,3,4,5,6]
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
       evtsel: null #is_ev_rej==0 (not applied for ITS Upgrade)
@@ -245,8 +251,8 @@ BsITS2:
 
       data:
         runselection: [LHC19h1b2]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultsMBvspt_coarse] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultstotMBvspt_coarse
+        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultsMBvspt_fine] #list of periods
+        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultstotMBvspt_fine
       mc:
         runselection: [LHC19h1b2]
         results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods

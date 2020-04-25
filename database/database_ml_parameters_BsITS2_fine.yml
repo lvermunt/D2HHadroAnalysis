@@ -218,9 +218,9 @@ BsITS2:
     dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
 
     MBvspt:
-      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95]
-      probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 500
+      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95, 0.95, 0.95]
+      probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
+      n_probscan: 5000
       probscan_func_par1: "pol2"
       probscan_nfits: 8
       probscan_length_fits: 0.001
@@ -239,8 +239,8 @@ BsITS2:
       triggereff: [1]
       triggereffunc: [0]
       triggerbit: NOTRIG
-      sel_an_binmin: [0,4,8,12,16]
-      sel_an_binmax: [4,8,12,16,24]
+      sel_an_binmin: [0,2,4,6,8,12,16]
+      sel_an_binmax: [2,4,6,8,12,16,24]
       binning_matching: [0,1,2,3,4,5,6]
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
       evtsel: null #is_ev_rej==0 (not applied for ITS Upgrade)
@@ -251,8 +251,8 @@ BsITS2:
 
       data:
         runselection: [LHC19h1b2]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/resultsMBvspt_final] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/resultstotMBvspt_final
+        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultsMBvspt_fine] #list of periods
+        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultstotMBvspt_fine
       mc:
         runselection: [LHC19h1b2]
         results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
