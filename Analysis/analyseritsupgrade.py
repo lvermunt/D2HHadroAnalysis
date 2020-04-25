@@ -136,6 +136,19 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.rebins = datap["analysis"][self.typean]["rebin"]
         self.binwidth = [None for _ in range(self.p_nptfinbins)]
 
+        self.n_filebkgcorrection = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/BkgCorrFactor_Bs_1DataFile_25MCFile.root"
+        self.n_filefonllinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/inputFONLL_02468121624.root"
+        self.n_filetamuinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/input_RAA_TAMU_Bs_02468121624.root"
+        self.v_ninterestingtrials = 500
+        self.brbs = 0.00304
+        self.brbs_err = 0.00023
+        self.brds = 0.0227
+        self.brds_err = 0.0008
+        self.nevexpected = 8000000000
+        self.nevanalysed = 852644 #756420 (FIXME)
+        self.taa = 0.02307
+        self.gauss3sigmafac = 0.9973
+
     def define_probscan_limits(self):
         """
         Sets the array with the probability cuts used for the scan
@@ -703,3 +716,113 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             return
         self.fit_invmassbkg_scan()
         self.fit_bkgparams_2_scan()
+
+    def expected_significance_print(self):
+        """
+        Calculate expected significance
+        """
+
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+
+        # Define limits first
+        self.define_probscan_limits()
+
+        fmass = TFile(self.n_filemass_probscan, "READ")
+        feff = TFile(self.n_fileeff_probscanfinal, "READ")
+        fbkgcorr = TFile(self.n_filebkgcorrection, "READ")
+        ffonll = TFile(self.n_filefonllinput, "READ")
+        ftamu = TFile(self.n_filetamuinput, "READ")
+        ffitpars = TFile(self.n_file_params, "READ")
+
+        self.logger.info("Calculating expected significance for %s", self.p_period)
+        TGaxis.SetMaxDigits(3)
+        gStyle.SetOptStat(0000)
+
+        hbkgcorr = fbkgcorr.Get("hCorrFacBs")
+        hfonll = ffonll.Get("hFONLLcent")
+        hfonllmin = ffonll.Get("hFONLLmin")
+        hfonllmax = ffonll.Get("hFONLLmax")
+        htamu = ftamu.Get("hTAMUcent")
+        arrprint = []
+        for ipt in range(self.p_nptfinbins):
+            bkgcorr = hbkgcorr.GetBinContent(hbkgcorr.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+            fonll = hfonll.GetBinContent(hfonll.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+            fonllmin = hfonllmin.GetBinContent(hfonll.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+            fonllmax = hfonllmax.GetBinContent(hfonll.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+            tamu = htamu.GetBinContent(htamu.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+            for isc in range(self.n_probscan):
+                if isc < self.n_probscan - self.v_ninterestingtrials:
+                    continue
+                heff = feff.Get("eff_%d" % isc)
+
+                suffix = "%s%d_%d_%d" % (self.v_var_binning,
+                                         self.lpt_finbinmin[ipt],
+                                         self.lpt_finbinmax[ipt], isc)
+                hsig = fmass.Get("hmass_sig" + suffix)
+                hbkg = fmass.Get("hmass_bkg" + suffix)
+
+                #Fit signal for 3sigma range
+                fsig = TF1("fsig", "gaus", 5.32, 5.42)
+                hsig.Fit("fsig", "R")
+                mean = fsig.GetParameter(1)
+                sigma = fsig.GetParameter(2)
+                xmin = mean - 3 * sigma
+                xmax = mean + 3 * sigma
+
+                #Extract background
+                hbkg.Rebin(self.rebins[ipt])
+                fbkg = TF1("fbkg", self.bkg_fmap[self.p_bkgfunc[ipt]],
+                           self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                hbkg.Fit("fbkg", "R,E,+,0")
+
+                grpar0cent = ffitpars.Get("gpar0cent_%d" % ipt)
+                grpar0low = ffitpars.Get("gpar0low_%d" % ipt)
+                grpar0up = ffitpars.Get("gpar0high_%d" % ipt)
+                fpar1cent = ffitpars.Get("fpar1cent_%d" % ipt)
+                fpar1low = ffitpars.Get("fpar1low_%d" % ipt)
+                fpar1up = ffitpars.Get("fpar1high_%d" % ipt)
+
+                fbkgcent = fbkg.Clone("fbkgcent")
+                fbkgcent.SetParameter(0, grpar0cent.Eval(self.a_probscan[ipt][isc]))
+                dpar1cent = fpar1cent.Eval(self.a_probscan[ipt][isc])
+                if dpar1cent > 0: dpar1cent = 0
+                fbkgcent.SetParameter(1, dpar1cent)
+
+                fbkglow = fbkg.Clone("fbkglow")
+                fbkglow.SetParameter(0, grpar0low.Eval(self.a_probscan[ipt][isc]))
+                dpar1low = fpar1low.Eval(self.a_probscan[ipt][isc])
+                if dpar1low > 0: dpar1low = 0
+                fbkglow.SetParameter(1, dpar1low)
+
+                fbkgup = fbkg.Clone("fbkgup")
+                fbkgup.SetParameter(0, grpar0up.Eval(self.a_probscan[ipt][isc]))
+                dpar1up = fpar1up.Eval(self.a_probscan[ipt][isc])
+                if dpar1up > 0: dpar1up = 0
+                fbkgup.SetParameter(1, dpar1up)
+
+                bkgcentbc = hbkg.Integral(hbkg.FindBin(xmin), hbkg.FindBin(xmax))
+                bkgcentorigfit = fbkg.Integral(xmin, xmax)/hbkg.GetBinWidth(1)
+                bkgcentparafit = fbkgcent.Integral(xmin, xmax)/hbkg.GetBinWidth(1)
+
+                #Extract efficiency
+                effcent = heff.GetBinContent(heff.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+                effcenterr = heff.GetBinError(heff.FindBin(self.lpt_finbinmax[ipt] - 0.1))
+
+                #Calculate expected significance
+                expsigcent = 2 * (self.lpt_finbinmax[ipt] - self.lpt_finbinmin[ipt]) * 1 * \
+                             self.brbs * self.brds * self.nevexpected * effcent * self.taa * \
+                             fonll * tamu * self.gauss3sigmafac
+                expbkgcentbc = bkgcorr * bkgcentbc * self.nevexpected / self.nevanalysed
+                expbkgcentorigfit = bkgcorr * bkgcentorigfit * self.nevexpected / self.nevanalysed
+                expbkgcentparafit = bkgcorr * bkgcentparafit * self.nevexpected / self.nevanalysed
+                expsignfcentbc = expsigcent / math.sqrt(expsigcent + expbkgcentbc)
+                expsignfcentorigfit = expsigcent / math.sqrt(expsigcent + expbkgcentorigfit)
+                expsignfcentparafit = expsigcent / math.sqrt(expsigcent + expbkgcentparafit)
+
+                arrprint.append(str("%.6f, %.4f, %.4f, %.4f, %.4f, %.4f" % (self.a_probscan[ipt][isc], expsigcent, expbkgcentbc, expsignfcentbc, expsignfcentorigfit, expsignfcentparafit)))
+            arrprint.append(str("\n"))
+
+        for ipr in range(len(arrprint)):
+            print(arrprint[ipr])
