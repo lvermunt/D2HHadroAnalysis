@@ -210,6 +210,7 @@ BsITS3:
     sigmav0: -1
     inputfonllpred: null
     dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
+    #dir_general_plots: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/analysis_plots
 
     MBvspt:
       probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95]
@@ -247,10 +248,14 @@ BsITS3:
         runselection: [LHC19h1b2]
         results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultsMBvspt_coarse] #list of periods
         resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultstotMBvspt_coarse
+        #results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse] #list of periods
+        #resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse
       mc:
         runselection: [LHC19h1b2]
         results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
         resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
+        #results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultsMBvspt_coarse] #list of periods
+        #resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultstotMBvspt_coarse
 
       # The global mass limits
       mass_fit_lim: [5.066, 5.666] # region for the fit of the invariant mass distribution [GeV/c^2]

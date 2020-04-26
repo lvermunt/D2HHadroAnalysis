@@ -94,6 +94,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.b_mcsigfd = datap["bitmap_sel"]["ismcfd"]
         self.b_mcbkg = datap["bitmap_sel"]["ismcbkg"]
         self.b_mcrefl = datap["bitmap_sel"]["ismcrefl"]
+        self.b_dsprompt = datap["bitmap_sel"].get("isdsprompt", None)
+        self.b_dsfdbplus = datap["bitmap_sel"].get("isdsfdbplus", None)
+        self.b_dsfdbzero = datap["bitmap_sel"].get("isdsfdbzero", None)
+        self.b_dsfdlambdab = datap["bitmap_sel"].get("isdsfdlambdab", None)
+        self.b_dsfdbs = datap["bitmap_sel"].get("isdsfdbs", None)
 
         #variables name
         self.lpt_anbinmin = datap["sel_skim_binmin"]
@@ -113,6 +118,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.v_ismcfd = datap["bitmap_sel"]["var_ismcfd"]
         self.v_ismcbkg = datap["bitmap_sel"]["var_ismcbkg"]
         self.v_ismcrefl = datap["bitmap_sel"]["var_ismcrefl"]
+        self.v_dsprompt = datap["bitmap_sel"].get("var_isdsprompt", None)
+        self.v_dsfdbplus = datap["bitmap_sel"].get("var_isdsfdbplus", None)
+        self.v_dsfdbzero = datap["bitmap_sel"].get("var_isdsfdbzero", None)
+        self.v_dsfdlambdab = datap["bitmap_sel"].get("var_isdsfdlambdab", None)
+        self.v_dsfdbs = datap["bitmap_sel"].get("var_isdsfdbs", None)
         self.v_var_binning = datap["var_binning"]
         self.nprongs = datap["nprongs"]
 
@@ -255,6 +265,20 @@ class Processer: # pylint: disable=too-many-instance-attributes
         if self.mcordata == "data" and self.case.startswith('Bs'):
             dfreco[self.v_ismcbkg] = np.array(tag_bit_df(dfreco, self.v_bitvar,
                                                          self.b_mcbkg), dtype=int)
+
+            # Assuming if you set one, you set all of them
+            if self.v_dsprompt is not None:
+                dfreco[self.v_dsprompt] = np.array(tag_bit_df(dfreco, self.v_bitvar,
+                                                              self.b_dsprompt), dtype=int)
+                dfreco[self.v_dsfdbplus] = np.array(tag_bit_df(dfreco, self.v_bitvar,
+                                                               self.b_dsfdbplus), dtype=int)
+                dfreco[self.v_dsfdbzero] = np.array(tag_bit_df(dfreco, self.v_bitvar,
+                                                               self.b_dsfdbzero), dtype=int)
+                dfreco[self.v_dsfdlambdab] = np.array(tag_bit_df(dfreco, self.v_bitvar,
+                                                                 self.b_dsfdlambdab), dtype=int)
+                dfreco[self.v_dsfdbs] = np.array(tag_bit_df(dfreco, self.v_bitvar,
+                                                            self.b_dsfdbs), dtype=int)
+
         dfreco = dfreco.reset_index(drop=True)
         pickle.dump(dfreco, openfile(self.l_reco[file_index], "wb"), protocol=4)
 

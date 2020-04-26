@@ -105,7 +105,8 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
     if doprobscan is True:
         analyse_steps.append("probability_scan")
     if dofitbackpars is True:
-        analyse_steps.append("parametrise_background_scan")
+        #analyse_steps.append("parametrise_background_scan")
+        analyse_steps.append("expected_significance_print")
 
     # Now do the analysis
     ana_mgr.analyse(*analyse_steps)

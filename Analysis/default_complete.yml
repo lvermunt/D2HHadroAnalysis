@@ -8,5 +8,5 @@ analysis:
     activate: true
   masshisto: false
   effhisto: false
-  probscan: true
+  probscan: false
   fitbackpars: true
