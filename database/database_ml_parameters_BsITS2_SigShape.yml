@@ -92,7 +92,7 @@ BsITS2_SigShape:
   multi:
     #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
     #Sometimes an issue occurs ("parallel_for failed: invalid configuration argument") when chunksize is larger than nprocesses
-    max_ncand_merge: 500000
+    max_ncand_merge: -1
     data:
       nprocessesparallel: 50
       chunksizeunp: [50] #list of periods
@@ -225,7 +225,7 @@ BsITS2_SigShape:
     MBvspt:
       probscan_min: [0.995, 0.995, 0.995, 0.995, 0.995]
       probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 500
+      n_probscan: 100
       probscan_func_par1: "pol2"
       probscan_nfits: 8
       probscan_length_fits: 0.0005

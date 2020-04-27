@@ -1,4 +1,4 @@
-case: BsITS2 # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
+case: BsITS2_SigShape # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
 
 analysis:
   type: MBvspt # used unless specified explicitly as do_entire_analysis -a type_ana
@@ -9,4 +9,6 @@ analysis:
   masshisto: false
   effhisto: false
   probscan: false
-  fitbackpars: true
+  fitbackpars: false
+  expectedsignf: false
+  bkgshapestudy: true

@@ -61,6 +61,8 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
     doefficiency = data_config["analysis"]["effhisto"]
     doprobscan = data_config["analysis"]["probscan"]
     dofitbackpars = data_config["analysis"]["fitbackpars"]
+    doexpectedsignf = data_config["analysis"]["expectedsignf"]
+    dobkgshapestudy = data_config["analysis"]["bkgshapestudy"]
 
     dirresultsdata = data_param[case]["analysis"][typean]["data"]["results"]
     dirresultsmc = data_param[case]["analysis"][typean]["mc"]["results"]
@@ -105,8 +107,11 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
     if doprobscan is True:
         analyse_steps.append("probability_scan")
     if dofitbackpars is True:
-        #analyse_steps.append("parametrise_background_scan")
+        analyse_steps.append("parametrise_background_scan")
+    if doexpectedsignf is True:
         analyse_steps.append("expected_significance_print")
+    if dobkgshapestudy is True:
+        analyse_steps.append("bkgshapestudy_mass_histo")
 
     # Now do the analysis
     ana_mgr.analyse(*analyse_steps)

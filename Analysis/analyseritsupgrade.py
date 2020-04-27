@@ -100,6 +100,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.n_fileeff_temp = "efficiencies.root"
         self.n_fileeff_name = datap["files_names"]["efffilename"]
         self.n_filemass_probscan = os.path.join(self.d_resultsallpdata, self.n_filemass_name)
+        self.n_filemass_bkgshape = self.n_filemass_probscan.replace(".root", "_bkgshape.root")
         self.n_filemass_probscanfit = os.path.join(self.d_resultsallpdata, self.n_filemass_namefit)
         self.n_file_params = os.path.join(self.d_resultsallpdata, self.n_filepars_probscanfit)
         self.n_fileeff_probscan = os.path.join(self.d_resultsallpdata, self.n_fileeff_temp)
@@ -118,6 +119,11 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.v_ismcfd = datap["bitmap_sel"]["var_ismcfd"]
         self.v_ismcbkg = datap["bitmap_sel"]["var_ismcbkg"]
         self.v_ismcrefl = datap["bitmap_sel"]["var_ismcrefl"]
+        self.v_dsprompt = datap["bitmap_sel"].get("var_isdsprompt", None)
+        self.v_dsfdbplus = datap["bitmap_sel"].get("var_isdsfdbplus", None)
+        self.v_dsfdbzero = datap["bitmap_sel"].get("var_isdsfdbzero", None)
+        self.v_dsfdlambdab = datap["bitmap_sel"].get("var_isdsfdlambdab", None)
+        self.v_dsfdbs = datap["bitmap_sel"].get("var_isdsfdbs", None)
 
         #to get number of analysed events (actually not analysed, but used when merging)
         self.n_evt = datap["files_names"]["namefile_evt"]
@@ -184,16 +190,15 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         self.logger.info("Doing mass histo for period %s", self.p_period)
 
-        #FIXME temporary commented, need to rerun with dofullevtmerge = true
-        #df_evt_all = pickle.load(openfile(self.f_evt_mergedallp, "rb"))
-        #nselevt = len(df_evt_all.query("is_ev_rej==0"))
-        #normevt = getnormforselevt(df_evt_all)
-        #hNorm = TH1F("hEvForNorm", ";;Normalisation", 2, 0.5, 2.5)
-        #hNorm.GetXaxis().SetBinLabel(1, "normsalisation factor")
-        #hNorm.GetXaxis().SetBinLabel(2, "selected events")
-        #hNorm.SetBinContent(1, normevt)
-        #hNorm.SetBinContent(2, nselevt)
-        #hNorm.Write()
+        df_evt_all = pickle.load(openfile(self.f_evt_mergedallp, "rb"))
+        nselevt = len(df_evt_all.query("is_ev_rej==0"))
+        normevt = getnormforselevt(df_evt_all)
+        hNorm = TH1F("hEvForNorm", ";;Normalisation", 2, 0.5, 2.5)
+        hNorm.GetXaxis().SetBinLabel(1, "normsalisation factor")
+        hNorm.GetXaxis().SetBinLabel(2, "selected events")
+        hNorm.SetBinContent(1, normevt)
+        hNorm.SetBinContent(2, nselevt)
+        hNorm.Write()
 
         for ipt in range(self.p_nptfinbins):
             bin_id = self.bin_matching[ipt]
@@ -826,3 +831,78 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         for ipr in range(len(arrprint)):
             print(arrprint[ipr])
+
+    def bkgshapestudy_mass_histo(self):
+        """
+        Invariant mass histogram for injected Ds + HIJING pion
+        """
+
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+
+        # Define limits first
+        self.define_probscan_limits()
+
+        myfile = TFile.Open(self.n_filemass_bkgshape, "recreate")
+
+        self.logger.info("Doing bkg shape study for period %s", self.p_period)
+
+        for ipt in range(self.p_nptfinbins):
+            bin_id = self.bin_matching[ipt]
+            df = pickle.load(openfile(self.lpt_recodecmerged_data[bin_id], "rb"))
+
+            if self.s_evtsel is not None:
+                df = df.query(self.s_evtsel)
+            if self.s_trigger_data is not None:
+                df = df.query(self.s_trigger_data)
+            df = seldf_singlevar(df, self.v_var_binning,
+                                 self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt])
+
+            ptstring = "%s%d_%d" % (self.v_var_binning,
+                                    self.lpt_finbinmin[ipt],
+                                    self.lpt_finbinmax[ipt])
+            h_isc_match = TH1F("h_match" + ptstring, ";scan iterator;ML prob.",
+                               self.n_probscan + 2, -0.5, self.n_probscan + 1.5)
+
+            for isc in range(len(self.a_probscan[ipt])):
+                h_isc_match.Fill(isc, self.a_probscan[ipt][isc])
+                selml_cv = "y_test_prob%s>%s" % (self.p_modelname, self.a_probscan[ipt][isc])
+                df = df.query(selml_cv)
+
+                if self.lvar2_binmin is None:
+                    suffix = "%s%d_%d_%d" % (self.v_var_binning,
+                                             self.lpt_finbinmin[ipt],
+                                             self.lpt_finbinmax[ipt], isc)
+                    h_invmass_dspr = TH1F("hmass_DsPr" + suffix, "", self.p_num_bins,
+                                          self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_dsfdbplus = TH1F("hmass_DsFDBplus" + suffix, "", self.p_num_bins,
+                                               self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_dsfdbzero = TH1F("hmass_DsFDBzero" + suffix, "", self.p_num_bins,
+                                               self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_dsfdlamdab = TH1F("hmass_DsFDLambdab" + suffix, "", self.p_num_bins,
+                                                self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    h_invmass_dsfdbs = TH1F("hmass_DsFDBs" + suffix, "", self.p_num_bins,
+                                            self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+
+                    df_dspr = df[df[self.v_dsprompt] == 1]
+                    df_dsfdbplus = df[df[self.v_dsfdbplus] == 1]
+                    df_dsfdbzero = df[df[self.v_dsfdbzero] == 1]
+                    df_dsfdlambdab = df[df[self.v_dsfdlambdab] == 1]
+                    df_dsfdbs = df[df[self.v_dsfdbs] == 1]
+
+                    fill_hist(h_invmass_dspr, df_dspr.inv_mass)
+                    fill_hist(h_invmass_dsfdbplus, df_dsfdbplus.inv_mass)
+                    fill_hist(h_invmass_dsfdbzero, df_dsfdbzero.inv_mass)
+                    fill_hist(h_invmass_dsfdlamdab, df_dsfdlambdab.inv_mass)
+                    fill_hist(h_invmass_dsfdbs, df_dsfdbs.inv_mass)
+
+                    myfile.cd()
+                    h_invmass_dspr.Write()
+                    h_invmass_dsfdbplus.Write()
+                    h_invmass_dsfdbzero.Write()
+                    h_invmass_dsfdlamdab.Write()
+                    h_invmass_dsfdbs.Write()
+                else:
+                    self.logger.fatal("2nd binning to be implemented (code exists)")
+            h_isc_match.Write()
