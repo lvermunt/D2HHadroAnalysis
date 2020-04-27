@@ -29,9 +29,9 @@ Double_t nEvExpected = 8000000000;
 TString nEvExpectedString = "8 * 10^{9}";
 TString nLumiExpectedString = "10 nb^{-1}";
 
-TString filenameBkgCorr = "ITS3_Bs/BkgCorrFactor_Bs_1DataFile_25MCFile.root";
-TString filenameTAMU = "ITS3_Bs/input_RAA_TAMU_Bs.txt";
-TString filnameFONLL = "ITS3_Bs/inputFONLL.txt";
+TString filenameBkgCorr = "theory/BkgCorrFactor_Bs_1DataFile_25MCFile.root";
+TString filenameTAMU = "theory/input_RAA_TAMU_Bs.txt";
+TString filnameFONLL = "theory/inputFONLL.txt";
 Double_t fbtoB = 0.407; //http://pdg.lbl.gov/2019/reviews/rpp2018-rev-b-meson-prod-decay.pdf, table 85.1
 Double_t fbtoBUnc = 0.007;
 Double_t fLHCbBBs = 2*0.122; //https://journals.aps.org/prd/pdf/10.1103/PhysRevD.100.031102, factor 2 because B0 + B+

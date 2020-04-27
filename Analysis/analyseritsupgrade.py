@@ -142,9 +142,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.rebins = datap["analysis"][self.typean]["rebin"]
         self.binwidth = [None for _ in range(self.p_nptfinbins)]
 
-        self.n_filebkgcorrection = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/BkgCorrFactor_Bs_1DataFile_25MCFile.root"
-        self.n_filefonllinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/inputFONLL_02468121624.root"
-        self.n_filetamuinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/Analysis/ITS3_Bs/input_RAA_TAMU_Bs_02468121624.root"
+        #FIXME, move to a database
+        self.n_filebkgcorrection = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/InputAnalyses/Analysis_ITS3_Bs/theory/BkgCorrFactor_Bs_1DataFile_25MCFile.root"
+        self.n_filefonllinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/InputAnalyses/Analysis_ITS3_Bs/theory/inputFONLL_02468121624.root"
+        self.n_filetamuinput = "/Users/lvermunt/PycharmProjects/D2HHadroAnalysis/InputAnalyses/Analysis_ITS3_Bs/theory/input_RAA_TAMU_Bs_02468121624.root"
         self.v_ninterestingtrials = 500
         self.brbs = 0.00304
         self.brbs_err = 0.00023
