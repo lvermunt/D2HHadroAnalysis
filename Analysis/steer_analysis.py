@@ -60,7 +60,9 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
     dohistomass = data_config["analysis"]["masshisto"]
     doefficiency = data_config["analysis"]["effhisto"]
     doprobscan = data_config["analysis"]["probscan"]
-    dofitbackpars = data_config["analysis"]["fitbackpars"]
+    doparametrisebkg = data_config["analysis"]["parametrisebkg"]
+    dofitinvmassbkgscan = data_config["analysis"]["fitinvmassbkgscan"]
+    dofitbkgparamsbkgscan = data_config["analysis"]["fitbkgparamsbkgscan"]
     doexpectedsignf = data_config["analysis"]["expectedsignf"]
     dobkgshapestudy = data_config["analysis"]["bkgshapestudy"]
 
@@ -106,8 +108,12 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
         analyse_steps.append("efficiency")
     if doprobscan is True:
         analyse_steps.append("probability_scan")
-    if dofitbackpars is True:
+    if doparametrisebkg is True:
         analyse_steps.append("parametrise_background_scan")
+    if dofitinvmassbkgscan is True:
+        analyse_steps.append("fit_invmassbkg_scan")
+    if fitbkgparamsbkgscan is True:
+        analyse_steps.append("fit_bkgparams_2_scan")
     if doexpectedsignf is True:
         analyse_steps.append("expected_significance_print")
     if dobkgshapestudy is True:

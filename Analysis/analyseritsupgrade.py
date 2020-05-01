@@ -21,11 +21,12 @@ import pickle
 import math
 # pylint: disable=unused-wildcard-import, wildcard-import
 from array import array
-from numpy import isnan
+from numpy import isnan, average
 from root_numpy import fill_hist  # pylint: disable=import-error, no-name-in-module
 
 # pylint: disable=import-error, no-name-in-module, unused-import
 from ROOT import TFile, TH1F, TCanvas, TF1, TGraph, gPad, TGaxis, gStyle
+from ROOT import kBlack, kRed, kGreen, kBlue, kOrange, kViolet, kAzure
 
 from Analysis.analyser import Analyser
 from machine_learning_hep.logger import get_logger
@@ -101,6 +102,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.n_fileeff_name = datap["files_names"]["efffilename"]
         self.n_filemass_probscan = os.path.join(self.d_resultsallpdata, self.n_filemass_name)
         self.n_filemass_bkgshape = self.n_filemass_probscan.replace(".root", "_bkgshape.root")
+        self.n_filemass_bkgshapescaled = self.n_filemass_probscan.replace(".root", "_bkgshape_scaled.root")
         self.n_filemass_probscanfit = os.path.join(self.d_resultsallpdata, self.n_filemass_namefit)
         self.n_file_params = os.path.join(self.d_resultsallpdata, self.n_filepars_probscanfit)
         self.n_fileeff_probscan = os.path.join(self.d_resultsallpdata, self.n_fileeff_temp)
@@ -508,6 +510,11 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             canv = TCanvas("c_%d" % ipt, "c_%d" % ipt, 1350, 400)
             canv.Divide(3)
 
+            hbinwidth = TH1F("hbinwidth", "", self.p_num_bins,
+                             self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+            hbinwidth.Rebin(self.rebins[ipt])
+            self.binwidth[ipt] = hbinwidth.GetBinWidth(1)
+
             hpar0 = fpars.Get("hpar0_%d" % ipt)
             hpar1 = fpars.Get("hpar1_%d" % ipt)
             hentr = fpars.Get("hentr_%d" % ipt)
@@ -844,6 +851,8 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
         # Define limits first
         self.define_probscan_limits()
+        for ipt in range(self.p_nptfinbins):
+            self.a_probscan[ipt].insert(0, 0)
 
         myfile = TFile.Open(self.n_filemass_bkgshape, "recreate")
 
@@ -866,6 +875,41 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             h_isc_match = TH1F("h_match" + ptstring, ";scan iterator;ML prob.",
                                self.n_probscan + 2, -0.5, self.n_probscan + 1.5)
 
+            df_dspr = df[df[self.v_dsprompt] == 1]
+            df_dsfdbplus = df[df[self.v_dsfdbplus] == 1]
+            df_dsfdbzero = df[df[self.v_dsfdbzero] == 1]
+            df_dsfdlambdab = df[df[self.v_dsfdlambdab] == 1]
+            df_dsfdbs = df[df[self.v_dsfdbs] == 1]
+            unique_dspr = average([len(df_dspr["d_len_Ds"].unique()),
+                                   len(df_dspr["imp_par_xy_Ds"].unique()),
+                                   len(df_dspr["cos_PiDs_Ds"].unique())])
+            unique_dsfdbplus = average([len(df_dsfdbplus["d_len_Ds"].unique()),
+                                        len(df_dsfdbplus["imp_par_xy_Ds"].unique()),
+                                        len(df_dsfdbplus["cos_PiDs_Ds"].unique())])
+            unique_dsfdbzero = average([len(df_dsfdbzero["d_len_Ds"].unique()),
+                                        len(df_dsfdbzero["imp_par_xy_Ds"].unique()),
+                                        len(df_dsfdbzero["cos_PiDs_Ds"].unique())])
+            unique_dsfdlambdab = average([len(df_dsfdlambdab["d_len_Ds"].unique()),
+                                          len(df_dsfdlambdab["imp_par_xy_Ds"].unique()),
+                                          len(df_dsfdlambdab["cos_PiDs_Ds"].unique())])
+            unique_dsfdbs = average([len(df_dsfdbs["d_len_Ds"].unique()),
+                                     len(df_dsfdbs["imp_par_xy_Ds"].unique()),
+                                     len(df_dsfdbs["cos_PiDs_Ds"].unique())])
+
+            myfile.cd()
+            hNorm = TH1F("hNormUniqueDs" + ptstring, ";;Normalisation", 5, 0.5, 5.5)
+            hNorm.GetXaxis().SetBinLabel(1, "prompt Ds")
+            hNorm.GetXaxis().SetBinLabel(2, "feed-down Ds (B+)")
+            hNorm.GetXaxis().SetBinLabel(3, "feed-down Ds (B0)")
+            hNorm.GetXaxis().SetBinLabel(4, "feed-down Ds (Lb)")
+            hNorm.GetXaxis().SetBinLabel(5, "feed-down Ds (Bs)")
+            hNorm.SetBinContent(1, unique_dspr)
+            hNorm.SetBinContent(2, unique_dsfdbplus)
+            hNorm.SetBinContent(3, unique_dsfdbzero)
+            hNorm.SetBinContent(4, unique_dsfdlambdab)
+            hNorm.SetBinContent(5, unique_dsfdbs)
+            hNorm.Write()
+
             for isc in range(len(self.a_probscan[ipt])):
                 h_isc_match.Fill(isc, self.a_probscan[ipt][isc])
                 selml_cv = "y_test_prob%s>%s" % (self.p_modelname, self.a_probscan[ipt][isc])
@@ -881,7 +925,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                                                self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
                     h_invmass_dsfdbzero = TH1F("hmass_DsFDBzero" + suffix, "", self.p_num_bins,
                                                self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
-                    h_invmass_dsfdlamdab = TH1F("hmass_DsFDLambdab" + suffix, "", self.p_num_bins,
+                    h_invmass_dsfdlambdab = TH1F("hmass_DsFDLambdab" + suffix, "", self.p_num_bins,
                                                 self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
                     h_invmass_dsfdbs = TH1F("hmass_DsFDBs" + suffix, "", self.p_num_bins,
                                             self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
@@ -895,15 +939,204 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                     fill_hist(h_invmass_dspr, df_dspr.inv_mass)
                     fill_hist(h_invmass_dsfdbplus, df_dsfdbplus.inv_mass)
                     fill_hist(h_invmass_dsfdbzero, df_dsfdbzero.inv_mass)
-                    fill_hist(h_invmass_dsfdlamdab, df_dsfdlambdab.inv_mass)
+                    fill_hist(h_invmass_dsfdlambdab, df_dsfdlambdab.inv_mass)
                     fill_hist(h_invmass_dsfdbs, df_dsfdbs.inv_mass)
+
+                    h_norm_dspr = h_invmass_dspr.Clone("h_norm_dspr" + suffix)
+                    h_norm_dspr.Rebin(self.rebins[ipt])
+                    if h_norm_dspr.GetEntries() != 0:
+                        h_norm_dspr.Scale(1. / h_norm_dspr.GetEntries())
+                    h_norm_dspr.SetLineColor(kBlack)
+                    fbkg_dspr = TF1("fbkg_dspr" + suffix, "pol2",
+                                    self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dspr.SetLineColor(kBlack)
+                    h_norm_dspr.Fit("fbkg_dspr" + suffix, "R,E,+,0")
+                    fbkg_dspr1 = TF1("fbkg_dspr1" + suffix, "pol1",
+                                     self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dspr1.SetLineColor(kBlack)
+                    h_norm_dspr.Fit("fbkg_dspr1" + suffix, "R,E,+,0")
+
+                    h_norm_dsfdbplus = h_invmass_dsfdbplus.Clone("h_norm_dsfdbplus" + suffix)
+                    h_norm_dsfdbplus.Rebin(self.rebins[ipt])
+                    if h_norm_dsfdbplus.GetEntries() != 0:
+                        h_norm_dsfdbplus.Scale(1. / h_norm_dsfdbplus.GetEntries())
+                    h_norm_dsfdbplus.SetLineColor(kRed+1)
+                    fbkg_dsfdbplus = TF1("fbkg_dsfdbplus" + suffix, "pol2",
+                                         self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbplus.SetLineColor(kRed+1)
+                    h_norm_dsfdbplus.Fit("fbkg_dsfdbplus" + suffix, "R,E,+,0")
+                    fbkg_dsfdbplus1 = TF1("fbkg_dsfdbplus1" + suffix, "pol1",
+                                          self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbplus1.SetLineColor(kRed+1)
+                    h_norm_dsfdbplus.Fit("fbkg_dsfdbplus1" + suffix, "R,E,+,0")
+
+                    h_norm_dsfdbzero = h_invmass_dsfdbzero.Clone("h_norm_dsfdbzero" + suffix)
+                    h_norm_dsfdbzero.Rebin(self.rebins[ipt])
+                    if h_norm_dsfdbzero.GetEntries() != 0:
+                        h_norm_dsfdbzero.Scale(1. / h_norm_dsfdbzero.GetEntries())
+                    h_norm_dsfdbzero.SetLineColor(kBlue+1)
+                    fbkg_dsfdbzero = TF1("fbkg_dsfdbzero" + suffix, "pol2",
+                                         self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbzero.SetLineColor(kBlue+1)
+                    h_norm_dsfdbzero.Fit("fbkg_dsfdbzero" + suffix, "R,E,+,0")
+                    fbkg_dsfdbzero1 = TF1("fbkg_dsfdbzero1" + suffix, "pol1",
+                                          self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbzero1.SetLineColor(kBlue+1)
+                    h_norm_dsfdbzero.Fit("fbkg_dsfdbzero1" + suffix, "R,E,+,0")
+
+                    h_norm_dsfdlambdab = h_invmass_dsfdlambdab.Clone("h_norm_dsfdlambdab" + suffix)
+                    h_norm_dsfdlambdab.Rebin(self.rebins[ipt])
+                    if h_norm_dsfdlambdab.GetEntries() != 0:
+                        h_norm_dsfdlambdab.Scale(1. / h_norm_dsfdlambdab.GetEntries())
+                    h_norm_dsfdlambdab.SetLineColor(kGreen+2)
+                    fbkg_dsfdlambdab = TF1("fbkg_dsfdlambdab" + suffix, "pol2",
+                                          self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdlambdab.SetLineColor(kGreen+2)
+                    h_norm_dsfdlambdab.Fit("fbkg_dsfdlambdab" + suffix, "R,E,+,0")
+                    fbkg_dsfdlambdab1 = TF1("fbkg_dsfdlambdab1" + suffix, "pol1",
+                                            self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdlambdab1.SetLineColor(kGreen+2)
+                    h_norm_dsfdlambdab.Fit("fbkg_dsfdlambdab1" + suffix, "R,E,+,0")
+
+                    h_norm_dsfdbs = h_invmass_dsfdbs.Clone("h_norm_dsfdbs" + suffix)
+                    h_norm_dsfdbs.Rebin(self.rebins[ipt])
+                    if h_norm_dsfdbs.GetEntries() != 0:
+                        h_norm_dsfdbs.Scale(1. / h_norm_dsfdbs.GetEntries())
+                    h_norm_dsfdbs.SetLineColor(kOrange+2)
+                    fbkg_dsfdbs = TF1("fbkg_dsfdbs" + suffix, "pol2",
+                                      self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbs.SetLineColor(kOrange+2)
+                    h_norm_dsfdbs.Fit("fbkg_dsfdbs" + suffix, "R,E,+,0")
+                    fbkg_dsfdbs1 = TF1("fbkg_dsfdbs1" + suffix, "pol1",
+                                       self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+                    fbkg_dsfdbs1.SetLineColor(kOrange+2)
+                    h_norm_dsfdbs.Fit("fbkg_dsfdbs1" + suffix, "R,E,+,0")
+
+                    self.binwidth[ipt] = h_norm_dspr.GetBinWidth(1)
+                    h_norm_dspr.GetYaxis().SetTitle("Counts per %.2f MeV/#it{c}^{2} (norm.)" % self.binwidth[ipt])
+                    h_norm_dspr.GetXaxis().SetTitle("#it{M}(KK#pi#pi) (GeV/#it{c}^{2})")
 
                     myfile.cd()
                     h_invmass_dspr.Write()
+                    h_norm_dspr.Write()
+                    fbkg_dspr.Write()
+                    fbkg_dspr1.Write()
                     h_invmass_dsfdbplus.Write()
+                    h_norm_dsfdbplus.Write()
+                    fbkg_dsfdbplus.Write()
+                    fbkg_dsfdbplus1.Write()
                     h_invmass_dsfdbzero.Write()
-                    h_invmass_dsfdlamdab.Write()
+                    h_norm_dsfdbzero.Write()
+                    fbkg_dsfdbzero.Write()
+                    fbkg_dsfdbzero1.Write()
+                    h_invmass_dsfdlambdab.Write()
+                    h_norm_dsfdlambdab.Write()
+                    fbkg_dsfdlambdab.Write()
+                    fbkg_dsfdlambdab1.Write()
                     h_invmass_dsfdbs.Write()
+                    h_norm_dsfdbs.Write()
+                    fbkg_dsfdbs.Write()
+                    fbkg_dsfdbs1.Write()
                 else:
                     self.logger.fatal("2nd binning to be implemented (code exists)")
             h_isc_match.Write()
+
+    def analyse_bkgshapestudy(self):
+        """
+        Invariant mass histogram for injected Ds + HIJING pion
+        """
+
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+
+        # Define limits first
+        self.define_probscan_limits()
+        for ipt in range(self.p_nptfinbins):
+            self.a_probscan[ipt].insert(0, 0)
+
+        myfile = TFile.Open(self.n_filemass_bkgshape)
+        outfile = TFile.Open(self.n_filemass_bkgshapescaled, "recreate")
+
+        self.logger.info("Analysing bkg shape study for period %s", self.p_period)
+
+        for ipt in range(self.p_nptfinbins):
+            bin_id = self.bin_matching[ipt]
+            df = pickle.load(openfile(self.lpt_recodecmerged_data[bin_id], "rb"))
+
+            if self.s_evtsel is not None:
+                df = df.query(self.s_evtsel)
+            if self.s_trigger_data is not None:
+                df = df.query(self.s_trigger_data)
+            df = seldf_singlevar(df, self.v_var_binning,
+                                 self.lpt_finbinmin[ipt], self.lpt_finbinmax[ipt])
+
+            h_dspr = []
+            h_dsfdbplus = []
+            h_dsfdbzero = []
+            h_dsfdlambdab = []
+            h_dsfdbs = []
+            for isc in range(len(self.a_probscan[ipt])):
+                selml_cv = "y_test_prob%s>%s" % (self.p_modelname, self.a_probscan[ipt][isc])
+                df = df.query(selml_cv)
+
+                df_dspr = df[df[self.v_dsprompt] == 1]
+                df_dsfdbplus = df[df[self.v_dsfdbplus] == 1]
+                df_dsfdbzero = df[df[self.v_dsfdbzero] == 1]
+                df_dsfdlambdab = df[df[self.v_dsfdlambdab] == 1]
+                df_dsfdbs = df[df[self.v_dsfdbs] == 1]
+
+                arr_unique_dspr[ipt].append(average([len(df_dspr["d_len_Ds"].unique()),
+                                                     len(df_dspr["imp_par_xy_Ds"].unique()),
+                                                     len(df_dspr["cos_PiDs_Ds"].unique())]))
+                arr_unique_dsfdbplus[ipt].append(average([len(df_dsfdbplus["d_len_Ds"].unique()),
+                                                          len(df_dsfdbplus["imp_par_xy_Ds"].unique()),
+                                                          len(df_dsfdbplus["cos_PiDs_Ds"].unique())]))
+                arr_unique_dsfdbzero[ipt].append(average([len(df_dsfdbzero["d_len_Ds"].unique()),
+                                                          len(df_dsfdbzero["imp_par_xy_Ds"].unique()),
+                                                          len(df_dsfdbzero["cos_PiDs_Ds"].unique())]))
+                arr_unique_dsfdlambdab[ipt].append(average([len(df_dsfdlambdab["d_len_Ds"].unique()),
+                                                            len(df_dsfdlambdab["imp_par_xy_Ds"].unique()),
+                                                            len(df_dsfdlambdab["cos_PiDs_Ds"].unique())]))
+                arr_unique_dsfdbs[ipt].append(average([len(df_dsfdbs["d_len_Ds"].unique()),
+                                                       len(df_dsfdbs["imp_par_xy_Ds"].unique()),
+                                                       len(df_dsfdbs["cos_PiDs_Ds"].unique())]))
+
+                if self.lvar2_binmin is None:
+                    suffix = "%s%d_%d_%d" % (self.v_var_binning,
+                                             self.lpt_finbinmin[ipt],
+                                             self.lpt_finbinmax[ipt], isc)
+                    h_dspr.append(myfile.Get("hmass_DsPr" + suffix))
+                    h_dsfdbplus.append(myfile.Get("hmass_DsFDBplus" + suffix))
+                    h_dsfdbzero.append(myfile.Get("hmass_DsFDBzero" + suffix))
+                    h_dsfdlambdab.append(myfile.Get("hmass_DsFDLambdab" + suffix))
+                    h_dsfdbs.append(myfile.Get("hmass_DsFDBs" + suffix))
+
+                    h_dspr[isc].Rebin(self.rebins[ipt])
+                    h_dsfdbplus[isc].Rebin(self.rebins[ipt])
+                    h_dsfdbzero[isc].Rebin(self.rebins[ipt])
+                    h_dsfdlambdab[isc].Rebin(self.rebins[ipt])
+                    h_dsfdbs[isc].Rebin(self.rebins[ipt])
+
+                    if arr_unique_dspr[ipt][isc] != 0: h_dspr[isc].Scale(1. / arr_unique_dspr[ipt][isc])
+                    if arr_unique_dsfdbplus[ipt][isc] != 0: h_dsfdbplus[isc].Scale(1. / arr_unique_dsfdbplus[ipt][isc])
+                    if arr_unique_dsfdbzero[ipt][isc] != 0: h_dsfdbzero[isc].Scale(1. / arr_unique_dsfdbzero[ipt][isc])
+                    if arr_unique_dsfdlambdab[ipt][isc] != 0: h_dsfdlambdab[isc].Scale(1. / arr_unique_dsfdlambdab[ipt][isc])
+                    if arr_unique_dsfdbs[ipt][isc] != 0: h_dsfdbs[isc].Scale(1. / arr_unique_dsfdbs[ipt][isc])
+
+                    h_dspr[isc].SetLineColor(kBlack)
+                    h_dsfdbplus[isc].SetLineColor(kRed+1)
+                    h_dsfdbzero[isc].SetLineColor(kBlue+1)
+                    h_dsfdlambdab[isc].SetLineColor(kGreen+2)
+                    h_dsfdbs[isc].SetLineColor(kOrange+2)
+
+                    print(h_dspr[isc].Integral(), h_dsfdbplus[isc].Integral(), h_dsfdbs[isc].Integral())
+
+                    outfile.cd()
+                    h_dspr[isc].Write()
+                    h_dsfdbplus[isc].Write()
+                    h_dsfdbzero[isc].Write()
+                    h_dsfdlambdab[isc].Write()
+                    h_dsfdbs[isc].Write()
+                else:
+                    self.logger.fatal("2nd binning to be implemented (code exists)")
