@@ -15,6 +15,7 @@
 BsITS2:
   nprongs: 4
   doml: true
+  doml_asprefilter: true #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
   mass: 5.366
   sel_reco_unp: "pt_cand>0"
   sel_reco_singletrac_unp : null
@@ -196,6 +197,7 @@ BsITS2:
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
+    ml_prefilter_probcut: [0.7,0.7,0.7,0.7,0.7]
     probcutpresel:
       data: [0.7,0.7,0.7,0.7,0.7] #list of nbins
       mc: [0.7,0.7,0.7,0.7,0.7] #list of nbins
@@ -209,12 +211,16 @@ BsITS2:
     cctype: -1
     sigmav0: -1
     inputfonllpred: null
-    dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
+    #dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
+    dir_general_plots: /data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/analysis_plots
 
     MBvspt:
-      probscan_min: [0.95, 0.95, 0.95, 0.95, 0.95]
+      probscan_min: [0.97, 0.97, 0.97, 0.97, 0.97]
       probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 5000
+      n_probscan: 3000
+      #probscan_min: [0.7, 0.7, 0.7, 0.7, 0.7]
+      #probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
+      #n_probscan: 3000
       probscan_func_par1: "pol2"
       probscan_nfits: 8
       probscan_length_fits: 0.0005
@@ -245,12 +251,16 @@ BsITS2:
 
       data:
         runselection: [LHC19h1b2]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultsMBvspt_coarse] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_Bs/resultstotMBvspt_coarse
+        #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse_2nd] #list of periods
+        #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse_2nd
+        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse2] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse2
       mc:
         runselection: [LHC19h1b2]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
+        #results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
+        #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
+        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultsMBvspt_coarse2] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultstotMBvspt_coarse2
 
       # The global mass limits
       mass_fit_lim: [5.066, 5.666] # region for the fit of the invariant mass distribution [GeV/c^2]

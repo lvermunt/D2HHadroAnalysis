@@ -15,6 +15,7 @@
 BsITS2:
   nprongs: 4
   doml: true
+  doml_asprefilter: true #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
   mass: 5.366
   sel_reco_unp: "pt_cand>0"
   sel_reco_singletrac_unp : null
@@ -202,6 +203,7 @@ BsITS2:
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
+    ml_prefilter_probcut: [0.7,0.7,0.7,0.7,0.7,0.7,0.7]
     probcutpresel:
       data: [0.7,0.7,0.7,0.7,0.7,0.7,0.7] #list of nbins
       mc: [0.7,0.7,0.7,0.7,0.7,0.7,0.7] #list of nbins

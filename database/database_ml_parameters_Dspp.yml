@@ -15,6 +15,7 @@
 Dspp:
   nprongs: 3
   doml: true
+  doml_asprefilter: true #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
   mass: 1.968
   sel_reco_unp: "pt_cand>1"
   sel_reco_singletrac_unp : null
@@ -97,14 +98,14 @@ Dspp:
       period: [LHC16pp,LHC17pp] #list of periods
       unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/374_20200304-2028/merged,
                           /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/375_20200304-2028/merged] #list of periods
-      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/374_20200304-2028/pkl,
-            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/375_20200304-2028/pkl] #list of periods
-      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/374_20200304-2028/pklsk,
-                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/375_20200304-2028/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/374_20200304-2028/pklskml,
-                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/375_20200304-2028/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/pp_data_mltot
-      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/pp_data_evttot
+      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pkl,
+            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pkl] #list of periods
+      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pklsk,
+                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pklskml,
+                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/pp_data_mltot
+      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/pp_data_evttot
       mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2016,
                     ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2017] #list of periods
     mc:
@@ -115,14 +116,14 @@ Dspp:
       period: [LHC16pp,LHC17pp] #list of periods
       unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_1/merged,
                           /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_2/merged] #list of periods
-      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_1/pkl,
-            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_2/pkl] #list of periods
-      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_1/pklsk,
-                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_2/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_1/pklskml,
-                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_2/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/pp_mc_prodD2H_mltot
-      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/pp_mc_prodD2H_evttot
+      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pkl,
+            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pkl] #list of periods
+      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pklsk,
+                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pklskml,
+                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/pp_mc_prodD2H_mltot
+      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/pp_mc_prodD2H_evttot
       mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_16,
                     ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_17]
   ml:
@@ -146,8 +147,8 @@ Dspp:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10
-    mlplot: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/mlplot # to be removed
-    mlout: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/mlout    # to be removed
+    mlplot: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/mlplot # to be removed
+    mlout: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/mlout    # to be removed
     opt:
       isFONLLfromROOT: true
       filename_fonll: 'data/fonll/D0DplusDstarPredictions_13TeV_y05_all_300416_BDShapeCorrected.root' # file with FONLL predictions
@@ -176,7 +177,7 @@ Dspp:
     #                     {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':1, 'tree_method':hist}]
     #                     # list of dicts of hyperparameters (one for each pT bin)
     hyper_par_opt:
-      do_hyp_opt: True # whether to do the parameter optimization
+      do_hyp_opt: False # whether to do the parameter optimization
       njobs: 3         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5        # number of folds used in cross validation
       initpoints: 5    # steps of random exploration you want to perform
@@ -195,20 +196,21 @@ Dspp:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/374_20200304-2028/skpkldec,
-                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/375_20200304-2028/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/374_20200304-2028/skpkldecmerged,
-                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data/375_20200304-2028/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/skpkldec,
+                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/skpkldecmerged,
+                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/skpkldecmerged] #list of periods
     mc:
-      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_1/skpkldec,
-                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_2/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_1/skpkldecmerged,
-                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc/373_20200304-2021_2/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/skpkldec,
+                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/skpkldecmerged,
+                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/skpkldecmerged] #list of periods
     modelname: xgboost
-    modelsperptbin: [xgboost_classifierDspp_dfselection_pt_cand_1.0_8.0.sav,
-                     xgboost_classifierDspp_dfselection_pt_cand_8.0_24.0.sav]
+    modelsperptbin: [Model_pT_1_8.model,
+                     Model_pT_8_24.model]
     modelsperptbin_hipe4ml: [ModelHandler_pT_1_8.pickle,
                              ModelHandler_pT_8_24.pickle]
+    ml_prefilter_probcut: [0.2, 0.2]
     probcutpresel:
       data: [0.3,0.3] #list of nbins
       mc: [0.3,0.3] #list of nbins
