@@ -32,10 +32,10 @@ void makeCutsTreeCreator_PbPb2018_noCentrality(Bool_t usePID = kTRUE, Bool_t use
   Printf("\n\n");
   Printf("*************************************************************");
   Printf("Ds filtering cuts");
-  AliRDHFCutsDstoKKpi  *looseCutsDstoKKpi    = makeInputCutsDstoKKpi(0,"DstoKKpiFilteringCuts",minCent,maxCent,usePID);
+  AliRDHFCutsDstoKKpi  *looseCutsDstoKKpi    = makeInputCutsDstoKKpi(0,"DstoKKpiFilteringCuts",minCent,maxCent,usePID,usePreSelectBs);
   Printf("\n\n");
   Printf("Ds analysis cuts");
-  AliRDHFCutsDstoKKpi  *analysisCutsDstoKKpi = makeInputCutsDstoKKpi(1,"DstoKKpiAnalysisCuts",minCent,maxCent,usePID);
+  AliRDHFCutsDstoKKpi  *analysisCutsDstoKKpi = makeInputCutsDstoKKpi(1,"DstoKKpiAnalysisCuts",minCent,maxCent,usePID,usePreSelectBs);
   Printf("\n\n");
   Printf("*************************************************************");
   Printf("Dplus filtering cuts");
@@ -87,10 +87,10 @@ void makeCutsTreeCreator_PbPb2018_noCentrality(Bool_t usePID = kTRUE, Bool_t use
   AliRDHFCutsLctopKpi *analysisCutsLbtoLcpi= makeInputCutsLbtoLcpi(1,"LbtoLcpiAnalysisCuts",minCent,maxCent,usePID);
   
   TFile* fout;
-  if(usePID && usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_PbPb2018_kAny_noCentnoPS_ConsvPID_usePreSelect.root","recreate");
-  else if(usePID && !usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_PbPb2018_kAny_noCentnoPS_ConsvPID.root","recreate");
-  else if(!usePID && !usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_PbPb2018_kAny_noCentnoPS.root","recreate");
-  else       fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_PbPb2018_kAny_noCentnoPSnoPID_usePreSelect.root","recreate");
+  if(usePID && usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_DsAsBs_PbPb2018_kAny_noCentnoPS_ConsvPID_usePreSelect.root","recreate");
+  else if(usePID && !usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_DsAsBs_PbPb2018_kAny_noCentnoPS_ConsvPID.root","recreate");
+  else if(!usePID && !usePreSelectBs) fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_DsAsBs_PbPb2018_kAny_noCentnoPS.root","recreate");
+  else       fout=new TFile("D0DsDplusDstarLcBplusBsLbCuts_DsAsBs_PbPb2018_kAny_noCentnoPSnoPID_usePreSelect.root","recreate");
   fout->cd();
   looseCutsD0toKpi->Write();
   analysisCutsD0toKpi->Write();

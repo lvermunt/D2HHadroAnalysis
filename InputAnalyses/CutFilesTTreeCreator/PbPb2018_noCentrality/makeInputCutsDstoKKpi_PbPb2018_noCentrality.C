@@ -10,7 +10,7 @@
  */
 
 
-AliRDHFCutsDstoKKpi *makeInputCutsDstoKKpi(Int_t whichCuts=0, TString nameCuts="DstoKKpiFilteringCuts", Float_t minc=0.,Float_t maxc=100.,Bool_t usePID=kTRUE)
+AliRDHFCutsDstoKKpi *makeInputCutsDstoKKpi(Int_t whichCuts=0, TString nameCuts="DstoKKpiFilteringCuts", Float_t minc=0.,Float_t maxc=100.,Bool_t usePID=kTRUE,Bool_t usePreSelect=kTRUE)
 {
   
   AliRDHFCutsDstoKKpi* cuts=new AliRDHFCutsDstoKKpi();
@@ -28,14 +28,12 @@ AliRDHFCutsDstoKKpi *makeInputCutsDstoKKpi(Int_t whichCuts=0, TString nameCuts="
   //  esdTrackCuts->SetMinNClustersTPC(70);
   esdTrackCuts->SetMinRatioCrossedRowsOverFindableClustersTPC(0.8);
   esdTrackCuts->SetMinNCrossedRowsTPC(70);
-  esdTrackCuts->SetMinRatioCrossedRowsOverFindableClustersTPC(0.8);
   esdTrackCuts->SetClusterRequirementITS(AliESDtrackCuts::kSPD,AliESDtrackCuts::kAny);
   esdTrackCuts->SetEtaRange(-0.8,0.8);
-  esdTrackCuts->SetMinDCAToVertexXY(0.);
-  esdTrackCuts->SetPtRange(0.6,1.e10);
+  esdTrackCuts->SetPtRange(0.5,1.e10);
   esdTrackCuts->SetMaxDCAToVertexXY(1.);
   esdTrackCuts->SetMaxDCAToVertexZ(1.);
-  esdTrackCuts->SetMinDCAToVertexXYPtDep("0.0060*TMath::Max(0.,(1-TMath::Floor(TMath::Abs(pt)/2.)))");
+  esdTrackCuts->SetMinDCAToVertexXYPtDep("0.0015*TMath::Max(0.,(1-TMath::Floor(TMath::Abs(pt)/2.)))");
   
   cuts->AddTrackCuts(esdTrackCuts);
   cuts->SetUseTrackSelectionWithFilterBits(kFALSE);
@@ -44,57 +42,95 @@ AliRDHFCutsDstoKKpi *makeInputCutsDstoKKpi(Int_t whichCuts=0, TString nameCuts="
     cuts->SetStandardCutsPbPb2010();
     cuts->AddTrackCuts(esdTrackCuts);
 
-    const Int_t nptbins=2;
-    Float_t ptlimits[nptbins+1]={0.,5.,1000000.};
+    const Int_t nptbins=3;
+    Float_t ptlimits[nptbins+1]={0.,10.,1000000.};
     cuts->SetPtBins(nptbins+1,ptlimits);
-    
+
     Float_t** anacutsval=new Float_t*[20];
     for(Int_t ic=0;ic<20;ic++){anacutsval[ic]=new Float_t[nptbins];}
-    
-    anacutsval[0][0]=0.25;
-    anacutsval[1][0]=0.6;
-    anacutsval[2][0]=0.6;
+    //Used values for Ds analysis taken at 20/08/19 but tightened InvMass cut (0.25/0.3->0.12)
+    //04-12-20: Used filtering cuts for Ds, tightening Ds and phi mass window, set min pT to 2
+
+    /*
+     Cut list                                           rejection condition
+     0      "inv. mass [GeV]",                          invmassDS-massDspdg>fCutsRD
+     1      "pTK [GeV/c]",                              pTK<fCutsRd
+     2      "pTPi [GeV/c]",                             pTPi<fCutsRd
+     3      "d0K [cm]",                                 d0K<fCutsRd
+     4      "d0Pi [cm]",                                d0Pi<fCutsRd
+     5      "dist12 [cm]",                              dist12<fCutsRd
+     6      "sigmavert [cm]",                           sigmavert>fCutsRd
+     7      "decLen [cm]",                              decLen<fCutsRD
+     8      "ptMax [GeV/c]",                            ptMax<fCutsRD
+     9      "cosThetaPoint",                            CosThetaPoint<fCutsRD
+     10     "Sum d0^2 (cm^2)",                          sumd0<fCutsRD
+     11     "dca [cm]",                                 dca(i)>fCutsRD
+     12     "inv. mass (Mphi-MKK) [GeV]",               invmass-pdg>fCutsRD
+     13     "inv. mass (MKo*-MKpi) [GeV]"};             invmass-pdg>fCutsRD
+     14     "Abs(CosineKpiPhiRFrame)^3",
+     15     "CosPiDsLabFrame"};
+     16     "DecLengthXY
+     17     "NormDecayLength"};
+     18     "NormDecayLengthXY"};
+     19     "cosThetaPointXY"};
+     */
+
+    //Filtering ITS3 MC
+    //Float_t cutsArrayDstoKKpi[20]={0.3,0.3,0.3,0.,0.,0.,0.06,0.,0.,0.9,0.,100000.,0.02,0.0001,-1.,1.,0.,0.,0.,-1.};
+
+    anacutsval[0][0]=0.07; //tighter than filtering
+    anacutsval[1][0]=0.5; //tighter than filtering
+    anacutsval[2][0]=0.5; //tighter than filtering
     anacutsval[3][0]=0.;
     anacutsval[4][0]=0.;
     anacutsval[5][0]=0.;
-    anacutsval[6][0]=0.04;
-    anacutsval[7][0]=0.05;
+    anacutsval[6][0]=0.035; //tighter than filtering
+    anacutsval[7][0]=0.01; //=tighter than filtering (0.0, bkg level otherwise too high)
     anacutsval[8][0]=0.;
-    anacutsval[9][0]=0.98;
+    anacutsval[9][0]=0.9; //filtering
     anacutsval[10][0]=0.;
-    anacutsval[11][0]=1000.0;
-    anacutsval[12][0]=0.010;
-    anacutsval[13][0]=0.001;
-    anacutsval[14][0]=0.;
-    anacutsval[15][0]=1.;
-    anacutsval[16][0]=0.;
-    anacutsval[17][0]=0.;
-    anacutsval[18][0]=3.;
-    anacutsval[19][0]=0.98;
-    
-    anacutsval[0][1]=0.3;
-    anacutsval[1][1]=0.6;
-    anacutsval[2][1]=0.6;
+    anacutsval[11][0]=0.05; //tighter than filtering
+    anacutsval[12][0]=0.01; //tighter than filtering
+    anacutsval[13][0]=0.0001; //filtering
+    anacutsval[14][0]=-1; //Open for ML optimisation
+    anacutsval[15][0]=1.; //Open for ML optimisation
+    anacutsval[16][0]=0.; //Open for ML optimisation
+    anacutsval[17][0]=0.; //Open for ML optimisation
+    anacutsval[18][0]=0.; //Open for ML optimisation
+    anacutsval[19][0]=-1; //Open for ML optimisation
+
+    anacutsval[0][1]=0.07; //tighter than filtering
+    anacutsval[1][1]=0.5; //tighter than filtering
+    anacutsval[2][1]=0.5; //tighter than filtering
     anacutsval[3][1]=0.;
     anacutsval[4][1]=0.;
     anacutsval[5][1]=0.;
-    anacutsval[6][1]=0.06;
-    anacutsval[7][1]=0.02;
+    anacutsval[6][1]=0.035; //tighter than filtering
+    anacutsval[7][1]=0.01; //=tighter than filtering (0.0, bkg level otherwise too high)
     anacutsval[8][1]=0.;
-    anacutsval[9][1]=0.9;
+    anacutsval[9][1]=0.9; //filtering
     anacutsval[10][1]=0.;
-    anacutsval[11][1]=100000.;
-    anacutsval[12][1]=0.015;
-    anacutsval[13][1]=0.0001;
-    anacutsval[14][1]=-1.;
-    anacutsval[15][1]=1.;
-    anacutsval[16][1]=0.;
-    anacutsval[17][1]=0.;
-    anacutsval[18][1]=3.;
-    anacutsval[19][1]=-1.;
-    
+    anacutsval[11][1]=0.1; //tighter than filtering
+    anacutsval[12][1]=0.01; //tighter than filtering
+    anacutsval[13][1]=0.0001; //filtering
+    anacutsval[14][1]=-1; //Open for ML optimisation
+    anacutsval[15][1]=1.; //Open for ML optimisation
+    anacutsval[16][1]=0.; //Open for ML optimisation
+    anacutsval[17][1]=0.; //Open for ML optimisation
+    anacutsval[18][1]=0.; //Open for ML optimisation
+    anacutsval[19][1]=-1; //Open for ML optimisation
+
     cuts->SetCuts(20,nptbins,anacutsval);
-    cuts->SetMinPtCandidate(2.);
+    cuts->SetMinPtCandidate(1.);
+
+    //AliAODPidHF* pidObj=new AliAODPidHF();
+    //Double_t sigmasBac[5]={3.,3.,3.,3.,3.}; // 0, 1(A), 2(A) -> TPC; 3 -> TOF; 4 -> ITS
+    //pidObj->SetSigma(sigmasBac);
+    //pidObj->SetAsym(kFALSE);
+    //pidObj->SetMatch(1);
+    //pidObj->SetTPC(kTRUE);
+    //pidObj->SetTOF(kTRUE);
+    //cuts->SetPidHF(pidObj);
     
     cuts->SetPidOption(0); //0=kConservative,1=kStrong
     Bool_t pidflag=usePID;
@@ -268,19 +304,22 @@ AliRDHFCutsDstoKKpi *makeInputCutsDstoKKpi(Int_t whichCuts=0, TString nameCuts="
     cuts->SetCuts(nvars,nptbins,anacutsval);
     cuts->Setd0MeasMinusExpCut(nptbins,topomCuts);
     cuts->Setd0Cut(nptbins,d0Cuts);
-    
-    cuts->SetPidOption(1); //0=kConservative,1=kStrong
-    cuts->SetMaxPtStrongPid(8.);
-    
+
     cuts->SetMinPtCandidate(2.);
     cuts->SetMaxPtCandidate(36.);
-    cuts->SetMaxPtStrongPid(9999.);
-    
+
+    cuts->SetPidOption(0); //0=kConservative,1=kStrong
+    //cuts->SetMaxPtStrongPid(8.);
+    //cuts->SetMaxPtStrongPid(9999.);
+
     Bool_t pidflag=usePID;
     cuts->SetUsePID(pidflag);
     if(pidflag) cout<<"PID is used for analysis cuts"<<endl;
     else cout<<"PID is not used for analysis cuts"<<endl;
   }
+
+  //Use Ds PreSelect
+  if(usePreSelect) cuts->SetUsePreSelect(2);
   
   //Do not recalculate the vertex
   cuts->SetRemoveDaughtersFromPrim(kFALSE); //activate for pp
