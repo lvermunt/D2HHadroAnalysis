@@ -481,6 +481,22 @@ elif [ "$dataset" == "LHC19h1b2" ]; then
   inputpaths=(/alice/sim/2019/LHC19h1b2/280235/PWGHF/HF_TreeCreator)
   datasetwithchilds=0
   dataset_short="ITS2_19h1b2"
+elif [ "$dataset" == "LHC19h1b2_1234" ]; then
+  #MC ITS2 Upgrade 2019 cycle b: PbPb, heavily enriched with HF (charm and beauty signal)
+  inputpaths=(/alice/sim/2019/LHC19h1b2_1/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1b2_2/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1b2_3/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1b2_4/246392/PWGHF/HF_TreeCreator)
+  datasetwithchilds=1
+  dataset_short="ITS2_19h1b2_full"
+elif [ "$dataset" == "LHC19h1a2_1234" ]; then
+  #MC ITS2 Upgrade 2019 cycle a: PbPb, heavily enriched with HF (charm and beauty signal)
+  inputpaths=(/alice/sim/2019/LHC19h1a2_1/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1a2_2/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1a2_3/246392/PWGHF/HF_TreeCreator
+              /alice/sim/2019/LHC19h1a2_4/246392/PWGHF/HF_TreeCreator)
+  datasetwithchilds=1
+  dataset_short="ITS2_19h1a2_full"
 else
   printf "\e[1;31mError: Dataset not yet implemented. Returning...\e[0m\n\n"
   exit
@@ -579,7 +595,7 @@ fi
 #----RUNNING THE DOWNLOADER----#
 printf "\n\n\e[1m----RUNNING THE DOWNLOADER----\e[0m\n\n"
 printf "  Output of downloaders stored in:            \e[1m%s\e[0m\n  Warnings/Errors of downloader stored in:    \e[1m%s\e[0m\n" $i $stdoutputfile $stderrorfile
-rundownloader="sh ../cplusutilities/downloader.sh"
+rundownloader="sh downloader.sh"
 
 printf "\n\n\n\nOutput downloading starts here\n\n" > "$stdoutputfile"
 printf "\n\n\n\nErrors downloading starts here\n\n" > "$stderrorfile"
@@ -593,7 +609,7 @@ do
   localchild=$(($input_index+1))
   placetosave=${placetosavearr[$input_index]}
 
-  sh ../cplusutilities/run_downloader $rundownloader ${inputpaths[$input_index]} $ithinput "$nfiles" $outputfile $placetosave $trainname $datasetwithchilds $localchild $stage >> "$stdoutputfile" 2>> "$stderrorfile"
+  sh run_downloader $rundownloader ${inputpaths[$input_index]} $ithinput "$nfiles" $outputfile $placetosave $trainname $datasetwithchilds $localchild $stage >> "$stdoutputfile" 2>> "$stderrorfile"
 done
 
 
@@ -640,5 +656,4 @@ printf "\n\e[1m<<<Ready downloading? Please kill JAliEn daemons>>>\e[0m\n"
 printf "  killall java\n"
 printf "\e[1m<<<And remove alien logs if you like>>>\e[0m\n"
 printf "  rm alien-config* alien-fine* alien-info* alien-severe* alien-warning*\n"
-printf "  rm ../cplusutilities/alien-config* ../cplusutilities/alien-fine* ../cplusutilities/alien-info* ../cplusutilities/alien-severe* ../cplusutilities/alien-warning*\n"
 
