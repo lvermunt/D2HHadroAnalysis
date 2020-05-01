@@ -57,7 +57,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.p_frac_merge = p_frac_merge
         self.p_rd_merge = p_rd_merge
         self.period = p_period
-        self.runlist = run_param[self.period]
+        self.runlist = run_param.get(self.period, None)
         self.p_maxfiles = p_maxfiles
         self.p_chunksizeunp = p_chunksizeunp
         self.p_chunksizeskim = p_chunksizeskim
@@ -200,7 +200,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #    self.d_pkl_dec = d_pkl_dec + "/prefilter"
         #    self.d_pkl_decmerged = d_pkl_decmerged + "/prefilter"
         if self.do_mlprefilter is False:
-            inputdir_forapply = d_pkl_dec + "/prefilter"
+            inputdir_forapply = d_pkl_dec.replace("/analysis", "/prefilter")
         #    self.d_pkl_dec = d_pkl_dec + "/analysis"
         #    self.d_pkl_decmerged = d_pkl_decmerged + "/analysis"
 
@@ -378,7 +378,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
                         protocol=4)
-            if self.do_mlprefilter is True:
+            if self.do_mlprefilter is True and self.mcordata == "mc":
                 dfgensk = pickle.load(openfile(self.mptfiles_gensk[ipt][file_index], "rb"))
                 pickle.dump(dfgensk, openfile(self.mptfiles_genskmldec[ipt][file_index], "wb"),
                         protocol=4)

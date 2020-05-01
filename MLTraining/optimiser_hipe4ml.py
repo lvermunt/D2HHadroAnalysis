@@ -43,14 +43,14 @@ class Optimiserhipe4ml:
 
         self.logger = get_logger()
 
-        self.do_mlprefilter = datap.get("doml_asprefilter", None)
+        self.do_mlprefilter = data_param.get("doml_asprefilter", None)
         self.v_bin = data_param["var_binning"]
         # directory
         dirmcml = data_param["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"]
         dirdataml = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"]
-        if self.do_mlprefilter is False:
-            dirmcml = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"] + "/prefilter"
-            dirdataml = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"] + "/prefilter"
+        if self.do_mlprefilter is False: #FIXME for multiple periods
+            dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
+            dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
         # directory
         self.dirmlout = data_param["ml"]["mlout"]
         self.dirmlplot = data_param["ml"]["mlplot"]
