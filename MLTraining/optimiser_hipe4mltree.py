@@ -37,8 +37,15 @@ class Optimiserhipe4mltree:
         self.logger = get_logger()
 
         # directory
+        #self.do_mlprefilter = datap.get("doml_asprefilter", None)
         self.dirmlout = data_param["ml"]["mlout"]
         self.dirmlplot = data_param["ml"]["mlplot"]
+        #if self.do_mlprefilter is True:
+        #    self.dirmodel = self.dirmodel + "/prefilter"
+        #    self.dirmlplot = self.dirmlplot + "/prefilter"
+        #if self.do_mlprefilter is False:
+        #    self.dirmodel = self.dirmodel + "/analysis"
+        #    self.dirmlplot = self.dirmlplot + "/analysis"
 
         self.inputtreedata = "/Users/lvermunt/cernbox/Analyses/ML/input/hipe4mlTTree/data.root"
         self.inputtreemc = "/Users/lvermunt/cernbox/Analyses/ML/input/hipe4mlTTree/prompt.root"

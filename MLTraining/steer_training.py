@@ -61,6 +61,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 
     doml = data_config["ml_study"]["activate"]
     domloption = data_config["ml_study"]["dohipe4ml"]
+    domlprefilterstep = data_config["ml_study"]["domlprefilterstep"]
     docorrelation = data_config["ml_study"]['docorrelation']
     dotraining = data_config["ml_study"]['dotraining']
     dotesting = data_config["ml_study"]['dotesting']
@@ -87,8 +88,31 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
     if not isinstance(training_vars[0], list):
         training_vars = [training_vars for _ in range(len(binminarray))]
 
+    domlprefilterstep_indb = data_param[case].get("doml_asprefilter", None)
+    if domlprefilterstep is True and domlprefilterstep_indb is not None:
+        data_param[case]["doml_asprefilter"] = True
+        domlprefilterstep_indb = True
+    if domlprefilterstep is False and domlprefilterstep_indb is not None:
+        data_param[case]["doml_asprefilter"] = False
+        domlprefilterstep_indb = False
+    if domlprefilterstep_indb is None:
+        data_param[case]["doml_asprefilter"] = None
+        domlprefilterstep_indb = None
+        if domlprefilterstep is True:
+            logger.warning("Mismatch between domlprefilter step in config and DBs")
+
     mlout = data_param[case]["ml"]["mlout"]
     mlplot = data_param[case]["ml"]["mlplot"]
+    if domlprefilterstep_indb is True:
+        data_param[case]["ml"]["mlout"] = mlout + "/prefilter"
+        data_param[case]["ml"]["mlplot"] = mlplot + "/prefilter"
+        mlout = mlout + "/prefilter"
+        mlplot = mlplot + "/prefilter"
+    if domlprefilterstep_indb is False:
+        data_param[case]["ml"]["mlout"] = mlout + "/analysis"
+        data_param[case]["ml"]["mlplot"] = mlplot + "/analysis"
+        mlout = mlout + "/analysis"
+        mlplot = mlplot + "/analysis"
 
     opti_hyperpar_hipe4ml = data_param[case]["hipe4ml"]["hyper_par_opt"]["do_hyp_opt"]
     hipe4ml_hyper_pars = data_param[case]["hipe4ml"]["hipe4ml_hyper_pars"]

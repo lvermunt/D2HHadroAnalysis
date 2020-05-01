@@ -21,6 +21,7 @@ mergingperiods: # pkl_skimmed_merge_for_ml_all
     activate: true
 
 mlapplication:
+  domlprefilterstep: true
   data:
     doapply: true # pkl_skimmed_dec (pklskdec)
     doapplymodelhandler: false #for hipe4ml package

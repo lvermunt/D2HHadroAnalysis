@@ -165,30 +165,60 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                     self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
 
         #Variables for ML applying
+        self.do_mlprefilter = datap.get("doml_asprefilter", None)
         self.p_modelname = datap["mlapplication"]["modelname"]
         self.lpt_model = datap["mlapplication"]["modelsperptbin"]
         self.lpt_modhandler_hipe4ml = datap["mlapplication"]["modelsperptbin_hipe4ml"]
         self.dirmodel = datap["ml"]["mlout"]
+        if self.do_mlprefilter is True:
+            self.dirmodel = self.dirmodel + "/prefilter"
+            self.p_modelname = self.p_modelname + "prefilter"
+        if self.do_mlprefilter is False:
+            self.dirmodel = self.dirmodel + "/analysis"
         self.lpt_model = appendmainfoldertolist(self.dirmodel, self.lpt_model)
         self.lpt_modhandler_hipe4ml = appendmainfoldertolist(self.dirmodel, self.lpt_modhandler_hipe4ml)
 
         self.doml = datap["doml"]
+        if self.do_mlprefilter is not None and self.doml == False:
+            print("FATAL error: The ML prefilter feature cannot combine with rectangular cuts")
         if not self.doml:
             datap["mlapplication"]["probcutpresel"][self.mcordata] = [0 for _ in self.lpt_anbinmin]
             datap["mlapplication"]["probcutoptimal"] = [0 for _ in self.lpt_anbinmin]
-        self.lpt_probcutpre = datap["mlapplication"]["probcutpresel"][self.mcordata]
+            datap["mlapplication"]["ml_prefilter_probcut"] = [0 for _ in self.lpt_anbinmin]
         self.lpt_probcutfin = datap["mlapplication"]["probcutoptimal"]
-        if self.lpt_probcutfin < self.lpt_probcutpre:
-            print("FATAL error: probability cut final must be tighter!")
+        if self.do_mlprefilter is True:
+            self.lpt_probcutpre = datap["mlapplication"]["ml_prefilter_probcut"]
+        else:
+            self.lpt_probcutpre = datap["mlapplication"]["probcutpresel"][self.mcordata]
+            if self.lpt_probcutfin < self.lpt_probcutpre:
+                print("FATAL error: probability cut final must be tighter!")
 
         self.d_pkl_dec = d_pkl_dec
         self.d_pkl_decmerged = d_pkl_decmerged
+        inputdir_forapply = None
+        #if self.do_mlprefilter is True:
+        #    self.d_pkl_dec = d_pkl_dec + "/prefilter"
+        #    self.d_pkl_decmerged = d_pkl_decmerged + "/prefilter"
+        if self.do_mlprefilter is False:
+            inputdir_forapply = d_pkl_dec + "/prefilter"
+        #    self.d_pkl_dec = d_pkl_dec + "/analysis"
+        #    self.d_pkl_decmerged = d_pkl_decmerged + "/analysis"
 
+        self.mptfiles_recosk_forapply = []
+        if self.do_mlprefilter is False:
+            self.mptfiles_recosk_forapply = [createlist(inputdir_forapply, self.l_path,
+                                            self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
+        else:
+            self.mptfiles_recosk_forapply = [createlist(self.d_pklsk, self.l_path,
+                                             self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         self.lpt_recodec = None
         if self.doml is True:
-            self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
-                               (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
-                                self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
+            if self.do_mlprefilter is True:
+                self.lpt_recodec = self.lpt_recosk
+            else:
+                self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
+                                   (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                    self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
         else:
             self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_std.pkl" % \
                                (self.lpt_anbinmin[i], self.lpt_anbinmax[i])) \
@@ -198,6 +228,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.lpt_recodecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_recodec[ipt])
                                   for ipt in range(self.p_nptbins)]
         if self.mcordata == "mc":
+            self.mptfiles_genskmldec = [createlist(self.d_pkl_dec, self.l_path, \
+                                        self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
             self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_gensk[ipt])
                                      for ipt in range(self.p_nptbins)]
 
@@ -333,7 +365,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
                 if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
                     continue
-            dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
+            dfrecosk = pickle.load(openfile(self.mptfiles_recosk_forapply[ipt][file_index], "rb"))
             if self.doml is True:
                 if os.path.isfile(self.lpt_model[ipt]) is False:
                     print("Model file not present in bin %d" % ipt)
@@ -345,6 +377,10 @@ class Processer: # pylint: disable=too-many-instance-attributes
             else:
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
+                        protocol=4)
+            if self.do_mlprefilter is True:
+                dfgensk = pickle.load(openfile(self.mptfiles_gensk[ipt][file_index], "rb"))
+                pickle.dump(dfgensk, openfile(self.mptfiles_genskmldec[ipt][file_index], "wb"),
                         protocol=4)
 
     def applymodel_hipe4ml(self, file_index):

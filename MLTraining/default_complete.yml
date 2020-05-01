@@ -6,6 +6,7 @@ analysis:
 ml_study:
   activate: true
   dohipe4ml: 2 #1 default MLHEP, 2 is hipe4ml, 3 = hipe4ml_fromttrees
+  domlprefilterstep: true
 
   dopca: false
   docorrelation: false

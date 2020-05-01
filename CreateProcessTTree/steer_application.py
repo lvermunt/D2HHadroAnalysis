@@ -63,10 +63,42 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
     docontinueapplydata = data_config["mlapplication"]["data"]["docontinueafterstop"]
     docontinueapplymc = data_config["mlapplication"]["mc"]["docontinueafterstop"]
 
+    domlprefilterstep = data_config["mlapplication"]["domlprefilterstep"]
+    domlprefilterstep_indb = data_param[case].get("doml_asprefilter", None)
+    if domlprefilterstep is True and domlprefilterstep_indb is not None:
+        data_param[case]["doml_asprefilter"] = True
+        domlprefilterstep_indb = True
+    if domlprefilterstep is False and domlprefilterstep_indb is not None:
+        data_param[case]["doml_asprefilter"] = False
+        domlprefilterstep_indb = False
+    if domlprefilterstep_indb is None:
+        data_param[case]["doml_asprefilter"] = None
+        domlprefilterstep_indb = None
+        if domlprefilterstep is True:
+            logger.warning("Mismatch between domlprefilter step in config and DBs")
+
     dirpklskdecmc = data_param[case]["mlapplication"]["mc"]["pkl_skimmed_dec"]
     dirpklskdec_mergedmc = data_param[case]["mlapplication"]["mc"]["pkl_skimmed_decmerged"]
     dirpklskdecdata = data_param[case]["mlapplication"]["data"]["pkl_skimmed_dec"]
     dirpklskdec_mergeddata = data_param[case]["mlapplication"]["data"]["pkl_skimmed_decmerged"]
+    if domlprefilterstep_indb is True:
+        data_param[case]["mlapplication"]["mc"]["pkl_skimmed_dec"] = dirpklskdecmc + "/prefilter"
+        data_param[case]["mlapplication"]["mc"]["pkl_skimmed_decmerged"] = dirpklskdec_mergedmc + "/prefilter"
+        data_param[case]["mlapplication"]["data"]["pkl_skimmed_dec"] = dirpklskdecdata + "/prefilter"
+        data_param[case]["mlapplication"]["data"]["pkl_skimmed_decmerged"] = dirpklskdec_mergeddata + "/prefilter"
+        dirpklskdecmc = dirpklskdecmc + "/prefilter"
+        dirpklskdec_mergedmc = dirpklskdec_mergedmc + "/prefilter"
+        dirpklskdecdata = dirpklskdecdata + "/prefilter"
+        dirpklskdec_mergeddata = dirpklskdec_mergeddata + "/prefilter"
+    if domlprefilterstep_indb is False:
+        data_param[case]["mlapplication"]["mc"]["pkl_skimmed_dec"] = dirpklskdecmc + "/analysis"
+        data_param[case]["mlapplication"]["mc"]["pkl_skimmed_decmerged"] = dirpklskdec_mergedmc + "/analysis"
+        data_param[case]["mlapplication"]["data"]["pkl_skimmed_dec"] = dirpklskdecdata + "/analysis"
+        data_param[case]["mlapplication"]["data"]["pkl_skimmed_decmerged"] = dirpklskdec_mergeddata + "/analysis"
+        dirpklskdecmc = dirpklskdecmc + "/analysis"
+        dirpklskdec_mergedmc = dirpklskdec_mergedmc + "/analysis"
+        dirpklskdecdata = dirpklskdecdata + "/analysis"
+        dirpklskdec_mergeddata = dirpklskdec_mergeddata + "/analysis"
 
     #creating folder if not present
     counter = 0
