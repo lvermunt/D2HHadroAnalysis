@@ -12,7 +12,10 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-BsITS2_SigShape:
+#DB to extract Ds efficiency. Will not work for > ML stage.
+#Not yet sure how to match the pT binning to Bs. For the moment chose the same
+
+DsITS2_SigShape:
   nprongs: 4
   doml: true
   doml_asprefilter: true #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
@@ -55,10 +58,9 @@ BsITS2_SigShape:
     isdsfdbs: [[15],[]]
 
   variables:
-    var_all: [norm_dl_xy, cos_p, cos_p_xy, dca, cos_t_star, imp_par_xy, imp_par_prod,
-              inv_mass_Ds, pt_Ds, d_len_Ds, norm_dl_xy_Ds, cos_p_xy_Ds, imp_par_xy_Ds,
-              sig_vert_Ds, delta_mass_KK_Ds, cos_PiDs_Ds, cos_PiKPhi_3_Ds, max_norm_d0d0exp_Ds,
-              pt_prong0, pt_prong1, pt_prong2, pt_prong3, imp_par_prong0, imp_par_prong1, imp_par_prong2, imp_par_prong3,
+    var_all: [d_len, norm_dl_xy, cos_p_xy, imp_par_xy,
+              sig_vert, delta_mass_KK, cos_PiDs, cos_PiKPhi_3, max_norm_d0d0exp,
+              pt_prong0, pt_prong1, pt_prong2, imp_par_prong0, imp_par_prong1, imp_par_prong2
               inv_mass, pt_cand, cand_type, y_cand, run_number, ev_id, ev_id_ext]
               #d_len, d_len_xy,  max_norm_d0d0exp, y_Ds, d_len_xy_Ds, cos_p_Ds, dca_Ds, phi_cand, eta_prong0, eta_prong1, eta_prong2, eta_prong3, PID variables
     var_evt:
@@ -82,10 +84,10 @@ BsITS2_SigShape:
     namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl
     namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl
     namefile_mcweights: mcweights.root
-    treeoriginreco: 'PWGHF_TreeCreatorITS2/tree_Bs'
-    treeorigingen: 'PWGHF_TreeCreatorITS2/tree_Bs_gen'
+    treeoriginreco: 'PWGHF_TreeCreatorITS2/tree_Ds'
+    treeorigingen: 'PWGHF_TreeCreatorITS2/tree_Ds_gen'
     treeoriginevt: 'PWGHF_TreeCreatorITS2/tree_event_char'
-    treeoutput: "Bstree"
+    treeoutput: "Dstree"
     histofilename: "masshisto.root"
     efffilename: "effhisto.root"
     crossfilename: "cross_section_tot.root"
@@ -102,11 +104,11 @@ BsITS2_SigShape:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200426_ROOT6-1/ITS2_19h1a2_full/412_20200427-1444/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/ITS2Upgr_19_bkg_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/ITS2Upgr_19_bkg_evttot_coarse
+      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pklDs] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pklDssk_coarse] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/pklDsskml_coarse] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/ITS2Upgr_19_bkgDs_mltot_coarse
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/ITS2Upgr_19_bkgDs_evttot_coarse
       mcreweights: [mcreweights]
     mc:
       nprocessesparallel: 50
@@ -116,11 +118,11 @@ BsITS2_SigShape:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_BsITSUpgrade/TTree_BskAnyITS2ITS3Improver/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/merged] #list of periods
-      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pklsk_coarse] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pklskml_coarse] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/ITS2Upgr_19_sig_mltot_coarse
-      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/ITS2Upgr_19_sig_evttot_coarse
+      pkl: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pklDs] #list of periods
+      pkl_skimmed: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pklDssk_coarse] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/pklDsskml_coarse] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/ITS2Upgr_19_sigDs_mltot_coarse
+      pkl_evtcounter_all: /data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/ITS2Upgr_19_sigDs_evttot_coarse
       mcreweights: [mcreweights]
 
   ml:
@@ -145,8 +147,8 @@ BsITS2_SigShape:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mlplot_hipe4ml_coarse # to be removed
-    mlout: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mlout_hipe4ml_coarse # to be removed
+    mlplot: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mlplotDs_hipe4ml_coarse # to be removed
+    mlout: /data/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mloutDs_hipe4ml_coarse # to be removed
 
     opt:
       isFONLLfromROOT: false
@@ -191,12 +193,12 @@ BsITS2_SigShape:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpklDsdec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpklDsdecmerged_coarse] #list of periods
       #pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/339_20200116-2348/skpkldecmerged_coarse]  #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpklDsdec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpklDsdecmerged_coarse] #list of periods
     modelname: xgboost
     modelsperptbin: [Model_pT_0_4.model,
                      Model_pT_4_8.model,
@@ -223,7 +225,7 @@ BsITS2_SigShape:
     sigmav0: -1
     inputfonllpred: null
     #dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
-    dir_general_plots: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/analysis_plots
+    dir_general_plots: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/analysis_plots_Ds
 
     MBvspt:
       probscan_min: [0.995, 0.995, 0.995, 0.995, 0.995]
@@ -261,14 +263,14 @@ BsITS2_SigShape:
         runselection: [LHC19h1b2]
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/335_20200116-2347/resultsMBvspt_coarse] #list of periods
         #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/335_20200116-2347/resultstotMBvspt_coarse
-        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultsMBvspt_coarse] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultstotMBvspt_coarse
+        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultsMBvsptDs_coarse] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultstotMBvsptDs_coarse
       mc:
         runselection: [LHC19h1b2]
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
         #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
-        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/resultsMBvspt_final] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/resultstotMBvspt_final
+        results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/resultsMBvsptDs_final] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/resultstotMBvsptDs_final
 
       # The global mass limits
       mass_fit_lim: [5.066, 5.666] # region for the fit of the invariant mass distribution [GeV/c^2]
