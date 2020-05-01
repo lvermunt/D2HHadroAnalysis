@@ -1,0 +1,21 @@
+# Job started on: Sat Apr 25 21:04:10 CEST 2020 ........
+# FONLL heavy quark hadroproduction cross section, calculated on Sat Apr 25 21:05:23 CEST 2020
+# FONLL version and perturbative order: ## FONLL v1.3.2 fonll [ds/dpt^2dy (pb/GeV^2)]
+# quark = bottom
+# final state = meson. NP params (cm,lm,hm) = 24.2, 26.7, 22.2
+# BR(q->meson) = 1
+# ebeam1 = 2515, ebeam2 = 2515
+# PDF set = CTEQ6.6
+# ptmin = 0
+# ptmax = 4
+# ymin  = -0.5
+# ymax  = 0.5
+# Uncertainties from scales, masses, PDFs combined quadratically
+# cross section is sigma (pb)
+# ptmin     central      min       max       min_sc     max_sc     min_mass   max_mass     min_pdf    max_pdf   fr=.5 .5     fr=2 2     fr=2 1     fr=1 2    fr=1 .5    fr=.5 1
+   0.0000 1.4510e+07 8.0223e+06 2.1631e+07 8.7990e+06 2.0660e+07 1.2050e+07 1.7580e+07 1.2660e+07 1.6370e+07 1.3960e+07 1.4310e+07 1.8100e+07 1.0810e+07 2.0660e+07 8.7990e+06
+   4.0000 1.0270e+07 6.9235e+06 1.4818e+07 7.3210e+06 1.4470e+07 9.0410e+06 1.1700e+07 9.2740e+06 1.1270e+07 1.1060e+07 9.5910e+06 1.2310e+07 7.7100e+06 1.4470e+07 7.3210e+06
+   8.0000 3.0920e+06 2.2799e+06 4.3263e+06 2.3530e+06 4.2740e+06 2.8450e+06 3.3640e+06 2.8630e+06 3.3210e+06 3.5780e+06 2.7600e+06 3.5440e+06 2.3530e+06 4.2740e+06 2.4800e+06
+  12.0000 1.0090e+06 7.6886e+05 1.3597e+06 7.8570e+05 1.3480e+06 9.4800e+05 1.0730e+06 9.4510e+05 1.0720e+06 1.1870e+06 8.8720e+05 1.1190e+06 7.8570e+05 1.3480e+06 8.5810e+05
+  16.0000 5.5370e+05 4.3679e+05 7.1683e+05 4.4380e+05 7.1170e+05 5.2850e+05 5.8000e+05 5.2280e+05 5.8460e+05 6.5130e+05 4.8630e+05 5.9840e+05 4.4380e+05 7.1170e+05 4.9280e+05
+  24.0000
