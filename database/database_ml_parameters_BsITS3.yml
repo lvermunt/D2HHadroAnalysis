@@ -135,8 +135,8 @@ BsITS3:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10 
-    mlplot: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlplot_hipe4ml_coarse # to be removed
-    mlout: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/mlout_hipe4ml_coarse # to be removed
+    mlplot: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mlplot_hipe4ml_coarse # to be removed
+    mlout: /data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/mlout_hipe4ml_coarse # to be removed
 
     opt:
       isFONLLfromROOT: false
@@ -181,11 +181,11 @@ BsITS3:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/skpkldec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/skpkldecmerged_coarse] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldec_coarse] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/skpkldecmerged_coarse] #list of periods
+      pkl_skimmed_dec: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/337_20200116-2345/skpkldec_coarse] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/337_20200116-2345/skpkldecmerged_coarse] #list of periods
     modelname: xgboost
     modelsperptbin: [Model_pT_0_4.model,
                      Model_pT_4_8.model,
@@ -197,7 +197,7 @@ BsITS3:
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
-    ml_prefilter_probcut: [0.7,0.7,0.7,0.7,0.7]
+    ml_prefilter_probcut: [0.4,0.5,0.4,0.3,0.3]
     probcutpresel:
       data: [0.7,0.7,0.7,0.7,0.7] #list of nbins
       mc: [0.7,0.7,0.7,0.7,0.7] #list of nbins
@@ -212,7 +212,7 @@ BsITS3:
     sigmav0: -1
     inputfonllpred: null
     #dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_Bs/analysis_plots
-    dir_general_plots: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/analysis_plots
+    dir_general_plots: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/analysis_plots
 
     MBvspt:
       probscan_min: [0.97, 0.97, 0.97, 0.97, 0.97]
@@ -250,14 +250,14 @@ BsITS3:
         runselection: [LHC19h1b2]
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse2] #list of periods
         #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse2
-        results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse2] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse2
+        results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/resultsMBvspt_coarse] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/resultstotMBvspt_coarse
       mc:
         runselection: [LHC19h1b2]
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods
         #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultstotMBvspt_final
-        results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultsMBvspt_coarse2] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/337_20200116-2345/resultstotMBvspt_coarse2
+        results: [/data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/337_20200116-2345/resultsMBvspt_coarse] #list of periods
+        resultsallp: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/337_20200116-2345/resultstotMBvspt_coarse
 
       # The global mass limits
       mass_fit_lim: [5.066, 5.666] # region for the fit of the invariant mass distribution [GeV/c^2]
