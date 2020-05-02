@@ -112,7 +112,7 @@ def do_analysis(data_config: dict, data_param: dict): # pylint: disable=too-many
         analyse_steps.append("parametrise_background_scan")
     if dofitinvmassbkgscan is True:
         analyse_steps.append("fit_invmassbkg_scan")
-    if fitbkgparamsbkgscan is True:
+    if dofitbkgparamsbkgscan is True:
         analyse_steps.append("fit_bkgparams_2_scan")
     if doexpectedsignf is True:
         analyse_steps.append("expected_significance_print")

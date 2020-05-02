@@ -82,9 +82,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                           (self.v_var_binning, self.lpt_finbinmin[i], self.lpt_finbinmax[i])) \
                           for i in range(self.p_nptfinbins)]
 
-        self.d_pkl_decmerged_mc = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][period] \
+        #FIXME
+        self.d_pkl_decmerged_mc = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][period] + "/analysis" \
             if period is not None else "./"
-        self.d_pkl_decmerged_data = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][period] \
+        self.d_pkl_decmerged_data = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][period] + "/analysis" \
             if period is not None else "./"
         self.lpt_recodecmerged_data = [os.path.join(self.d_pkl_decmerged_data, self.lpt_recodec_data[ipt])
                                        for ipt in range(self.p_nptfinbins)]
