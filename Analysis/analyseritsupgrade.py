@@ -52,6 +52,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.lvar2_binmin = datap["analysis"][self.typean].get("sel_binmin2", None)
 
         #Input for probability scan
+        self.probscan_prefilter = datap["analysis"][self.typean].get("probscan_prefilter", None)
         self.probscan_min = datap["analysis"][self.typean]["probscan_min"]
         self.probscan_max = datap["analysis"][self.typean]["probscan_max"]
         self.n_probscan = datap["analysis"][self.typean]["n_probscan"]
@@ -862,6 +863,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         for ipt in range(self.p_nptfinbins):
             bin_id = self.bin_matching[ipt]
             df = pickle.load(openfile(self.lpt_recodecmerged_data[bin_id], "rb"))
+            preselapplied = False
 
             if self.s_evtsel is not None:
                 df = df.query(self.s_evtsel)
@@ -915,6 +917,13 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                 h_isc_match.Fill(isc, self.a_probscan[ipt][isc])
                 selml_cv = "y_test_prob%s>%s" % (self.p_modelname, self.a_probscan[ipt][isc])
                 df = df.query(selml_cv)
+
+                #FIXME, for non-sequential case
+                if isc > 0 and self.a_probscan[ipt][0] == 0 and preselapplied is False:
+                    modelnamepref = self.p_modelname + "prefilter"
+                    selml_prefilter = "y_test_prob%s>%s" % (modelnamepref, self.probscan_prefilter[ipt])
+                    df = df.query(selml_prefilter)
+                    preselapplied = True
 
                 if self.lvar2_binmin is None:
                     suffix = "%s%d_%d_%d" % (self.v_var_binning,

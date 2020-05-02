@@ -208,7 +208,7 @@ BsITS3_SigShape:
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
-    ml_prefilter_probcut: [0.4,0.5,0.4,0.3,0.3]
+    ml_prefilter_probcut: [0.0,0.0,0.0,0.0,0.0] #For actual data: [0.4,0.5,0.4,0.3,0.3] (to be applied in analysis)
     probcutpresel:
       data: [0.0,0.0,0.0,0.0,0.0] #list of nbins
       mc: [0.0,0.0,0.0,0.0,0.0] #list of nbins
@@ -226,9 +226,10 @@ BsITS3_SigShape:
     dir_general_plots: /data/DerivedResults/BskAnyITS3_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/analysis_plots
 
     MBvspt:
-      probscan_min: [0.995, 0.995, 0.995, 0.995, 0.995]
+      probscan_prefilter: [0.4,0.5,0.4,0.3,0.3] #The prefilter ML cut, to be extra applied in analysis (after getting the ML=0 info)
+      probscan_min: [0.5, 0.5, 0.5, 0.5, 0.5]
       probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 20
+      n_probscan: 5000
       probscan_func_par1: "pol2"
       probscan_nfits: 8
       probscan_length_fits: 0.0005
