@@ -193,7 +193,7 @@ BsITS2_SigShape:
     data:
       pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpkldec_coarse] #list of periods
       pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/skpkldecmerged_coarse] #list of periods
-      #pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/339_20200116-2348/skpkldecmerged_coarse]  #list of periods
+      #pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_sequence/339_20200116-2348/skpkldecmerged_coarse]  #list of periods
     mc:
       pkl_skimmed_dec: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpkldec_coarse] #list of periods
       pkl_skimmed_decmerged: [/data/Derived/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/noMCtrain/skpkldecmerged_coarse] #list of periods
@@ -208,10 +208,10 @@ BsITS2_SigShape:
                              ModelHandler_pT_8_12.model,
                              ModelHandler_pT_12_16.model,
                              ModelHandler_pT_16_24.model]
-    ml_prefilter_probcut: [0.7,0.7,0.7,0.7,0.7]
+    ml_prefilter_probcut: [0.6,0.7,0.5,0.3,0.2]
     probcutpresel:
-      data: [0.7,0.7,0.7,0.7,0.7] #list of nbins
-      mc: [0.7,0.7,0.7,0.7,0.7] #list of nbins
+      data: [0.0,0.0,0.0,0.0,0.0] #list of nbins
+      mc: [0.0,0.0,0.0,0.0,0.0] #list of nbins
     #probcutoptimal: [0.9995,0.9994,0.999,0.999,0.999,0.996,0.989] #list of nbins
     #probcutoptimal: [0.99,0.99,0.99,0.99,0.99,0.99,0.99] #list of nbins
     probcutoptimal: [0.9995,0.9995,0.9995,0.9995,0.9995] #list of nbins
@@ -259,8 +259,8 @@ BsITS2_SigShape:
 
       data:
         runselection: [LHC19h1b2]
-        #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/335_20200116-2347/resultsMBvspt_coarse] #list of periods
-        #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_full/335_20200116-2347/resultstotMBvspt_coarse
+        #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_sequence/335_20200116-2347/resultsMBvspt_coarse] #list of periods
+        #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1a2_sequence/335_20200116-2347/resultstotMBvspt_coarse
         results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultsMBvspt_coarse] #list of periods
         resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200426_ROOT6-1/ITS2_19h1a2_sequence/412_20200427-1444/resultstotMBvspt_coarse
       mc:
