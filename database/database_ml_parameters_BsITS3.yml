@@ -166,7 +166,7 @@ BsITS3:
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist}]
     hyper_par_opt:
-      do_hyp_opt: False # whether to do the parameter optimization
+      do_hyp_opt: True  # whether to do the parameter optimization
       njobs: -1         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5         # number of folds used in cross validation
       initpoints: 10    # steps of random exploration you want to perform
@@ -199,8 +199,8 @@ BsITS3:
                              ModelHandler_pT_16_24.model]
     ml_prefilter_probcut: [0.4,0.5,0.4,0.3,0.3]
     probcutpresel:
-      data: [0.7,0.7,0.7,0.7,0.7] #list of nbins
-      mc: [0.7,0.7,0.7,0.7,0.7] #list of nbins
+      data: [0.0,0.0,0.0,0.0,0.0] #list of nbins
+      mc: [0.0,0.0,0.0,0.0,0.0] #list of nbins
     #probcutoptimal: [0.9995,0.9994,0.999,0.999,0.999,0.996,0.989] #list of nbins
     #probcutoptimal: [0.99,0.99,0.99,0.99,0.99,0.99,0.99] #list of nbins
     probcutoptimal: [0.9995,0.9995,0.9995,0.9995,0.9995] #list of nbins
@@ -215,9 +215,9 @@ BsITS3:
     dir_general_plots: /data/DerivedResults/BskAnyITS3_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/analysis_plots
 
     MBvspt:
-      probscan_min: [0.97, 0.97, 0.97, 0.97, 0.97]
+      probscan_min: [0.5, 0.5, 0.5, 0.5, 0.5]
       probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
-      n_probscan: 3000
+      n_probscan: 5000
       probscan_func_par1: "pol2"
       probscan_nfits: 8
       probscan_length_fits: 0.0005

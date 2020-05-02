@@ -98,7 +98,7 @@ BsITS2_SigShape:
       nprocessesparallel: 50
       chunksizeunp: [50] #list of periods
       chunksizeskim: [50] #list of periods
-      fracmerge: [0.1] #list of periods
+      fracmerge: [1.0] #list of periods
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC19h1b2] #list of periods
       unmerged_tree_dir: [/data/TTree/BskAnyITS2ITS3Improver/vAN-20200426_ROOT6-1/ITS2_19h1a2_full/412_20200427-1444/merged] #list of periods
