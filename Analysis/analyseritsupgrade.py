@@ -68,20 +68,23 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.lpt_probcutpre_mc = datap["mlapplication"]["probcutpresel"]["mc"]
         self.lpt_probcutpre_data = datap["mlapplication"]["probcutpresel"]["data"]
         self.bin_matching = datap["analysis"][self.typean]["binning_matching"]
+        self.lpt_skimbinmin = datap["sel_skim_binmin"]
+        self.lpt_skimbinmax = datap["sel_skim_binmax"]
+        self.p_nptskimbins = len(self.lpt_skimbinmin)
 
         #input filenames
         #Build names for input pickle files (data, mc_reco, mc_gen)
         self.n_reco = datap["files_names"]["namefile_reco"]
         self.n_gen = datap["files_names"]["namefile_gen"]
         self.lpt_recodec_data = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
-                                 (self.lpt_finbinmin[i], self.lpt_finbinmax[i],
-                                  self.lpt_probcutpre_data[i])) for i in range(self.p_nptfinbins)]
+                                 (self.lpt_skimbinmin[i], self.lpt_skimbinmax[i],
+                                  self.lpt_probcutpre_data[i])) for i in range(self.p_nptskimbins)]
         self.lpt_recodec_mc = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
-                               (self.lpt_finbinmin[i], self.lpt_finbinmax[i],
-                                self.lpt_probcutpre_mc[i])) for i in range(self.p_nptfinbins)]
+                               (self.lpt_skimbinmin[i], self.lpt_skimbinmax[i],
+                                self.lpt_probcutpre_mc[i])) for i in range(self.p_nptskimbins)]
         self.lpt_gensk = [self.n_gen.replace(".pkl", "_%s%d_%d.pkl" % \
-                          (self.v_var_binning, self.lpt_finbinmin[i], self.lpt_finbinmax[i])) \
-                          for i in range(self.p_nptfinbins)]
+                          (self.v_var_binning, self.lpt_skimbinmin[i], self.lpt_skimbinmax[i])) \
+                          for i in range(self.p_nptskimbins)]
 
         #FIXME
         self.d_pkl_decmerged_mc = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][period] + "/analysis" \
@@ -89,11 +92,11 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.d_pkl_decmerged_data = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][period] + "/analysis" \
             if period is not None else "./"
         self.lpt_recodecmerged_data = [os.path.join(self.d_pkl_decmerged_data, self.lpt_recodec_data[ipt])
-                                       for ipt in range(self.p_nptfinbins)]
+                                       for ipt in range(self.p_nptskimbins)]
         self.lpt_recodecmerged_mc = [os.path.join(self.d_pkl_decmerged_mc, self.lpt_recodec_mc[ipt])
-                                     for ipt in range(self.p_nptfinbins)]
+                                     for ipt in range(self.p_nptskimbins)]
         self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged_mc, self.lpt_gensk[ipt])
-                                 for ipt in range(self.p_nptfinbins)]
+                                 for ipt in range(self.p_nptskimbins)]
 
         #output files
         self.d_resultsallpdata = datap["analysis"][self.typean]["data"]["resultsallp"]
@@ -156,7 +159,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.brds = 0.0227
         self.brds_err = 0.0008
         self.nevexpected = 8000000000
-        self.nevanalysed = 852644 #756420 (FIXME)
+        self.nevanalysed = 852644
         self.taa = 0.02307
         self.gauss3sigmafac = 0.9973
 
@@ -529,7 +532,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
             canv.cd(2)
             hpar1.Draw("ep")
-            fpar1.append(TF1("fpar1_%d" % ipt, self.fpar1func, self.probscan_min[ipt],
+            fpar1.append(TF1("fpar1_%d" % ipt, self.fpar1func[ipt], self.probscan_min[ipt],
                              self.probscan_max[ipt]))
             hpar1.Fit("fpar1_%d" % ipt, "R,+")
             gPad.SetTickx()
@@ -573,7 +576,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             minprob_forfit = self.probscan_max[ipt] - self.n_bkgentrfits * self.v_fitsplit
             ranges_k.append(minprob_forfit)
             for k in range(self.n_bkgentrfits):
-                fentr.append(TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                fentr.append(TF1("fentr_%d_%d" % (ipt, k), "pol1",
                                  minprob_forfit + k * self.v_fitsplit,
                                  minprob_forfit + (k + 1) * self.v_fitsplit))
                 ranges_k.append(minprob_forfit + (k + 1) * self.v_fitsplit)
@@ -582,21 +585,21 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
 
                 #shift ranges a bit for when fit fails
                 if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
-                    fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                    fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol1",
                                    minprob_forfit + (k - 0.1) * self.v_fitsplit,
                                    minprob_forfit + (k + 0.9) * self.v_fitsplit)
                     ranges_k[k+1] = minprob_forfit + (k + 0.9) * self.v_fitsplit
                     hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
 
                     if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
-                        fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol2",
+                        fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol1",
                                        minprob_forfit + (k - 0.2) * self.v_fitsplit,
                                        minprob_forfit + (k + 0.8) * self.v_fitsplit)
                         ranges_k[k+1] = minprob_forfit + (k + 0.8) * self.v_fitsplit
                         hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
                 fentr[k].Draw("same")
 
-                fentrfull.append(TF1("%sfull" % fentr[k].GetName(), "pol2",
+                fentrfull.append(TF1("%sfull" % fentr[k].GetName(), "pol1",
                                      self.probscan_min[ipt], self.probscan_max[ipt]))
                 fentrlow.append(fentr[k].Clone("%slow" % fentr[k].GetName()))
                 fentrhigh.append(fentr[k].Clone("%shigh" % fentr[k].GetName()))

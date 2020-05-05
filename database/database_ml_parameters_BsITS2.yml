@@ -221,9 +221,9 @@ BsITS2:
       #probscan_min: [0.7, 0.7, 0.7, 0.7, 0.7]
       #probscan_max: [1.0, 1.0, 1.0, 1.0, 1.0]
       #n_probscan: 3000
-      probscan_func_par1: "pol2"
+      probscan_func_par1: ["pol2","pol2","pol2","pol2","pol2"]
       probscan_nfits: 8
-      probscan_length_fits: 0.0005
+      probscan_length_fits: 0.01
       probscan_min_binc: 100
 
       proc_type: ITSUpgrade
@@ -254,7 +254,8 @@ BsITS2:
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultsMBvspt_coarse_2nd] #list of periods
         #resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_full/335_20200116-2347/resultstotMBvspt_coarse_2nd
         results: [/data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/resultsMBvspt_coarse] #list of periods
-        resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/resultstotMBvspt_coarse
+        #resultsallp: /data/DerivedResults/BskAnyITS2_new/vAN-20200116_ROOT6-1/ITS2_19h1b2_sequence/335_20200116-2347/resultstotMBvspt_coarse
+        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/finalinput_ITS2_0205
       mc:
         runselection: [LHC19h1b2]
         #results: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_Bs/resultsMBvspt_final] #list of periods

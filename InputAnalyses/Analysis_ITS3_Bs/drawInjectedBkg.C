@@ -1,12 +1,70 @@
 void SetStyleHisto(TH1D *h);
 
-void drawInjectedBkg(TString filename, Int_t ptmin, Int_t ptmax, Int_t iscan){
+//https://indico.cern.ch/event/873138/contributions/3823930/attachments/2019548/3376384/D2H_FONLL_predictions_feeddown.pdf
+Double_t ff_bplus = 0.09 * 0.412 / (0.117 * 0.412 + 0.09 * 0.412 + 0.93 * 0.088 + 0.011 * 0.089);
+Double_t ff_bzero = 0.117 * 0.412 / (0.117 * 0.412 + 0.09 * 0.412 + 0.93 * 0.088 + 0.011 * 0.089);
+Double_t ff_lambdab = 0.011 * 0.089 / (0.117 * 0.412 + 0.09 * 0.412 + 0.93 * 0.088 + 0.011 * 0.089);
+Double_t ff_bs = 0.93 * 0.088 / (0.117 * 0.412 + 0.09 * 0.412 + 0.93 * 0.088 + 0.011 * 0.089);
+
+void drawInjectedBkg(TString path, Int_t ptmin, Int_t ptmax, Int_t iscan){
 
   TGaxis::SetMaxDigits(2);
 
+  TString filename = path + "/masshisto_bkgshape.root";
   TFile* f = new TFile(filename);
 
+  TString filename2 = path + "/expected_Ds_signal_perevent.root";
+  TFile* f2 = new TFile(filename2);
+  TH1F* h_expsig_pr = (TH1F*)f2->Get("h_expsig_pr");
+  TH1F* h_expsigmin_pr = (TH1F*)f2->Get("h_expsigmin_pr");
+  TH1F* h_expsigmax_pr = (TH1F*)f2->Get("h_expsigmax_pr");
+  TH1F* h_expsig_fd = (TH1F*)f2->Get("h_expsig_fd");
+  TH1F* h_expsigmin_fd = (TH1F*)f2->Get("h_expsigmin_fd");
+  TH1F* h_expsigmax_fd = (TH1F*)f2->Get("h_expsigmax_fd");
+  Double_t exp_pr_cent_perev = h_expsig_pr->GetBinContent(h_expsig_pr->FindBin(0.5 * (ptmin + ptmax)));
+  Double_t exp_pr_min_perev = h_expsigmin_pr->GetBinContent(h_expsigmin_pr->FindBin(0.5 * (ptmin + ptmax)));
+  Double_t exp_pr_max_perev = h_expsigmax_pr->GetBinContent(h_expsigmax_pr->FindBin(0.5 * (ptmin + ptmax)));
+  Double_t exp_fd_cent_perev = h_expsig_fd->GetBinContent(h_expsig_fd->FindBin(0.5 * (ptmin + ptmax)));
+  Double_t exp_fd_min_perev = h_expsigmin_fd->GetBinContent(h_expsigmin_fd->FindBin(0.5 * (ptmin + ptmax)));
+  Double_t exp_fd_max_perev = h_expsigmax_fd->GetBinContent(h_expsigmax_fd->FindBin(0.5 * (ptmin + ptmax)));
+
+  TString suffixpt = Form("pt_cand%d_%d", ptmin, ptmax);
   TString suffix = Form("pt_cand%d_%d_%d", ptmin, ptmax, iscan);
+
+  TH1F* hUniqueDs = (TH1F*)f->Get(Form("hNormUniqueDs%s",suffixpt.Data()));
+  TH1F* hdspr = (TH1F*)f->Get(Form("hmass_DsPr%s", suffix.Data()));
+  TH1F* hdsfdbplus = (TH1F*)f->Get(Form("hmass_DsFDBplus%s", suffix.Data()));
+  TH1F* hdsfdbzero = (TH1F*)f->Get(Form("hmass_DsFDBzero%s", suffix.Data()));
+  TH1F* hdsfdlambdab = (TH1F*)f->Get(Form("hmass_DsFDLambdab%s", suffix.Data()));
+  TH1F* hdsfdbs = (TH1F*)f->Get(Form("hmass_DsFDBs%s", suffix.Data()));
+  Double_t effBs_dspr = hdspr->GetEntries()/hUniqueDs->GetBinContent(1);
+  Double_t effBs_dsfdbplus = hdsfdbplus->GetEntries()/hUniqueDs->GetBinContent(2) * ff_bplus;
+  Double_t effBs_dsfdbzero = hdsfdbzero->GetEntries()/hUniqueDs->GetBinContent(3) * ff_bzero;
+  Double_t effBs_dsfdlambdab = hdsfdlambdab->GetEntries()/hUniqueDs->GetBinContent(4) * ff_lambdab;
+  Double_t effBs_dsfdbs = hdsfdbs->GetEntries()/hUniqueDs->GetBinContent(5) * ff_bs;
+  cout << "Efficiency Ds -> Bs: " << effBs_dspr << " " << effBs_dsfdbplus << " " << effBs_dsfdbzero << " " << effBs_dsfdlambdab << " " << effBs_dsfdbs << endl;
+
+  Double_t exp_Bspr_cent_perev = effBs_dspr * exp_pr_cent_perev;
+  Double_t exp_Bspr_min_perev =  effBs_dspr * exp_pr_min_perev;
+  Double_t exp_Bspr_max_perev =  effBs_dspr * exp_pr_max_perev;
+  Double_t exp_Bsfdbplus_cent_perev = effBs_dsfdbplus * exp_fd_cent_perev;
+  Double_t exp_Bsfdbplus_min_perev =  effBs_dsfdbplus * exp_fd_min_perev;
+  Double_t exp_Bsfdbplus_max_perev =  effBs_dsfdbplus * exp_fd_max_perev;
+  Double_t exp_Bsfdbzero_cent_perev = effBs_dsfdbzero * exp_fd_cent_perev;
+  Double_t exp_Bsfdbzero_min_perev =  effBs_dsfdbzero * exp_fd_min_perev;
+  Double_t exp_Bsfdbzero_max_perev =  effBs_dsfdbzero * exp_fd_max_perev;
+  Double_t exp_Bsfdlambdab_cent_perev = effBs_dsfdlambdab * exp_fd_cent_perev;
+  Double_t exp_Bsfdlambdab_min_perev =  effBs_dsfdlambdab * exp_fd_min_perev;
+  Double_t exp_Bsfdlambdab_max_perev =  effBs_dsfdlambdab * exp_fd_max_perev;
+  Double_t exp_Bsfdbs_cent_perev = effBs_dsfdbs * exp_fd_cent_perev;
+  Double_t exp_Bsfdbs_min_perev =  effBs_dsfdbs * exp_fd_min_perev;
+  Double_t exp_Bsfdbs_max_perev =  effBs_dsfdbs * exp_fd_max_perev;
+  cout << "Expected (pr. Ds) + pi -> Bs cand: " << exp_Bspr_cent_perev << " + " << exp_Bspr_max_perev - exp_Bspr_cent_perev << " - " << exp_Bspr_cent_perev - exp_Bspr_min_perev << endl;
+  cout << "Expected (B+ fd. Ds) + pi -> Bs cand: " << exp_Bsfdbplus_cent_perev << " + " << exp_Bsfdbplus_max_perev - exp_Bsfdbplus_cent_perev << " - " << exp_Bsfdbplus_cent_perev - exp_Bsfdbplus_min_perev << endl;
+  cout << "Expected (B0 fd. Ds) + pi -> Bs cand: " << exp_Bsfdbzero_cent_perev << " + " << exp_Bsfdbzero_max_perev - exp_Bsfdbzero_cent_perev << " - " << exp_Bsfdbzero_cent_perev - exp_Bsfdbzero_min_perev << endl;
+  cout << "Expected (Lb fd. Ds) + pi -> Bs cand: " << exp_Bsfdlambdab_cent_perev << " + " << exp_Bsfdlambdab_max_perev - exp_Bsfdlambdab_cent_perev << " - " << exp_Bsfdlambdab_cent_perev - exp_Bsfdlambdab_min_perev << endl;
+  cout << "Expected (Bs fd. Ds) + pi -> Bs cand: " << exp_Bsfdbs_cent_perev << " + " << exp_Bsfdbs_max_perev - exp_Bsfdbs_cent_perev << " - " << exp_Bsfdbs_cent_perev - exp_Bsfdbs_min_perev << endl;
+
   TF1* fdspr2 = (TF1*)f->Get(Form("fbkg_dspr%s", suffix.Data()));
   TF1* fdsfdbzero2 = (TF1*)f->Get(Form("fbkg_dsfdbzero%s", suffix.Data()));
   TF1* fdsfdbplus2 = (TF1*)f->Get(Form("fbkg_dsfdbplus%s", suffix.Data()));

@@ -1,4 +1,5 @@
 .idea
+InputAnalyses/Analysis_ITS3_Bs/tempfig*
 
 # If python build in source tree
 build/*

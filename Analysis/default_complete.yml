@@ -11,6 +11,6 @@ analysis:
   probscan: false
   parametrisebkg: false
   fitinvmassbkgscan: false
-  fitbkgparamsbkgscan: false
+  fitbkgparamsbkgscan: true
   expectedsignf: false
   bkgshapestudy: false
