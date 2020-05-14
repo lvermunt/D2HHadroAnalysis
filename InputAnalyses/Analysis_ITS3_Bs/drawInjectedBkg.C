@@ -116,6 +116,91 @@ void drawInjectedBkg(TString path, Int_t ptmin, Int_t ptmax, Int_t iscan){
   leg->Draw();
 }
 
+void plotRatio(){
+  //From 05/05/20 results
+  const Int_t nptbins = 5;
+  Float_t ptbinsfl[nptbins+1] = {0, 4, 8, 12, 16, 24};
+  TH1D* hratioITS2_1 = new TH1D("hratioITS2_1", ";#it{p}_{T} (GeV/#it{c});Bkg sources: All / Combi.",nptbins,ptbinsfl);
+  TH1D* hratioITS3_1 = new TH1D("hratioITS3_1", ";#it{p}_{T} (GeV/#it{c});Bkg sources: All / Combi.",nptbins,ptbinsfl);
+  TH1D* hratioITS2_2 = new TH1D("hratioITS2_2", ";#it{p}_{T} (GeV/#it{c});Bkg sources: All / Combi.",nptbins,ptbinsfl);
+  TH1D* hratioITS3_2 = new TH1D("hratioITS3_2", ";#it{p}_{T} (GeV/#it{c});Bkg sources: All / Combi.",nptbins,ptbinsfl);
+
+  hratioITS2_1->SetBinContent(1,1.0177e+06);
+  hratioITS2_1->SetBinContent(2,391090);
+  hratioITS2_1->SetBinContent(3,75811.2);
+  hratioITS2_1->SetBinContent(4,35098.7);
+  hratioITS2_1->SetBinContent(5,25952.6);
+  hratioITS2_1->SetBinError(1,TMath::Sqrt(1.0177e+06));
+  hratioITS2_1->SetBinError(2,TMath::Sqrt(391090));
+  hratioITS2_1->SetBinError(3,TMath::Sqrt(75811.2));
+  hratioITS2_1->SetBinError(4,TMath::Sqrt(35098.7));
+  hratioITS2_1->SetBinError(5,TMath::Sqrt(25952.6));
+
+  hratioITS2_2->SetBinContent(1,1.01982e+06);
+  hratioITS2_2->SetBinContent(2,392083);
+  hratioITS2_2->SetBinContent(3,79207.3);
+  hratioITS2_2->SetBinContent(4,37104.5);
+  hratioITS2_2->SetBinContent(5,27085.6);
+  hratioITS2_2->SetBinError(1,TMath::Sqrt(1.01982e+06));
+  hratioITS2_2->SetBinError(2,TMath::Sqrt(392083));
+  hratioITS2_2->SetBinError(3,TMath::Sqrt(79207.3));
+  hratioITS2_2->SetBinError(4,TMath::Sqrt(37104.5));
+  hratioITS2_2->SetBinError(5,TMath::Sqrt(27085.6));
+
+  hratioITS2_2->Divide(hratioITS2_1);
+  hratioITS2_2->SetLineColor(kBlue+1);
+  hratioITS2_2->SetMarkerColor(kBlue+1);
+  hratioITS2_2->SetMarkerStyle(20);
+
+  hratioITS3_1->SetBinContent(1,592074);
+  hratioITS3_1->SetBinContent(2,155641);
+  hratioITS3_1->SetBinContent(3,32989.8);
+  hratioITS3_1->SetBinContent(4,14551.9);
+  hratioITS3_1->SetBinContent(5,22416.4);
+  hratioITS3_1->SetBinError(1,TMath::Sqrt(592074));
+  hratioITS3_1->SetBinError(2,TMath::Sqrt(155641));
+  hratioITS3_1->SetBinError(3,TMath::Sqrt(32989.8));
+  hratioITS3_1->SetBinError(4,TMath::Sqrt(14551.9));
+  hratioITS3_1->SetBinError(5,TMath::Sqrt(22416.4));
+
+  hratioITS3_2->SetBinContent(1,596557);
+  hratioITS3_2->SetBinContent(2,157189);
+  hratioITS3_2->SetBinContent(3,34525.4);
+  hratioITS3_2->SetBinContent(4,14995.1);
+  hratioITS3_2->SetBinContent(5,23222.2);
+  hratioITS3_2->SetBinError(1,TMath::Sqrt(596557));
+  hratioITS3_2->SetBinError(2,TMath::Sqrt(157189));
+  hratioITS3_2->SetBinError(3,TMath::Sqrt(34525.4));
+  hratioITS3_2->SetBinError(4,TMath::Sqrt(14995.1));
+  hratioITS3_2->SetBinError(5,TMath::Sqrt(23222.2));
+
+  hratioITS3_2->Divide(hratioITS3_1);
+  hratioITS3_2->SetLineColor(kRed+1);
+  hratioITS3_2->SetMarkerColor(kRed+1);
+  hratioITS3_2->SetMarkerStyle(21);
+
+  SetStyleHisto(hratioITS2_2);
+  SetStyleHisto(hratioITS3_2);
+
+  TCanvas* cratio = new TCanvas("cratio", "cratio", 450, 400);
+  cratio->cd();
+  hratioITS2_2->Draw("ep");
+  hratioITS2_2->GetYaxis()->SetRangeUser(0.97,1.1);
+  gPad->SetTickx();
+  gPad->SetTicky();
+  hratioITS3_2->Draw("same ep");
+
+  TLine* l = new TLine(0,1,24,1);
+  l->SetLineStyle(2);
+  l->Draw();
+
+  TLegend* leg = new TLegend(0.2, 0.63, 0.5, 0.88, 0, "NDC");
+  leg->SetTextFont(43); leg->SetTextSize(16); leg->SetFillColor(0); leg->SetFillStyle(0); leg->SetLineColor(0);
+  leg->AddEntry(hratioITS2_2, "ITS2", "plm");
+  leg->AddEntry(hratioITS3_2, "ITS3", "plm");
+  leg->Draw();
+}
+
 void SetStyleHisto(TH1D *h){
 
   h->SetStats(0);
@@ -124,7 +209,7 @@ void SetStyleHisto(TH1D *h){
   h->GetYaxis()->SetLabelFont(42);
   h->GetYaxis()->SetTitleFont(42);
   h->GetYaxis()->SetTitleSize(0.05);
-  h->GetYaxis()->SetTitleOffset(0.9);
+  h->GetYaxis()->SetTitleOffset(1.);
   h->GetYaxis()->SetLabelSize(0.04);
   //h->GetYaxis()->SetDecimals(kTRUE);
   //h->GetYaxis()->SetNdivisions(507);

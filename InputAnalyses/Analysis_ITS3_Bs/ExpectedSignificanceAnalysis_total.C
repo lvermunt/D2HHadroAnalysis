@@ -3,7 +3,7 @@ void InitializeProbCuts();
 void calculate_Dsbackground_MLindep();
 void calculate_Dsbackground_MLindep_corr();
 void calculate_Dsbackground_MLdep(Int_t ptbin, Int_t iscan);
-void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t expBssig);
+void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t expBssig, Float_t &expBsbkg, Float_t &expBssgnf);
 void SetStyleHisto(TH1D *h);
 
 void fit_signal(TH1F* hsig, int j, int i, double &xmin, double &xmax, bool draw);
@@ -35,6 +35,19 @@ TFile* feffDs;
 TFile* feffDsmatchBs;
 
 Bool_t drawall = kTRUE;
+
+//TGraphs for saving final result
+TGraphAsymmErrors* grBkgHIJING;
+TGraphAsymmErrors* grBkgFONLL;
+TGraphAsymmErrors* grBkgHIJINGrel;
+TGraphAsymmErrors* grBkgFONLLrel;
+
+TGraphAsymmErrors* grSigPythia;
+TGraphAsymmErrors* grSigFONLL;
+TGraphAsymmErrors* grSigPythiarel;
+TGraphAsymmErrors* grSigFONLLrel;
+
+TH1F* hEffPythia;
 
 //------------------------------------------------------
 
@@ -76,29 +89,35 @@ Double_t ptbinsdb[nptbins+1] = {0, 4, 8, 12, 16, 24};
 Int_t rebin[nptbins] = {16, 16, 16, 16, 16};
 Int_t sgnfmax = 10;
 
-
-//ITS2 03/05 (double training 5000)
-const Int_t trials = 5000;
-Float_t probcuts[trials+1];
-Int_t selbin[nptbins] = {4950, 2000, 4990, 4990, 4990};//{0, 0, 0, 0, 0}; //
-Float_t preselML[nptbins] = {0.6, 0.7 ,0.5, 0.3, 0.2};
-Bool_t useRealFit[nptbins] = {kFALSE, kFALSE, kTRUE, kFALSE, kTRUE};//{kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};//
-Bool_t bincountBkg[nptbins] = {kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};
-Int_t opt = 3;
-Int_t selbinDs[nptbins] = {selbin[0]/10 + 1, selbin[1]/10 + 1, selbin[2]/10 + 1, selbin[3]/10 + 1, selbin[4]/10 + 1}; //Need +1, because injected Ds starts with ML=0
-
-
 /*
-//ITS3 03/05 (double training 5000)
+//ITS2 05/05 (double training 5000).
+//--FINAL VALUES--
+//   0-4: 4980; 4-8: 4750-4850; 8-12: 4400; 12-16: 4050; 16-24: 4800
 const Int_t trials = 5000;
 Float_t probcuts[trials+1];
-Int_t selbin[nptbins] = {4990, 4990, 4990, 4990, 4990};//{0, 0, 0, 0, 0}; //
-Float_t preselML[nptbins] = {0.4,0.5,0.4,0.3,0.3};
+Int_t selbin[nptbins] = {4980, 4800, 4400, 4050, 4800};//{0, 0, 0, 0, 0}; //
+Float_t preselML[nptbins] = {0.6, 0.7 ,0.5, 0.3, 0.2};
+TString bkgfitoption[nptbins] = {"expo", "expo", "pol1", "pol1", "pol1"};
 Bool_t useRealFit[nptbins] = {kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};
 Bool_t bincountBkg[nptbins] = {kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};
 Int_t opt = 3;
 Int_t selbinDs[nptbins] = {selbin[0]/10 + 1, selbin[1]/10 + 1, selbin[2]/10 + 1, selbin[3]/10 + 1, selbin[4]/10 + 1}; //Need +1, because injected Ds starts with ML=0
 */
+
+
+//ITS3 05/05 (double training 5000)
+//--FINAL VALUES--
+//   0-4: 4600 ; 4-8: 4800 ; 8-12: >4850 ; 12-16: 4800 ; 16-24: 4550
+const Int_t trials = 5000;
+Float_t probcuts[trials+1];
+Int_t selbin[nptbins] = {4600, 4800, 4850, 4800, 4550};//{0, 0, 0, 0, 0}; //
+Float_t preselML[nptbins] = {0.4,0.5,0.4,0.3,0.3};
+TString bkgfitoption[nptbins] = {"expo", "expo", "pol1", "pol1", "pol1"};
+Bool_t useRealFit[nptbins] = {kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};
+Bool_t bincountBkg[nptbins] = {kFALSE, kFALSE, kFALSE, kFALSE, kFALSE};
+Int_t opt = 3;
+Int_t selbinDs[nptbins] = {selbin[0]/10 + 1, selbin[1]/10 + 1, selbin[2]/10 + 1, selbin[3]/10 + 1, selbin[4]/10 + 1}; //Need +1, because injected Ds starts with ML=0
+
 
 void ExpectedSignificanceAnalysis(TString path = "", Int_t opt = 0, Bool_t drawessentials = kFALSE){
 
@@ -109,7 +128,7 @@ void ExpectedSignificanceAnalysis(TString path = "", Int_t opt = 0, Bool_t drawe
   TString filenamemass = path + "masshisto.root";
   TString filenameeff = path + "effhisto.root";
   TString filenamefits = path + "parametrised_bkgpars.root";
-  TString filenameBkgCorr = "theory/BkgCorrFactor_Bs_1DataFile_25MCFile_RebinnedToCoarse.root";
+  TString filenameBkgCorr = "theory/BkgCorrFactor_Bs_1DataFile_25MCFile_CoarsepTBinning.root";
   TString filenamebkgshape = path + "masshisto_bkgshape.root";
   TString filenameexpDssignal = path + "expected_Ds_signal_perevent_correct.root";
   TString filenameexpDssignalscaled = path + "expected_Ds_signal_fullyscaled.root";
@@ -141,7 +160,24 @@ void ExpectedSignificanceAnalysis(TString path = "", Int_t opt = 0, Bool_t drawe
 
   InitializeProbCuts();
 
-  //if(opt < 1) calculate_Dsbackground_MLindep();
+/*
+  for(int p = 0; p < 100; p++){
+    selbin[0] = p*50;
+    selbin[1] = p*50;
+    selbin[2] = p*50;
+    selbin[3] = p*50;
+    selbin[4] = p*50;
+
+    selbinDs[0] = selbin[0] / 10 + 1;
+    selbinDs[1] = selbin[1] / 10 + 1;
+    selbinDs[2] = selbin[2] / 10 + 1;
+    selbinDs[3] = selbin[3] / 10 + 1;
+    selbinDs[4] = selbin[4] / 10 + 1;
+
+    //if(opt < 1) calculate_Dsbackground_MLindep();
+    if(opt < 1 && p == 0) calculate_Dsbackground_MLindep_corr();
+*/
+
   if(opt < 1) calculate_Dsbackground_MLindep_corr();
 
   if(opt < 2){
@@ -153,6 +189,34 @@ void ExpectedSignificanceAnalysis(TString path = "", Int_t opt = 0, Bool_t drawe
       }
     }
   }
+
+  Float_t expectedsignalcent[nptbins];
+  Float_t expectedsignalfonllmin[nptbins];
+  Float_t expectedsignalfonllmax[nptbins];
+  Float_t expectedsignalerreffmin[nptbins];
+  Float_t expectedsignalerreffmax[nptbins];
+  Float_t expectedbkg[nptbins];
+  Float_t expectedbkglow[nptbins];
+  Float_t expectedbkghigh[nptbins];
+  Float_t expectedsgnfcent[nptbins];
+  Float_t expectedsgnffonllmin[nptbins];
+  Float_t expectedsgnffonllmax[nptbins];
+  Float_t expectedsgnferreffmin[nptbins];
+  Float_t expectedsgnferreffmax[nptbins];
+  Float_t expectedsgnfbkgmin[nptbins];
+  Float_t expectedsgnfbkgmax[nptbins];
+
+  grBkgHIJING = new TGraphAsymmErrors(nptbins);
+  grBkgFONLL = new TGraphAsymmErrors(nptbins);
+  grBkgHIJINGrel = new TGraphAsymmErrors(nptbins);
+  grBkgFONLLrel = new TGraphAsymmErrors(nptbins);
+
+  grSigPythia = new TGraphAsymmErrors(nptbins);
+  grSigFONLL = new TGraphAsymmErrors(nptbins);
+  grSigPythiarel = new TGraphAsymmErrors(nptbins);
+  grSigFONLLrel = new TGraphAsymmErrors(nptbins);
+
+  hEffPythia = new TH1F("hEffPythia", ";#it{p}_{T} (GeV/#it{c});(Acc #times #epsilon)",nptbins,ptbinsfl);
 
   for(int iscan = 0; iscan <= trials; iscan++){
     for(int ptbin = 0; ptbin < nptbins; ptbin++){
@@ -173,17 +237,88 @@ void ExpectedSignificanceAnalysis(TString path = "", Int_t opt = 0, Bool_t drawe
       Double_t effcent, erreffcent;
       calculate_efficiency(heff, ptbin, iscan, effcent, erreffcent, kFALSE);
 
-      Float_t expectedsignalcent = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * effcent * TAA * fonllcent * tamucent;
-      expectedsignalcent *= gauss3sigmafactor;
+      expectedsignalcent[ptbin] = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * effcent * TAA * fonllcent * tamucent;
+      expectedsignalcent[ptbin] *= gauss3sigmafactor;
 
-      Double_t xmin, xmax;
-      calculate_Signal_CombBackground_MLdep(ptbin, iscan, expectedsignalcent);
+      calculate_Signal_CombBackground_MLdep(ptbin, iscan, expectedsignalcent[ptbin], expectedbkg[ptbin], expectedsgnfcent[ptbin]);
 
+      expectedsignalfonllmin[ptbin] = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * effcent * TAA * fonllmin * tamucent;
+      expectedsignalfonllmax[ptbin] = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * effcent * TAA * fonllmax * tamucent;
+      expectedsignalerreffmin[ptbin] = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * (effcent - erreffcent) * TAA * fonllcent * tamucent;
+      expectedsignalerreffmax[ptbin] = 2 * (ptbins[ptbin+1] - ptbins[ptbin]) * 1 * (BRBs * BRDs) * nEvExpected * (effcent + erreffcent) * TAA * fonllcent * tamucent;
 
+      expectedsignalfonllmin[ptbin] *= gauss3sigmafactor;
+      expectedsignalfonllmax[ptbin] *= gauss3sigmafactor;
+      expectedsignalerreffmin[ptbin] *= gauss3sigmafactor;
+      expectedsignalerreffmax[ptbin] *= gauss3sigmafactor;
+
+      Double_t ptmin = ptbins[ptbin];
+      Double_t ptmax = ptbins[ptbin+1];
+      Double_t ptcent = 0.5*(ptmax + ptmin);
+      Double_t pterr = 0.5*(ptmax - ptmin);
+      grSigPythia->SetPoint(ptbin, ptcent, expectedsignalcent[ptbin]);
+      grSigPythia->SetPointError(ptbin, pterr, pterr, expectedsignalcent[ptbin]-expectedsignalerreffmin[ptbin], expectedsignalerreffmax[ptbin]-expectedsignalcent[ptbin]);
+      grSigFONLL->SetPoint(ptbin, ptcent, expectedsignalcent[ptbin]);
+      grSigFONLL->SetPointError(ptbin, pterr, pterr, expectedsignalcent[ptbin]-expectedsignalfonllmin[ptbin], expectedsignalfonllmax[ptbin]-expectedsignalcent[ptbin]);
+
+      grSigPythiarel->SetPoint(ptbin, ptcent, 0);
+      grSigPythiarel->SetPointError(ptbin, pterr, pterr, (expectedsignalcent[ptbin]-expectedsignalerreffmin[ptbin])/expectedsignalcent[ptbin], (expectedsignalerreffmax[ptbin]-expectedsignalcent[ptbin])/expectedsignalcent[ptbin]);
+      grSigFONLLrel->SetPoint(ptbin, ptcent, 0);
+      grSigFONLLrel->SetPointError(ptbin, pterr, pterr, (expectedsignalcent[ptbin]-expectedsignalfonllmin[ptbin])/expectedsignalcent[ptbin], (expectedsignalfonllmax[ptbin]-expectedsignalcent[ptbin])/expectedsignalcent[ptbin]);
+
+      hEffPythia->SetBinContent(hEffPythia->FindBin(ptcent),effcent);
+      hEffPythia->SetBinError(hEffPythia->FindBin(ptcent),erreffcent);
     }
   }
-  //plot_expected_significance(filenamemass, filenameeff, filenamefits);
+  for(int ptbin = 0; ptbin < nptbins; ptbin++){
+    cout << "[" << ptbins[ptbin] << "-" << ptbins[ptbin+1] << "], sig=" << expectedsignalcent[ptbin] << ", bkg=" << expectedbkg[ptbin] << ", sgnf=" << expectedsgnfcent[ptbin] << endl;
+  }
+  /*
+  TCanvas* ctest = new TCanvas("ctest","ctest", 800,400);
+  ctest->Divide(2);
+  ctest->cd(1);
+  grBkgHIJING->Draw("alp");
+  grBkgFONLL->SetLineColor(kRed);
+  grBkgFONLL->Draw("same");
+  ctest->cd(2);
+  grBkgHIJINGrel->Draw("alp");
+  grBkgFONLLrel->SetLineColor(kRed);
+  grBkgFONLLrel->Draw("same");
 
+  TCanvas* ctest2 = new TCanvas("ctest2","ctest2", 800,400);
+  ctest2->Divide(2);
+  ctest2->cd(1);
+  grSigFONLL->SetLineColor(kRed);
+  grSigFONLL->Draw("alp");
+  grSigPythia->Draw("same");
+  ctest2->cd(2);
+  grSigFONLLrel->SetLineColor(kRed);
+  grSigFONLLrel->Draw("alp");
+  grSigPythiarel->Draw("same");
+
+  TCanvas* ctest3 = new TCanvas();
+  ctest3->cd();
+  hEffPythia->Draw("ep");
+
+  TString foutname_sbe = path + "signal_background_efficiency.root";
+  TFile* fout_sbe = new TFile(foutname_sbe.Data(), "RECREATE");
+  fout_sbe->cd();
+  grSigFONLL->Write("grSigFONLL");
+  grSigPythia->Write("grSigPythia");
+  grSigFONLLrel->Write("grSigFONLLrel");
+  grSigPythiarel->Write("grSigPythiarel");
+
+  grBkgFONLL->Write("grBkgFONLL");
+  grBkgHIJING->Write("grBkgHIJING");
+  grBkgFONLLrel->Write("grBkgFONLLrel");
+  grBkgFONLLrel->Write("grBkgFONLLrel");
+
+  hEffPythia->Write("hEffPythia");
+  cout << "Wrote output in: " << foutname_sbe.Data() << endl;
+  fout_sbe->Close();
+  */
+  plot_expected_significance(filenamemass, filenameeff, filenamefits);
+//  }
 }
 
 void calculate_Dsbackground_MLindep_corr(){
@@ -677,12 +812,12 @@ void calculate_Dsbackground_MLdep(Int_t ptbin, Int_t iscan){
   if(!drawall) cpol1scaled->Close();
 }
 
-void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t expBssig){
+void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t expBssig, Float_t &expBsbkg, Float_t &expBssgnf){
 
   TH1D* hsig = (TH1D*)fmass->Get(Form("hmass_sigpt_cand%d_%d_%d",ptbins[ptbin],ptbins[ptbin+1],iscan));
   TH1D* hbkg = (TH1D*)fmass->Get(Form("hmass_bkgpt_cand%d_%d_%d",ptbins[ptbin],ptbins[ptbin+1],iscan));
 
-  TH1F* hBkgCorr = (TH1F*)fBkgCorr->Get("hCorrFacBs_rebin");
+  TH1F* hBkgCorr = (TH1F*)fBkgCorr->Get("hCorrFacBs");
 
   //FIT SIGNAL AS INITIALISATION
   TCanvas* csignal = new TCanvas(Form("csignal_%d_%d",ptbin, iscan), Form("csignal_%d_%d",ptbin, iscan), 450, 400);
@@ -728,7 +863,7 @@ void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t exp
   SetStyleHisto(hbkg);
 
   //=Chi2 fit, add "L" for likelyhood
-  TF1* fbkg = new TF1(Form("f_%d_%d",ptbin,iscan), "expo", 5.07, 5.65);
+  TF1* fbkg = new TF1(Form("f_%d_%d",ptbin,iscan), bkgfitoption[ptbin], 5.07, 5.65);
   hbkg->Fit(Form("f_%d_%d",ptbin,iscan), "R,E,+");
 
   TGraph* grpar0cent = (TGraph*)ffits->Get(Form("gpar0cent_%d",ptbin));
@@ -737,26 +872,32 @@ void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t exp
   TF1* fpar1cent = (TF1*)ffits->Get(Form("fpar1cent_%d",ptbin));
   TF1* fpar1low = (TF1*)ffits->Get(Form("fpar1low_%d",ptbin));
   TF1* fpar1up = (TF1*)ffits->Get(Form("fpar1high_%d",ptbin));
+  TGraph* grpar1cent = (TGraph*)ffits->Get(Form("gpar1cent_%d",ptbin));
+  TGraph* grpar1low = (TGraph*)ffits->Get(Form("gpar1low_%d",ptbin));
+  TGraph* grpar1up = (TGraph*)ffits->Get(Form("gpar1high_%d",ptbin));
 
   TF1* fcent = (TF1*)fbkg->Clone(Form("fcent_%d_%d",ptbin,iscan));
   fcent->SetParameter(0,grpar0cent->Eval(probcuts[iscan]));
-  double dpar1cent = fpar1cent->Eval(probcuts[iscan]);
-  if(dpar1cent > 0) dpar1cent = 0;
+  double dpar1cent;
+  if(grpar1cent) dpar1cent = grpar1cent->Eval(probcuts[iscan]);
+  else           dpar1cent = fpar1cent->Eval(probcuts[iscan]);
   fcent->SetParameter(1,dpar1cent);
   fcent->SetLineColor(kBlue);
 
   TF1* flow = (TF1*)fbkg->Clone(Form("flow_%d_%d",ptbin,iscan));
   flow->SetParameter(0,grpar0low->Eval(probcuts[iscan]));
-  double dpar1low = fpar1low->Eval(probcuts[iscan]);
-  if(dpar1low > 0) dpar1low = 0;
+  double dpar1low;
+  if(grpar1low) dpar1low = grpar1low->Eval(probcuts[iscan]);
+  else          dpar1low = fpar1low->Eval(probcuts[iscan]);
   flow->SetParameter(1,dpar1low);
   flow->SetLineStyle(2);
   flow->SetLineColor(kBlue);
 
   TF1* fup = (TF1*)fbkg->Clone(Form("fup_%d_%d",ptbin,iscan));
   fup->SetParameter(0,grpar0up->Eval(probcuts[iscan]));
-  double dpar1up = fpar1up->Eval(probcuts[iscan]);
-  if(dpar1up > 0) dpar1up = 0;
+  double dpar1up;
+  if(grpar1up) dpar1up = grpar1up->Eval(probcuts[iscan]);
+  else         dpar1up = fpar1up->Eval(probcuts[iscan]);
   fup->SetParameter(1,dpar1up);
   fup->SetLineStyle(2);
   fup->SetLineColor(kBlue);
@@ -790,14 +931,15 @@ void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t exp
   leg->SetTextFont(43); leg->SetTextSize(16); leg->SetFillColor(0); leg->SetFillStyle(0); leg->SetLineColor(0);
   leg->SetHeader(Form("Combinatorial;  %s event",nEv335String.Data()));
   leg->AddEntry(hbkg, "HIJING", "lpm");
-  leg->AddEntry(fbkg, "Expo fit", "l");
-  leg->AddEntry(fcent, "Expo fit (parametrised)", "l");
+  leg->AddEntry(fbkg, Form("%s fit",bkgfitoption[ptbin].Data()), "l");
+  leg->AddEntry(fcent, Form("%s fit (parametrised)",bkgfitoption[ptbin].Data()), "l");
   leg->AddEntry(grrange, "3#sigma signal region", "f");
   leg->Draw();
-  if(!drawall) ccombbkg->Close();
+  /*if(!drawall) ccombbkg->Close();*/
 
   TCanvas* cfits = (TCanvas*)ffits->Get(Form("BkgFits_parametrised_%d",ptbin));
   cfits->Draw();
+  if(!drawall) cfits->Close();
 
 
   //EXTRACT SCALED COMBINATORIAL BACKGROUND
@@ -813,20 +955,40 @@ void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t exp
   fbkgnorm->SetParameter(0, bkgscalingHIJING * bkgscalingEv);
   cout << "   Setting par0 for fbkgnorm = " << bkgscalingHIJING * bkgscalingEv << endl;
 
-  TF1* fbkgscaled = new TF1(Form("fbkgscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fbkg->GetName()), fbkg->GetXmin(), fbkg->GetXmax());
+  TF1* fbkgscaled;
+  if(bkgfitoption[ptbin] == "pol1"){
+    fbkgscaled = new TF1(Form("fbkgscaled%d_%d",ptbin,iscan),"pol1", fbkg->GetXmin(), fbkg->GetXmax());
+    fbkgscaled->SetParameter(0, fbkgnorm->GetParameter(0) * fbkg->GetParameter(0));
+    fbkgscaled->SetParameter(1, fbkgnorm->GetParameter(0) * fbkg->GetParameter(1));
+  } else fbkgscaled = new TF1(Form("fbkgscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fbkg->GetName()), fbkg->GetXmin(), fbkg->GetXmax());
   fbkgscaled->SetLineColor(kMagenta+2);
   fbkgscaled->SetLineWidth(fbkg->GetLineWidth());
   fbkgscaled->SetLineStyle(fbkg->GetLineStyle());
 
-  TF1* fcentscaled = new TF1(Form("fcentscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fcent->GetName()), fcent->GetXmin(), fcent->GetXmax());
+  TF1* fcentscaled;
+  if(bkgfitoption[ptbin] == "pol1"){
+    fcentscaled = new TF1(Form("fcentscaled%d_%d",ptbin,iscan),"pol1", fcent->GetXmin(), fcent->GetXmax());
+    fcentscaled->SetParameter(0, fbkgnorm->GetParameter(0) * fcent->GetParameter(0));
+    fcentscaled->SetParameter(1, fbkgnorm->GetParameter(0) * fcent->GetParameter(1));
+  } else fcentscaled = new TF1(Form("fcentscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fcent->GetName()), fcent->GetXmin(), fcent->GetXmax());
   fcentscaled->SetLineColor(kMagenta+2);
   fcentscaled->SetLineWidth(fcent->GetLineWidth());
   fcentscaled->SetLineStyle(fcent->GetLineStyle());
-  TF1* fupscaled = new TF1(Form("fupscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fup->GetName()), fup->GetXmin(), fup->GetXmax());
+  TF1* fupscaled;
+  if(bkgfitoption[ptbin] == "pol1"){
+    fupscaled = new TF1(Form("fupscaled%d_%d",ptbin,iscan),"pol1", fup->GetXmin(), fup->GetXmax());
+    fupscaled->SetParameter(0, fbkgnorm->GetParameter(0) * fup->GetParameter(0));
+    fupscaled->SetParameter(1, fbkgnorm->GetParameter(0) * fup->GetParameter(1));
+  } else fupscaled = new TF1(Form("fupscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), fup->GetName()), fup->GetXmin(), fup->GetXmax());
   fupscaled->SetLineColor(kMagenta+2);
   fupscaled->SetLineWidth(fup->GetLineWidth());
   fupscaled->SetLineStyle(fup->GetLineStyle());
-  TF1* flowscaled = new TF1(Form("flowscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), flow->GetName()), flow->GetXmin(), flow->GetXmax());
+  TF1* flowscaled;
+  if(bkgfitoption[ptbin] == "pol1"){
+    flowscaled = new TF1(Form("flowscaled%d_%d",ptbin,iscan),"pol1", flow->GetXmin(), flow->GetXmax());
+    flowscaled->SetParameter(0, fbkgnorm->GetParameter(0) * flow->GetParameter(0));
+    flowscaled->SetParameter(1, fbkgnorm->GetParameter(0) * flow->GetParameter(1));
+  } else flowscaled = new TF1(Form("flowscaled%d_%d",ptbin,iscan),Form("%s*%s",fbkgnorm->GetName(), flow->GetName()), flow->GetXmin(), flow->GetXmax());
   flowscaled->SetLineColor(kMagenta+2);
   flowscaled->SetLineWidth(flow->GetLineWidth());
   flowscaled->SetLineStyle(flow->GetLineStyle());
@@ -894,21 +1056,71 @@ void calculate_Signal_CombBackground_MLdep(Int_t ptbin, Int_t iscan, Float_t exp
 
   TLatex info; info.SetNDC(); info.SetTextFont(43); info.SetTextSize(23);
   info.DrawLatex(0.19, 0.14, Form("ML_{1} > %.3f + ML_{2} > %.3f", preselML[ptbin], probcuts[iscan]));
+  if(!drawall) ccombbkgscaled->Close();
 
-  Double_t bkgcentfit = 0;
-  if(useRealFit[ptbin]) bkgcentfit += fbkgscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  else                  bkgcentfit += fcentscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  cout << "    Bkg combinatorial: " << bkgcentfit << endl;
-  Double_t bkgcentfitcomb = bkgcentfit;
-  bkgcentfit += fdspr1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  bkgcentfit += fdsfdbs1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  bkgcentfit += fdsfdbzero1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  bkgcentfit += fdsfdbplus1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  bkgcentfit += fdsfdlambdab1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
-  cout << "    Bkg combinatorial+injected: " << bkgcentfit << " " << bkgcentfit/bkgcentfitcomb << endl;
+  Double_t bkgcentfitcomb = 0;
+  if(useRealFit[ptbin]) bkgcentfitcomb += fbkgscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  else                  bkgcentfitcomb += fcentscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  cout << "    Bkg combinatorial: " << bkgcentfitcomb << endl;
 
-  Double_t expectedsgnfcent = expBssig / TMath::Sqrt(expBssig + bkgcentfit);
-  cout << "     Sngf = " << expectedsgnfcent << " (old = " << expBssig / TMath::Sqrt(expBssig + bkgcentfitcomb) << ")\n\n" << endl;
+  Double_t bkgcentfonll = 0;
+  bkgcentfonll += fdspr1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgcentfonll += fdsfdbs1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgcentfonll += fdsfdbzero1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgcentfonll += fdsfdbplus1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgcentfonll += fdsfdlambdab1scaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  expBsbkg = bkgcentfonll + bkgcentfitcomb;
+  cout << "    Bkg combinatorial+injected: " << expBsbkg << " " << expBsbkg/bkgcentfitcomb << endl;
+
+  Double_t bkgfitmax = 0;
+  if(useRealFit[ptbin]) bkgfitmax += 0;
+  else                  bkgfitmax += fupscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfitmax += bkgcentfonll;
+
+  Double_t bkgfonllmax = 0;
+  bkgfonllmax += fdspr1scaledmax->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmax += fdsfdbs1scaledmax->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmax += fdsfdbzero1scaledmax->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmax += fdsfdbplus1scaledmax->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmax += fdsfdlambdab1scaledmax->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmax += bkgcentfitcomb;
+
+  Double_t bkgfitmin = 0;
+  if(useRealFit[ptbin]) bkgfitmin += 0;
+  else                  bkgfitmin += flowscaled->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfitmin += bkgcentfonll;
+
+  Double_t bkgfonllmin = 0;
+  bkgfonllmin += fdspr1scaledmin->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmin += fdsfdbs1scaledmin->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmin += fdsfdbzero1scaledmin->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmin += fdsfdbplus1scaledmin->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmin += fdsfdlambdab1scaledmin->Integral(xmin,xmax)/(Double_t)hbkg->GetBinWidth(1);
+  bkgfonllmin += bkgcentfitcomb;
+
+  Double_t ptmin = ptbins[ptbin];
+  Double_t ptmax = ptbins[ptbin+1];
+  Double_t ptcent = 0.5*(ptmax + ptmin);
+  Double_t pterr = 0.5*(ptmax - ptmin);
+
+  grBkgHIJING->SetPoint(ptbin, ptcent, expBsbkg);
+  grBkgHIJING->SetPointError(ptbin, pterr, pterr, expBsbkg-bkgfitmin, bkgfitmax-expBsbkg);
+  grBkgFONLL->SetPoint(ptbin, ptcent, expBsbkg);
+  grBkgFONLL->SetPointError(ptbin, pterr, pterr, expBsbkg-bkgfonllmin, bkgfonllmax-expBsbkg);
+
+  grBkgHIJINGrel->SetPoint(ptbin, ptcent, 0);
+  grBkgHIJINGrel->SetPointError(ptbin, pterr, pterr, (expBsbkg-bkgfitmin)/expBsbkg, (bkgfitmax-expBsbkg)/expBsbkg);
+  grBkgFONLLrel->SetPoint(ptbin, ptcent, 0);
+  grBkgFONLLrel->SetPointError(ptbin, pterr, pterr, (expBsbkg-bkgfonllmin)/expBsbkg, (bkgfonllmax-expBsbkg)/expBsbkg);
+
+  expBssgnf = expBssig / TMath::Sqrt(expBssig + expBsbkg);
+  cout << "     Sngf = " << expBssgnf << " (old = " << expBssig / TMath::Sqrt(expBssig + bkgcentfitcomb) << ")\n\n" << endl;
+
+  //ccombbkg->cd();
+  //TLatex info2; info2.SetNDC(); info2.SetTextFont(43); info2.SetTextSize(23);
+  //info2.DrawLatex(0.19, 0.14, Form("Sgnf_comb = %.3f, Sgnf_all = %.3f", expBssgnf, expBssig / TMath::Sqrt(expBssig + bkgcentfitcomb)));
+  //ccombbkg->SaveAs(Form("tempfig_ITS2/%s.eps",ccombbkg->GetName()));
+
 }
 
 void plot_expected_significance(TString filenamemass, TString filenameeff, TString filenamefits){
@@ -949,7 +1161,7 @@ void plot_expected_significance(TString filenamemass, TString filenameeff, TStri
     }
   }
   
-  TH1F* hBkgCorr = (TH1F*)fBkgCorr->Get("hCorrFacBs_rebin");
+  TH1F* hBkgCorr = (TH1F*)fBkgCorr->Get("hCorrFacBs");
 
   double xmin[nptbins];
   double xmax[nptbins];
@@ -1019,6 +1231,28 @@ void plot_expected_significance(TString filenamemass, TString filenameeff, TStri
       expectedbkg[j] = hBkgCorr->GetBinContent(hBkgCorr->FindBin(ptbins[j]+0.01)) * nEvExpected * expectedbkg[j] / nEv335;
       expectedbkglow[j] = hBkgCorr->GetBinContent(hBkgCorr->FindBin(ptbins[j]+0.01)) * nEvExpected * expectedbkglow[j] / nEv335;
       expectedbkghigh[j] = hBkgCorr->GetBinContent(hBkgCorr->FindBin(ptbins[j]+0.01)) * nEvExpected * expectedbkghigh[j] / nEv335;
+
+expectedbkg[j] = grBkgHIJING->GetY()[j];
+expectedbkglow[j] = grBkgHIJING->GetY()[j] - grBkgHIJING->GetEYlow()[j];
+expectedbkghigh[j] = grBkgHIJING->GetY()[j] + grBkgHIJING->GetEYhigh()[j];
+
+  //if(j == 0) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + 3*grBkgHIJING->GetEYlow()[j];
+  //if(j == 1) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + 2*grBkgHIJING->GetEYlow()[j];
+  //if(j == 2) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + grBkgHIJING->GetEYlow()[j];
+  //grBkgHIJING2->SetPointEYhigh(0, 3*grBkgHIJING2->GetErrorYlow(0));
+  //grBkgHIJING2->SetPointEYhigh(1, 2*grBkgHIJING2->GetErrorYlow(1));
+  //grBkgHIJING2->SetPointEYhigh(2, grBkgHIJING2->GetErrorYlow(2));
+
+  if(j == 0) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + 2*grBkgHIJING->GetEYlow()[j];
+  if(j == 1) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + grBkgHIJING->GetEYlow()[j];
+  if(j == 2) expectedbkglow[j] = grBkgHIJING->GetY()[j] - 0.75 * grBkgHIJING->GetEYhigh()[j];
+  if(j == 2) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + 0.75 * grBkgHIJING->GetEYhigh()[j];\
+  if(j == 3) expectedbkghigh[j] = grBkgHIJING->GetY()[j] + grBkgHIJING->GetEYlow()[j];
+  //grBkgHIJING3->SetPointEYhigh(0, 2*grBkgHIJING3->GetErrorYlow(0));
+  //grBkgHIJING3->SetPointEYhigh(1, grBkgHIJING3->GetErrorYlow(1));
+  //grBkgHIJING3->SetPointEYlow(2, 0.75*grBkgHIJING3->GetErrorYhigh(2));
+  //grBkgHIJING3->SetPointEYhigh(2, 0.75*grBkgHIJING3->GetErrorYhigh(2));
+  //grBkgHIJING3->SetPointEYhigh(3, grBkgHIJING3->GetErrorYlow(3));
 
       expectedsignalcent[j] *= gauss3sigmafactor;
       expectedsignalfonllmin[j] *= gauss3sigmafactor;
@@ -1216,27 +1450,30 @@ void calculate_background(TH1F* hbkg, TF1* f1, int j, int i, double xmin, double
     TGraph* grpar0cent = (TGraph*)ffits->Get(Form("gpar0cent_%d",j));
     TGraph* grpar0low = (TGraph*)ffits->Get(Form("gpar0low_%d",j));
     TGraph* grpar0up = (TGraph*)ffits->Get(Form("gpar0high_%d",j));
-    TF1* fpar1cent = (TF1*)ffits->Get(Form("fpar1cent_%d",j));
-    TF1* fpar1low = (TF1*)ffits->Get(Form("fpar1low_%d",j));
-    TF1* fpar1up = (TF1*)ffits->Get(Form("fpar1high_%d",j));
+    //TF1* fpar1cent = (TF1*)ffits->Get(Form("fpar1cent_%d",j));
+    //TF1* fpar1low = (TF1*)ffits->Get(Form("fpar1low_%d",j));
+    //TF1* fpar1up = (TF1*)ffits->Get(Form("fpar1high_%d",j));
+    TGraph* grpar1cent = (TGraph*)ffits->Get(Form("gpar1cent_%d",j));
+    TGraph* grpar1low = (TGraph*)ffits->Get(Form("gpar1low_%d",j));
+    TGraph* grpar1up = (TGraph*)ffits->Get(Form("gpar1high_%d",j));
 
     fcent = (TF1*)f1->Clone(Form("fcent_%d",j));
     fcent->SetParameter(0,grpar0cent->Eval(probcuts[i]));
-    double dpar1cent = fpar1cent->Eval(probcuts[i]);
-    if(dpar1cent > 0) dpar1cent = 0;
+    //double dpar1cent = fpar1cent->Eval(probcuts[i]);
+    double dpar1cent = grpar1cent->Eval(probcuts[i]);
     fcent->SetParameter(1,dpar1cent);
     fcent->SetLineColor(kBlue);
     flow = (TF1*)f1->Clone(Form("flow_%d",j));
     flow->SetParameter(0,grpar0low->Eval(probcuts[i]));
-    double dpar1low = fpar1low->Eval(probcuts[i]);
-    if(dpar1low > 0) dpar1low = 0;
+    //double dpar1low = fpar1low->Eval(probcuts[i]);
+    double dpar1low = grpar1low->Eval(probcuts[i]);
     flow->SetParameter(1,dpar1low);
     flow->SetLineStyle(2);
     flow->SetLineColor(kBlue);
     fup = (TF1*)f1->Clone(Form("fup_%d",j));
     fup->SetParameter(0,grpar0up->Eval(probcuts[i]));
-    double dpar1up = fpar1up->Eval(probcuts[i]);
-    if(dpar1up > 0) dpar1up = 0;
+    //double dpar1up = fpar1up->Eval(probcuts[i]);
+    double dpar1up = grpar1up->Eval(probcuts[i]);
     fup->SetParameter(1,dpar1up);
     fup->SetLineStyle(2);
     fup->SetLineColor(kBlue);
@@ -1340,7 +1577,6 @@ void extract_fonll(TString filnam, int j, double &fonllmin, double &fonllcent, d
     Double_t errdw=csc-csmin;
     Double_t errtotup=TMath::Sqrt(errup*errup+systFF*systFF+systLHCb*systLHCb);
     Double_t errtotdw=TMath::Sqrt(errdw*errdw+systFF*systFF+systLHCb*systLHCb);
-
     if(draw){
       gf->SetPoint(iPt,ptmed,csc);
       gf->SetPointError(iPt,0.5*dpt,0.5*dpt,errtotdw,errtotup);

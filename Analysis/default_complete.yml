@@ -9,8 +9,8 @@ analysis:
   masshisto: false
   effhisto: false
   probscan: false
-  parametrisebkg: false
+  parametrisebkg: true
   fitinvmassbkgscan: false
-  fitbkgparamsbkgscan: true
+  fitbkgparamsbkgscan: false
   expectedsignf: false
   bkgshapestudy: false

@@ -406,6 +406,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         Fit background with TF1, and parametrise the background parameters
         """
 
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+
         # Define limits first
         self.define_probscan_limits()
         self.logger.info("\n\nArray for probability histo binning set:")
@@ -477,6 +481,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                     if fbkg.GetNpar() == 3:
                         hpar2[ipt].SetBinContent(hpar2[ipt].FindBin(self.a_probscan[ipt][isc]), bkgpar2)
                         hpar2[ipt].SetBinError(hpar2[ipt].FindBin(self.a_probscan[ipt][isc]), bkgparerr2)
+                print("Fitting pT bin", ipt, "for iscan", isc)
 
         fileout.cd()
         for ipt in range(self.p_nptfinbins):
@@ -495,6 +500,10 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         FIXME: Make less chaotic (although it does the job)...
         """
 
+        if self.p_period is "merged":
+            self.logger.warning("Invalid option for ITSUpgrade analyser, skipping")
+            return
+
         # Define limits first
         self.define_probscan_limits()
 
@@ -508,6 +517,9 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         fpar1 = []
         fpar1low = []
         fpar1high = []
+        gpar1cent = []
+        gpar1low = []
+        gpar1high = []
         gpar0cent = []
         gpar0low = []
         gpar0high = []
@@ -626,6 +638,9 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             gpar0cent.append(TGraph(0))
             gpar0low.append(TGraph(0))
             gpar0high.append(TGraph(0))
+            gpar1cent.append(TGraph(0))
+            gpar1low.append(TGraph(0))
+            gpar1high.append(TGraph(0))
             minbc = 9999.
             minfit = 9999.
             maxfit = -1.
@@ -640,7 +655,17 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                 if fbc < minbc and fbc > 0: minbc = fbc
                 if fbc <= 0: fbc = minbc
 
-                par0new = self.calculate_par0(ipt, fpar1[ipt].Eval(mlcut), fbc)
+                v_fpar1 = fpar1[ipt].Eval(mlcut)
+                v_fpar1low = fpar1low[ipt].Eval(mlcut)
+                v_fpar1high = fpar1high[ipt].Eval(mlcut)
+                par0new = self.calculate_par0(ipt, v_fpar1, fbc, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                if self.bkg_fmap[self.p_bkgfunc[ipt]] is "pol1":
+                    checkneg = par0new + fpar1[ipt].Eval(mlcut) * self.p_mass_fit_lim[0]
+                    if checkneg < 0:
+                        v_fpar1 = 0
+                        v_fpar1low = -0.1
+                        v_fpar1high = 0.1
+                        par0new = self.calculate_par0(ipt, v_fpar1, fbc, self.bkg_fmap[self.p_bkgfunc[ipt]])
 
                 #Add here the code for defining lower and upper limits (a mess...)
                 if k >= 0:
@@ -671,21 +696,24 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                     if fhigh > 0: maxfit = fhigh
                     if havenallzero and maxfit != -1: fhigh = maxfit
 
-                    par0low = self.calculate_par0(ipt, fpar1low[ipt].Eval(mlcut), flow)
-                    par0high = self.calculate_par0(ipt, fpar1high[ipt].Eval(mlcut), fhigh)
+                    par0low = self.calculate_par0(ipt, v_fpar1low, flow, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                    par0high = self.calculate_par0(ipt, v_fpar1high, fhigh, self.bkg_fmap[self.p_bkgfunc[ipt]])
                 else:
                     bcmin = hentr.GetBinContent(hentr.FindBin(mlcut)) - \
                             hentr.GetBinError(hentr.FindBin(mlcut))
                     bcmax = hentr.GetBinContent(hentr.FindBin(mlcut)) + \
                             hentr.GetBinError(hentr.FindBin(mlcut))
-                    par0low = self.calculate_par0(ipt, fpar1low[ipt].Eval(mlcut), bcmin)
-                    par0high = self.calculate_par0(ipt, fpar1high[ipt].Eval(mlcut), bcmax)
+                    par0low = self.calculate_par0(ipt, v_fpar1low, bcmin, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                    par0high = self.calculate_par0(ipt, v_fpar1high, bcmax, self.bkg_fmap[self.p_bkgfunc[ipt]])
 
                 if par0low > par0new: par0low = par0new
                 if par0high < par0new: par0high = par0new
                 gpar0cent[ipt].SetPoint(isc, mlcut, par0new)
                 gpar0low[ipt].SetPoint(isc, mlcut, par0low)
                 gpar0high[ipt].SetPoint(isc, mlcut, par0high)
+                gpar1cent[ipt].SetPoint(isc, mlcut, v_fpar1)
+                gpar1low[ipt].SetPoint(isc, mlcut, v_fpar1low)
+                gpar1high[ipt].SetPoint(isc, mlcut, v_fpar1high)
 
             canv.cd(3)
             gpar0cent[ipt].SetLineColor(2)
@@ -700,6 +728,19 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             gpar0low[ipt].Draw("same l")
             gpar0high[ipt].Draw("same l")
 
+            canv.cd(2)
+            gpar1cent[ipt].SetLineColor(4)
+            gpar1low[ipt].SetLineColor(4)
+            gpar1high[ipt].SetLineColor(4)
+            gpar1cent[ipt].SetLineWidth(2)
+            gpar1high[ipt].SetLineWidth(2)
+            gpar1low[ipt].SetLineWidth(2)
+            gpar1high[ipt].SetLineStyle(2)
+            gpar1low[ipt].SetLineStyle(2)
+            gpar1cent[ipt].Draw("same l")
+            gpar1low[ipt].Draw("same l")
+            gpar1high[ipt].Draw("same l")
+
             fileout.cd()
             canv.Write("BkgFits_parametrised_%d" % ipt)
 
@@ -710,18 +751,30 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             gpar0cent[ipt].Write("gpar0cent_%d" % ipt)
             gpar0low[ipt].Write("gpar0low_%d" % ipt)
             gpar0high[ipt].Write("gpar0high_%d" % ipt)
+            gpar1cent[ipt].Write("gpar1cent_%d" % ipt)
+            gpar1low[ipt].Write("gpar1low_%d" % ipt)
+            gpar1high[ipt].Write("gpar1high_%d" % ipt)
         fileout.Close()
 
         self.logger.info("\n\nBackground parametrising finished, saved in %s\n\n", self.n_file_params)
 
 
-    def calculate_par0(self, ipt, fpar1, fbc):
-        if fpar1 == 0:
-            return math.log(self.binwidth[ipt] * fbc)
-        else:
-            numerator = self.binwidth[ipt] * fpar1 * fbc
-            denominator = math.exp(fpar1 * self.p_mass_fit_lim[1]) - math.exp(fpar1 * self.p_mass_fit_lim[0])
-            return math.log(numerator / denominator)
+    def calculate_par0(self, ipt, fpar1, fbc, function):
+        if function == "expo":
+            #Integrate[Exp[a + b x], {x, x1, x2}]
+            #Solve[(Exp[a] (Exp[b x2] - Exp[b x1]))/b == c, a]
+            if fpar1 == 0:
+                return math.log(self.binwidth[ipt] * fbc)
+            else:
+                numerator = self.binwidth[ipt] * fpar1 * fbc
+                denominator = math.exp(fpar1 * self.p_mass_fit_lim[1]) - math.exp(fpar1 * self.p_mass_fit_lim[0])
+                return math.log(numerator / denominator)
+        if function == "pol1":
+            #Integrate[a + b x, {x, x1, x2}]
+            #Solve[a (x2 - x1) + 0.5*b (x2^2 - x1^2) == c, a]
+            numerator = self.binwidth[ipt] * fbc - 0.5 * fpar1 * (self.p_mass_fit_lim[1]*self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]*self.p_mass_fit_lim[0])
+            denominator = self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]
+            return numerator / denominator
 
 
     def parametrise_background_scan(self):
