@@ -1,5 +1,6 @@
 .idea
 InputAnalyses/Analysis_ITS3_Bs/tempfig*
+InputAnalyses/Analysis_ITS3_Bs/aliphysics/multitrialBs
 
 # If python build in source tree
 build/*
@@ -19,6 +20,8 @@ dist/*
 *.obj
 
 # dynamic libraries
+*_cxx.d
+*_cxx_ACLiC_*
 *.so
 *.dylib
 *.dll

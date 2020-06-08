@@ -92,3 +92,33 @@ void extract_TAMU(TString filn, TString foutput){
 
 }
 
+void extract_TAMU_TGraph(TString filnBs, TString filnB, TString foutput){
+
+  TGraph* gBs = new TGraph(0);
+  TGraph* gB = new TGraph(0);
+
+  Float_t pt, raa;
+  Int_t iPt=0;
+
+  FILE* f=fopen(filnBs.Data(),"r");
+  while(!feof(f)){
+    fscanf(f,"%f %f\n",&pt,&raa);
+    gBs->SetPoint(iPt++,pt,raa);
+  }
+  fclose(f);
+
+  FILE* f2=fopen(filnB.Data(),"r");
+  iPt=0;
+  while(!feof(f2)){
+    fscanf(f2,"%f %f\n",&pt,&raa);
+    gB->SetPoint(iPt++,pt,raa);
+  }
+  fclose(f2);
+
+  TFile* fout = new TFile(foutput.Data(),"RECREATE");
+  fout->cd();
+  gBs->Write("RAA_TAMU_Bs");
+  gB->Write("RAA_TAMU_B");
+  fout->Close();
+
+}

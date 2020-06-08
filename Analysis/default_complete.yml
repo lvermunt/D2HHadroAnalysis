@@ -5,12 +5,12 @@ analysis:
   data:
     activate: true
   mc:
-    activate: true
+    activate: false
   masshisto: false
   effhisto: false
   probscan: false
-  parametrisebkg: true
+  parametrisebkg: false
   fitinvmassbkgscan: false
-  fitbkgparamsbkgscan: false
+  fitbkgparamsbkgscan: true
   expectedsignf: false
   bkgshapestudy: false

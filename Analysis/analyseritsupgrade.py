@@ -60,7 +60,8 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
         self.a_probscan_bin = [[] for _ in range(self.p_nptfinbins)]
         self.fpar1func = datap["analysis"][self.typean].get("probscan_func_par1", "pol2")
         self.n_bkgentrfits = datap["analysis"][self.typean].get("probscan_nfits", 8)
-        self.v_fitsplit = datap["analysis"][self.typean].get("probscan_length_fits", 0.005)
+        self.v_fitsplit = datap["analysis"][self.typean].get("probscan_length_fits",
+                                                             [0.005 for _ in range(self.p_nptfinbins)])
         self.minbc = datap["analysis"][self.typean].get("probscan_min_binc", 100)
 
         #ML model variables
@@ -293,6 +294,8 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             df_gen = df_gen.query(self.s_presel_gen_eff)
             df_gen = seldf_singlevar(df_gen, self.v_var_binning, self.lpt_finbinmin[ipt],
                                      self.lpt_finbinmax[ipt])
+            df_gen_pr = df_gen[df_gen.ismcprompt == 1]
+            df_gen_fd = df_gen[df_gen.ismcfd == 1]
 
             idx = 0
             for isc in range(len(self.a_probscan[ipt])):
@@ -320,9 +323,7 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                                              n_bins, analysis_bin_lims))
 
                     df_sel_pr = df[df.ismcprompt == 1]
-                    df_gen_pr = df_gen[df_gen.ismcprompt == 1]
                     df_sel_fd = df[df.ismcfd == 1]
-                    df_gen_fd = df_gen[df_gen.ismcfd == 1]
 
                     h_gen_pr[idx].SetBinContent(ipt + 1, len(df_gen_pr))
                     h_gen_pr[idx].SetBinError(ipt + 1, math.sqrt(len(df_gen_pr)))
@@ -585,29 +586,29 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
             fentrlow = []
             fentrhigh = []
             ranges_k = []
-            minprob_forfit = self.probscan_max[ipt] - self.n_bkgentrfits * self.v_fitsplit
+            minprob_forfit = self.probscan_max[ipt] - self.n_bkgentrfits * self.v_fitsplit[ipt]
             ranges_k.append(minprob_forfit)
             for k in range(self.n_bkgentrfits):
                 fentr.append(TF1("fentr_%d_%d" % (ipt, k), "pol1",
-                                 minprob_forfit + k * self.v_fitsplit,
-                                 minprob_forfit + (k + 1) * self.v_fitsplit))
-                ranges_k.append(minprob_forfit + (k + 1) * self.v_fitsplit)
+                                 minprob_forfit + k * self.v_fitsplit[ipt],
+                                 minprob_forfit + (k + 1) * self.v_fitsplit[ipt]))
+                ranges_k.append(minprob_forfit + (k + 1) * self.v_fitsplit[ipt])
                 fentr[k].SetLineColor(k+1)
                 hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
 
                 #shift ranges a bit for when fit fails
                 if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
                     fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol1",
-                                   minprob_forfit + (k - 0.1) * self.v_fitsplit,
-                                   minprob_forfit + (k + 0.9) * self.v_fitsplit)
-                    ranges_k[k+1] = minprob_forfit + (k + 0.9) * self.v_fitsplit
+                                   minprob_forfit + (k - 0.1) * self.v_fitsplit[ipt],
+                                   minprob_forfit + (k + 0.9) * self.v_fitsplit[ipt])
+                    ranges_k[k+1] = minprob_forfit + (k + 0.9) * self.v_fitsplit[ipt]
                     hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
 
                     if fentr[k].GetParameter(0) == 0 and fentr[k].GetParameter(1) == 0:
                         fentr[k] = TF1("fentr_%d_%d" % (ipt, k), "pol1",
-                                       minprob_forfit + (k - 0.2) * self.v_fitsplit,
-                                       minprob_forfit + (k + 0.8) * self.v_fitsplit)
-                        ranges_k[k+1] = minprob_forfit + (k + 0.8) * self.v_fitsplit
+                                       minprob_forfit + (k - 0.2) * self.v_fitsplit[ipt],
+                                       minprob_forfit + (k + 0.8) * self.v_fitsplit[ipt])
+                        ranges_k[k+1] = minprob_forfit + (k + 0.8) * self.v_fitsplit[ipt]
                         hentr.Fit("fentr_%d_%d" % (ipt, k), "R,+,0")
                 fentr[k].Draw("same")
 
@@ -668,43 +669,76 @@ class AnalyserITSUpgrade(Analyser): # pylint: disable=invalid-name
                         par0new = self.calculate_par0(ipt, v_fpar1, fbc, self.bkg_fmap[self.p_bkgfunc[ipt]])
 
                 #Add here the code for defining lower and upper limits (a mess...)
-                if k >= 0:
-                    flow = hentr.GetBinContent(hentr.FindBin(mlcut))
-                    fhigh = hentr.GetBinContent(hentr.FindBin(mlcut))
-                    havezero = False
-                    havenallzero = True
-                    for z in range(k):
-                        if fentr[z].Eval(mlcut) < flow and fentr[z].Eval(mlcut) > 0:
-                            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
-                                flow = fentr[z].Eval(mlcut)
-                            elif fentr[z].Eval(mlcut) > 0.5 * fbc:
-                                flow = fentr[z].Eval(mlcut)
-                        if fentr[z].Eval(mlcut) > fhigh:
-                            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
-                                fhigh = fentr[z].Eval(mlcut)
-                            elif fentr[z].Eval(mlcut) > 1.5 * fbc:
-                                fhigh = fentr[z].Eval(mlcut)
-                        if fentr[z].Eval(mlcut) == 0:
-                            havezero = True
-                        if fentr[z].Eval(mlcut) > 0:
-                            havenallzero = False
+                #if k >= 0:
+                #    flow = hentr.GetBinContent(hentr.FindBin(mlcut))
+                #    fhigh = hentr.GetBinContent(hentr.FindBin(mlcut))
+                #    havezero = False
+                #    havenallzero = True
+                #    for z in range(k):
+                #        if fentr[z].Eval(mlcut) < flow and fentr[z].Eval(mlcut) > 0:
+                #            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
+                #                flow = fentr[z].Eval(mlcut)
+                #            elif fentr[z].Eval(mlcut) > 0.5 * fbc:
+                #                flow = fentr[z].Eval(mlcut)
+                #        if fentr[z].Eval(mlcut) > fhigh:
+                #            if fbc < self.minbc and (k - z) < 0.5 * self.n_bkgentrfits:
+                #                fhigh = fentr[z].Eval(mlcut)
+                #            elif fentr[z].Eval(mlcut) > 1.5 * fbc:
+                #                fhigh = fentr[z].Eval(mlcut)
+                #        if fentr[z].Eval(mlcut) == 0:
+                #            havezero = True
+                #        if fentr[z].Eval(mlcut) > 0:
+                #            havenallzero = False
+                #    if flow < minfit and flow > 0: minfit = flow
+                #    if flow <= 0 and minfit != 9999: flow = minfit
+                #    if havezero and minfit < 9999: flow = minfit
+                #    if flow <= 0 and minfit == 9999: flow = fbc
+                #    if fhigh > 0: maxfit = fhigh
+                #    if havenallzero and maxfit != -1: fhigh = maxfit
+                #    par0low = self.calculate_par0(ipt, v_fpar1low, flow, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                #    par0high = self.calculate_par0(ipt, v_fpar1high, fhigh, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                #else:
+                #    bcmin = hentr.GetBinContent(hentr.FindBin(mlcut)) - \
+                #            hentr.GetBinError(hentr.FindBin(mlcut))
+                #    bcmax = hentr.GetBinContent(hentr.FindBin(mlcut)) + \
+                #            hentr.GetBinError(hentr.FindBin(mlcut))
+                #    par0low = self.calculate_par0(ipt, v_fpar1low, bcmin, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                #    par0high = self.calculate_par0(ipt, v_fpar1high, bcmax, self.bkg_fmap[self.p_bkgfunc[ipt]])
 
-                    if flow < minfit and flow > 0: minfit = flow
-                    if flow <= 0 and minfit != 9999: flow = minfit
-                    if havezero and minfit < 9999: flow = minfit
-                    if flow <= 0 and minfit == 9999: flow = fbc
-                    if fhigh > 0: maxfit = fhigh
-                    if havenallzero and maxfit != -1: fhigh = maxfit
+                bccent = hentr.GetBinContent(hentr.FindBin(mlcut))
+                bcmin = hentr.GetBinContent(hentr.FindBin(mlcut)) - \
+                        hentr.GetBinError(hentr.FindBin(mlcut))
+                bcmax = hentr.GetBinContent(hentr.FindBin(mlcut)) + \
+                        hentr.GetBinError(hentr.FindBin(mlcut))
+                if bccent < 50:
+                    bcmin = bccent
+                    bcmax = bccent
+                fitcent = bccent
+                fitbefore = bccent
+                fitafter = bccent
+                if k == 0:
+                    if fentr[k].Eval(mlcut) > 0: fitcent = fentr[k].Eval(mlcut)
+                    fitbefore = fitcent
+                    fitafter = fitcent
+                if k > 0 and k != self.n_bkgentrfits - 1:
+                    if fentr[k].Eval(mlcut) > 0: fitcent = fentr[k].Eval(mlcut)
+                    if fentr[k-1].Eval(mlcut) > 0: fitbefore = fentr[k-1].Eval(mlcut)
+                    if fentr[k+1].Eval(mlcut) > 0: fitafter = fentr[k+1].Eval(mlcut)
+                if k == self.n_bkgentrfits - 1:
+                    if fentr[k].Eval(mlcut) > 0: fitcent = fentr[k].Eval(mlcut)
+                    if fentr[k-1].Eval(mlcut) > 0: fitbefore = fentr[k-1].Eval(mlcut)
+                    if bccent > 25 and fitbefore/bccent > 1.25: fitbefore = fitcent
+                    fitafter = fitcent
+                flow = min(bcmin, bccent, bcmax, fitbefore, fitcent, fitafter)
+                fhigh = max(bcmin, bccent, bcmax, fitbefore, fitcent, fitafter)
 
-                    par0low = self.calculate_par0(ipt, v_fpar1low, flow, self.bkg_fmap[self.p_bkgfunc[ipt]])
-                    par0high = self.calculate_par0(ipt, v_fpar1high, fhigh, self.bkg_fmap[self.p_bkgfunc[ipt]])
-                else:
-                    bcmin = hentr.GetBinContent(hentr.FindBin(mlcut)) - \
-                            hentr.GetBinError(hentr.FindBin(mlcut))
-                    bcmax = hentr.GetBinContent(hentr.FindBin(mlcut)) + \
-                            hentr.GetBinError(hentr.FindBin(mlcut))
-                    par0low = self.calculate_par0(ipt, v_fpar1low, bcmin, self.bkg_fmap[self.p_bkgfunc[ipt]])
-                    par0high = self.calculate_par0(ipt, v_fpar1high, bcmax, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                if flow == 0: flow = minfit
+                if fhigh == 0: fhigh = maxfit
+                minfit = flow
+                maxfit = fhigh
+
+                par0low = self.calculate_par0(ipt, v_fpar1, flow, self.bkg_fmap[self.p_bkgfunc[ipt]])
+                par0high = self.calculate_par0(ipt, v_fpar1, fhigh, self.bkg_fmap[self.p_bkgfunc[ipt]])
 
                 if par0low > par0new: par0low = par0new
                 if par0high < par0new: par0high = par0new
