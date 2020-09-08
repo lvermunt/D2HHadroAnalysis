@@ -69,9 +69,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #namefile root
         self.n_root = datap["files_names"]["namefile_unmerged_tree"]
         #troot trees names
-        self.n_treereco = datap["files_names"]["treeoriginreco"]
-        self.n_treegen = datap["files_names"]["treeorigingen"]
-        self.n_treeevt = datap["files_names"]["treeoriginevt"]
+        mcordata_int = 0
+        if self.mcordata == "mc":
+            mcordata_int = 1
+        self.n_treereco = datap["files_names"]["treeoriginreco"][mcordata_int]
+        self.n_treegen = datap["files_names"]["treeorigingen"][mcordata_int]
+        self.n_treeevt = datap["files_names"]["treeoriginevt"][mcordata_int]
         #namefiles pkl
         self.n_reco = datap["files_names"]["namefile_reco"]
         self.n_evt = datap["files_names"]["namefile_evt"]

@@ -96,9 +96,9 @@ Dspp8inf:
     namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl.lz4
     namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl.lz4
     namefile_mcweights: mcweights.root
-    treeoriginreco: 'PWGHF_TreeCreator8inf/tree_Ds'
-    treeorigingen: 'PWGHF_TreeCreator8inf/tree_Ds_gen'
-    treeoriginevt: 'PWGHF_TreeCreator8inf/tree_event_char'
+    treeoriginreco: ['PWGHF_TreeCreator8inf/tree_Ds', 'PWGHF_TreeCreator/tree_Ds']
+    treeorigingen: ['PWGHF_TreeCreator8inf/tree_Ds_gen', 'PWGHF_TreeCreator/tree_Ds_gen']
+    treeoriginevt: ['PWGHF_TreeCreator8inf/tree_event_char', 'PWGHF_TreeCreator/tree_event_char']
     treeoutput: "Dstree"
     histofilename: "masshisto.root"
     efffilename: "effhisto.root"
