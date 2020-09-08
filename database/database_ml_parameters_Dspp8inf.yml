@@ -12,22 +12,20 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-Dspp:
+Dspp8inf:
   nprongs: 3
   doml: true
   doml_asprefilter: true #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
   mass: 1.968
-  sel_reco_unp: "pt_cand>1"
+  sel_reco_unp: "pt_cand>0"
   sel_reco_singletrac_unp : null
-  sel_gen_unp: "pt_cand>1 and abs(z_vtx_gen)<10"
+  sel_gen_unp: "pt_cand>0 and abs(z_vtx_gen)<10"
   sel_cen_unp: null
-  #sel_good_evt_unp: "is_ev_rej == 0"
-  sel_good_evt_unp: null
-  sel_reco_skim: ["pt_prong0>0.3 and pt_prong1>0.3 and pt_prong2>0.3",
-                  "pt_prong0>0.3 and pt_prong1>0.3 and pt_prong2>0.3"]
-  sel_gen_skim: [null,null]
-  sel_skim_binmin: [1,8] #list of nbins
-  sel_skim_binmax: [8,24] #list of nbins
+  sel_good_evt_unp: "is_ev_rej == 0"
+  sel_reco_skim: [null, null]
+  sel_gen_skim: [null, null]
+  sel_skim_binmin: [8,12] #list of nbins
+  sel_skim_binmax: [12,24] #list of nbins
   var_binning: pt_cand
   dofullevtmerge: false
   bitmap_sel:
@@ -47,26 +45,44 @@ Dspp:
 
   variables:
     var_all: [d_len, d_len_xy, norm_dl_xy, cos_p, cos_p_xy, imp_par_xy, dca, sig_vert, delta_mass_KK,
-              cos_PiDs, cos_PiKPhi_3, imp_par_prong0, imp_par_prong1, imp_par_prong2, max_norm_d0d0exp,
-              inv_mass, pt_cand, cand_type, y_cand, ev_id, ev_id_ext, run_number,
+              cos_PiDs, cos_PiKPhi_3, max_norm_d0d0exp,
+              inv_mass, pt_cand, cand_type, y_cand,
+              ev_id, ev_id_ext, run_number,
               pt_prong0, pt_prong1, pt_prong2, p_prong0, p_prong1, p_prong2,
-              spdhits_prong0, spdhits_prong1, spdhits_prong2,
+              imp_par_prong0, imp_par_prong1, imp_par_prong2, spdhits_prong0, spdhits_prong1, spdhits_prong2,
               nsigTPC_Pi_0, nsigTPC_K_0, nsigTOF_Pi_0, nsigTOF_K_0,
               nsigTPC_Pi_1, nsigTPC_K_1, nsigTOF_Pi_1, nsigTOF_K_1,
-              nsigTPC_Pi_2, nsigTPC_K_2, nsigTOF_Pi_2, nsigTOF_K_2]
+              nsigTPC_Pi_2, nsigTPC_K_2, nsigTOF_Pi_2, nsigTOF_K_2,
+              nsigComb_Pi_0, nsigComb_K_0, nsigComb_Pi_1, nsigComb_K_1, nsigComb_Pi_2, nsigComb_K_2]
     var_evt:
-      data: [centrality, z_vtx_reco, n_vtx_contributors, n_tracks, is_ev_rej, run_number,
-              ev_id, ev_id_ext, n_tracklets,V0Amult, trigger_hasbit_INT7, trigger_hasbit_HighMultSPD,
-              trigger_hasbit_HighMultV0, trigger_hasclass_INT7, trigger_hasclass_HighMultSPD,
-              trigger_hasclass_HighMultV0, n_tracklets_corr, v0m, v0m_eq, v0m_corr, v0m_eq_corr, perc_v0m]
-      mc: [z_vtx_gen, centrality, z_vtx_reco, n_vtx_contributors, n_tracks, is_ev_rej, run_number,
-              ev_id, ev_id_ext, n_tracklets, V0Amult, trigger_hasbit_INT7, trigger_hasbit_HighMultSPD,
-              trigger_hasbit_HighMultV0, trigger_hasclass_INT7, trigger_hasclass_HighMultSPD,
-              trigger_hasclass_HighMultV0, n_tracklets_corr, v0m, v0m_eq, v0m_corr, v0m_eq_corr,
-              mult_gen, mult_gen_v0a, mult_gen_v0c, perc_v0m]
+      data: [centrality, z_vtx_reco, n_vtx_contributors, n_tracks, is_ev_rej, n_tracklets, V0Amult,
+             n_tracklets_corr, n_tracklets_corr_shm, v0m, v0m_eq, v0m_corr, v0m_eq_corr, perc_v0m,
+             run_number, ev_id, ev_id_ext,
+             trigger_hasbit_INT7, trigger_hasbit_HighMultSPD, trigger_hasbit_HighMultV0,
+             trigger_hasclass_INT7, trigger_hasclass_HighMultSPD, trigger_hasclass_HighMultV0,
+             is_ev_rej_INT7, is_ev_rej_HighMultSPD, is_ev_rej_HighMultV0,
+             is_ev_sel_int7, is_ev_sel_shm, is_ev_sel_vhm]
+      mc: [z_vtx_gen, centrality, z_vtx_reco, n_vtx_contributors, n_tracks, is_ev_rej, n_tracklets, V0Amult,
+           n_tracklets_corr, n_tracklets_corr_shm, v0m, v0m_eq, v0m_corr, v0m_eq_corr, perc_v0m,
+           mult_gen, mult_gen_v0a, mult_gen_v0c,
+           run_number, ev_id, ev_id_ext,
+           trigger_hasbit_INT7, trigger_hasbit_HighMultSPD, trigger_hasbit_HighMultV0,
+           trigger_hasclass_INT7, trigger_hasclass_HighMultSPD, trigger_hasclass_HighMultV0,
+           is_ev_rej_INT7, is_ev_rej_HighMultSPD, is_ev_rej_HighMultV0,
+           is_ev_sel_int7, is_ev_sel_shm, is_ev_sel_vhm]
     var_gen: [y_cand, pt_cand, cand_type, run_number, ev_id, ev_id_ext]
     var_evt_match: [run_number, ev_id, ev_id_ext]
-    var_training: [d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3, max_norm_d0d0exp]
+    #What was stored in this database
+    #var_training: [d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3, max_norm_d0d0exp]
+    #What was used for MB preliminary
+    #var_training: [d_len, d_len_xy, norm_dl_xy, imp_par_xy, dca, sig_vert, delta_mass_KK, cos_PiKPhi_3,
+    #               imp_par_prong0, imp_par_prong1, imp_par_prong2, max_norm_d0d0exp,
+    #               nsigTPC_Pi_0, nsigTPC_K_0, nsigTOF_Pi_0, nsigTOF_K_0, nsigTPC_Pi_1, nsigTPC_K_1, nsigTOF_Pi_1, nsigTOF_K_1,
+    #               nsigTPC_Pi_2, nsigTPC_K_2, nsigTOF_Pi_2, nsigTOF_K_2]
+    #Same as NP Ds analysis (and re-analysis 5.02 TeV)
+    var_training: [d_len, d_len_xy, norm_dl_xy, cos_p, cos_p_xy, imp_par_xy, sig_vert, delta_mass_KK,
+                   cos_PiKPhi_3, max_norm_d0d0exp,
+                   nsigComb_Pi_0, nsigComb_K_0, nsigComb_Pi_1, nsigComb_K_1, nsigComb_Pi_2, nsigComb_K_2]
     var_signal: signal
     var_inv_mass: inv_mass
 
@@ -80,52 +96,41 @@ Dspp:
     namefile_reco_applieddata: AnalysisResultsRecoAppliedData.pkl.lz4
     namefile_reco_appliedmc: AnalysisResultsRecoAppliedMC.pkl.lz4
     namefile_mcweights: mcweights.root
-    treeoriginreco: 'PWGHF_TreeCreator/tree_Ds'
-    treeorigingen: 'PWGHF_TreeCreator/tree_Ds_gen'
-    treeoriginevt: 'PWGHF_TreeCreator/tree_event_char'
+    treeoriginreco: 'PWGHF_TreeCreator8inf/tree_Ds'
+    treeorigingen: 'PWGHF_TreeCreator8inf/tree_Ds_gen'
+    treeoriginevt: 'PWGHF_TreeCreator8inf/tree_event_char'
     treeoutput: "Dstree"
     histofilename: "masshisto.root"
     efffilename: "effhisto.root"
-    crossfilename: "cross_section_tot.root"
 
   multi:
     #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
-    max_ncand_merge: 500
+    max_ncand_merge: 1000000
     data:
       nprocessesparallel: 50
-      fracmerge : [1.0,1.0] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
-      period: [LHC16pp,LHC17pp] #list of periods
-      unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/374_20200304-2028/merged,
-                          /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_data/375_20200304-2028/merged] #list of periods
-      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pkl,
-            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pkl] #list of periods
-      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pklsk,
-                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/pklskml,
-                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/pp_data_mltot
-      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/pp_data_evttot
-      mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2016,
-                    ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2017] #list of periods
+      fracmerge : [1.0] #list of periods
+      max_frac_merge: [1.0, 1.0] #list of pT bins
+      period: [LHC161718pp] #list of periods
+      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200901_ROOT6-1/pp_data/497_20200901-1725/merged] #list of periods
+      pkl: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/497_20200901-1725/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/497_20200901-1725/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/497_20200901-1725/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/pp_data_mltot
+      pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/pp_data_evttot
+      #mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_161718] #list of periods
     mc:
       nprocessesparallel: 50
-      chunksizeskim: [1000,1000] #list of periods
-      fracmerge : [1.0,1.0] #list of periods
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
-      period: [LHC16pp,LHC17pp] #list of periods
-      unmerged_tree_dir: [/Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_1/merged,
-                          /Users/lvermunt/cernbox/Analyses/ML/input/TTree/test_mc/373_20200304-2021_2/merged] #list of periods
-      pkl: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pkl,
-            /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pkl] #list of periods
-      pkl_skimmed: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pklsk,
-                    /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/pklskml,
-                                 /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/pp_mc_prodD2H_mltot
-      pkl_evtcounter_all: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/pp_mc_prodD2H_evttot
-      mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_16,
-                    ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_17]
+      chunksizeskim: [1000] #list of periods
+      fracmerge : [1.0] #list of periods
+      max_frac_merge: [1.0, 1.0] #list of pT bins
+      period: [LHC161718pp_Ds] #list of periods
+      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/merged] #list of periods
+      pkl: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/500_20200906-2241/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/500_20200906-2241/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/500_20200906-2241/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/pp_mc_prodD2H_mltot
+      pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/pp_mc_prodD2H_evttot
+      #mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_161718]
   ml:
     evtsel: is_ev_rej==0
     triggersel:
@@ -141,16 +146,17 @@ Dspp:
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
-    binmin: [1,8] #list of nbins
-    binmax: [8,24] #list of nbins
+    binmin: [8,12] #list of nbins
+    binmax: [12,24] #list of nbins
     mltype: BinaryClassification
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10
-    mlplot: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/mlplot # to be removed
-    mlout: /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/mlout    # to be removed
+    mlplot: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/mlplot8inf # to be removed
+    mlout: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/mlout8inf   # to be removed
     opt:
       isFONLLfromROOT: true
+      #TODO: UPDATE
       filename_fonll: 'data/fonll/D0DplusDstarPredictions_13TeV_y05_all_300416_BDShapeCorrected.root' # file with FONLL predictions
       fonll_particle: 'hDsPhipitoKkpi'
       fonll_pred: 'max' # edge of the FONLL prediction
@@ -172,57 +178,52 @@ Dspp:
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
     hipe4ml_hyper_pars: [{'max_depth':3, 'learning_rate':0.0238, 'n_estimators':1028, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
                          {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist}]
-    #hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':1, 'tree_method':hist},
-    #                     {'max_depth': 4, 'learning_rate': 0.1, 'n_estimators': 800, 'min_child_weight': 2, 'subsample': 1., 'colsample_bytree': 0.9, n_jobs':1, 'tree_method':hist}]
-    #                     # list of dicts of hyperparameters (one for each pT bin)
+                         # list of dicts of hyperparameters (one for each pT bin)
     hyper_par_opt:
-      do_hyp_opt: False # whether to do the parameter optimization
-      njobs: 3         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
+      do_hyp_opt: True # whether to do the parameter optimization
+      njobs: -1        # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5        # number of folds used in cross validation
-      initpoints: 5    # steps of random exploration you want to perform
-      niter: 5         # steps for bayesian optimization
-      bayes_opt_config: {'max_depth': !!python/tuple [2, 4],
+      initpoints: 10   # steps of random exploration you want to perform
+      niter: 20        # steps for bayesian optimization
+      bayes_opt_config: {'max_depth': !!python/tuple [2, 6],
                          'learning_rate': !!python/tuple [0.01, 0.1],
-                         'n_estimators': !!python/tuple [200, 1000]}
-      # configuration dictionary for optimize_params_bayes()
-      #bayes_opt_config: {'max_depth': !!python/tuple [3, 8],
-      #                  'learning_rate': !!python/tuple [0.01, 0.1],
-      #                   'n_estimators': !!python/tuple [300, 1500],
-      #                   'min_child_weight': !!python/tuple [1, 10],
-      #                   'subsample': !!python/tuple [0.8, 1.],
-      #                   'colsample_bytree': !!python/tuple [0.8, 1.]}
-      #                   # configuration dictionary for optimize_params_bayes()
+                         'n_estimators': !!python/tuple [300, 1500],
+                         'min_child_weight': !!python/tuple [1, 10],
+                         'subsample': !!python/tuple [0.8, 1.],
+                         'colsample_bytree': !!python/tuple [0.8, 1.]}
+                         # configuration dictionary for optimize_params_bayes()
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/skpkldec,
-                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/374_20200304-2028/skpkldecmerged,
-                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_data_2nd/375_20200304-2028/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/497_20200901-1725/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_data_8inf/497_20200901-1725/skpkldecmerged] #list of periods
     mc:
-      pkl_skimmed_dec: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/skpkldec,
-                        /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_1/skpkldecmerged,
-                              /Users/lvermunt/cernbox/Analyses/ML/input/Derived/test_mc_2nd/373_20200304-2021_2/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/500_20200906-2241/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds_8inf/500_20200906-2241/skpkldecmerged] #list of periods
     modelname: xgboost
-    modelsperptbin: [Model_pT_1_8.model,
-                     Model_pT_8_24.model]
-    modelsperptbin_hipe4ml: [ModelHandler_pT_1_8.pickle,
-                             ModelHandler_pT_8_24.pickle]
+    modelsperptbin: [Model_pT_8_12.model,
+                     Model_pT_12_24.model]
+    modelsperptbin_hipe4ml: [ModelHandler_pT_8_12.pickle,
+                             ModelHandler_pT_12_24.pickle]
     ml_prefilter_probcut: [0.2, 0.2]
     probcutpresel:
-      data: [0.3,0.3] #list of nbins
-      mc: [0.3,0.3] #list of nbins
-    probcutoptimal: [0.9,0.6] #list of nbins
+      data: [0.3, 0.3] #list of nbins
+      mc: [0.3, 0.3] #list of nbins
+    probcutoptimal: [0.6, 0.6] #list of nbins
 
   analysis:
+    #TODO: To update
     indexhptspectrum: 3 #kD0Kpi=0, kDplusKpipi=1, kDstarD0pi=2, kDsKKpi=3, kLctopKpi=4, kLcK0Sp=5
     fd_method: 2 #knone=0, kfc=1, kNb=2
     cctype: 1 #kpp7
     sigmav0: 57.8e-3 #NB: multiplied by 1e12 before giving to HFPtSpectrum!
     inputfonllpred: data/fonll/D0DplusDstarPredictions_13TeV_y05_all_300416_BDShapeCorrected.root
-    dir_general_plots: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_data/analysis_plots
+    dir_general_plots: /data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/analysis_plots
 
     MBvspt_ntrkl:
       proc_type: Dhadrons_mult
@@ -253,15 +254,13 @@ Dspp:
         weighttrig: false
 
       data:
-        runselection: [null, null]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_data/374_20200304-2028/resultsMBvspt_ntrkl,
-                  /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_data/375_20200304-2028/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResultsResults/test_data/resultsMBvspt_ntrkl
+        runselection: [null]
+        results: [/data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_data/497_20200901-1725/resultsMBvspt_ntrkl] #list of periods
+        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_data/resultsMBvspt_ntrkl
       mc:
-        runselection: [null, null]
-        results: [/Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_mc/373_20200304-2021_1/resultsMBvspt_ntrkl,
-                  /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResults/test_mc/373_20200304-2021_2/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /Users/lvermunt/cernbox/Analyses/ML/input/DerivedResultsResults/test_mc/resultsMBvspt_ntrkl
+        runselection: [null]
+        results: [/data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/resultsMBvspt_ntrkl] #list of periods
+        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/resultsMBvspt_ntrkl
 
       # The global mass limits
       mass_fit_lim: [1.69, 2.21] # region for the fit of the invariant mass distribution [GeV/c^2]
