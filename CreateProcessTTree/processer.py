@@ -27,7 +27,7 @@ import uproot
 
 from machine_learning_hep.utilities import create_folder_struc, openfile
 from machine_learning_hep.utilities import list_folders, createlist, appendmainfoldertolist
-from machine_learning_hep.utilities import merge_method, merge_method_max
+from machine_learning_hep.utilities import merge_method, merge_method_max2
 from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df, selectdfrunlist
 from machine_learning_hep.utilities_selection import selectfidacc, selectdfquery, seldf_singlevar
 from machine_learning_hep.ml_functions import apply
@@ -477,7 +477,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             ntomerge = (int)(nfiles * self.p_max_frac_merge[ipt])
             filesel = rd.sample(range(0, nfiles), ntomerge)
             list_sel_recosk = [self.mptfiles_recosk[ipt][j] for j in filesel]
-            merge_method_max(list_sel_recosk, self.lpt_reco_ml[ipt], self.v_max_ncand_merge)
+            merge_method_max2(list_sel_recosk, self.lpt_reco_ml[ipt], self.v_max_ncand_merge)
 
     def process_mergedec(self):
         for ipt in range(self.p_nptbins):

@@ -197,6 +197,26 @@ def merge_method_max(listfiles, namemerged, maxlength):
     dftot = pd.concat(dflist)
     pickle.dump(dftot, openfile(namemerged, "wb"), protocol=4)
 
+def merge_method_max2(listfiles, namemerged, maxlength):
+    """
+    Merge list of dataframes into one
+    """
+    dflist = []
+    sumcand = 0
+    iter = 0
+    for myfilename in listfiles:
+        myfile = openfile(myfilename, "rb")
+        df = pickle.load(myfile)
+        sumcand = sumcand + len(df)
+        iter = iter + 1
+        dflist.append(df)
+    dftot = pd.concat(dflist)
+    if sumcand > maxlength:
+        print("Max length of", maxlength, "reached for", namemerged)
+        print("Total length was", sumcand)
+        dftot = dftot.sample(maxlength)
+    pickle.dump(dftot, openfile(namemerged, "wb"), protocol=4)
+
 def parse_yaml(filepath):
     """
     Parse a YAML file and return dictionary
