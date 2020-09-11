@@ -79,7 +79,7 @@ class Optimiserhipe4ml:
         self.v_fracbkgoversig = data_param["ml"].get("fracbkgoversig", None)
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
-        self.p_tagbkgfd = data_param["ml"]["sampletagforbkgfd"]
+        self.p_tagbkgfd = data_param["ml"].get("sampletagforbkgfd", 2)
         self.p_binmin = binmin
         self.p_binmax = binmax
         self.rnd_shuffle = data_param["ml"]["rnd_shuffle"]
@@ -155,7 +155,7 @@ class Optimiserhipe4ml:
         if self.s_selbkgmlfd is not None:
             self.df_bkgfd = self.df_bkgfd.query(self.s_selbkgmlfd)
         else:
-            self.df_bkgfd = pd.DataFrame(columns=self.df_sig)
+            self.df_bkgfd = pd.DataFrame()
         self.df_bkg["ismcsignal"] = 0
         self.df_bkg["ismcprompt"] = 0
         self.df_bkg["ismcfd"] = 0

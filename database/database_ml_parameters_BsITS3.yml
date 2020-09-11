@@ -166,7 +166,7 @@ BsITS3:
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist},
                          {'max_depth': 3, 'learning_rate': 0.081, 'n_estimators': 1011, 'min_child_weight': 5.63, 'subsample': 0.809, 'colsample_bytree': 0.891, 'n_jobs':-1, 'tree_method':hist}]
     hyper_par_opt:
-      do_hyp_opt: True  # whether to do the parameter optimization
+      do_hyp_opt: False  # whether to do the parameter optimization
       njobs: -1         # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5         # number of folds used in cross validation
       initpoints: 10    # steps of random exploration you want to perform
