@@ -65,7 +65,8 @@ def split_df_sigbkg(dataframe_, var_signal_):
     """
     dataframe_sig_ = dataframe_.loc[dataframe_[var_signal_] == 1]
     dataframe_bkg_ = dataframe_.loc[dataframe_[var_signal_] == 0]
-    return dataframe_sig_, dataframe_bkg_
+    dataframe_bkgfd_ = dataframe_.loc[dataframe_[var_signal_] == 2]
+    return dataframe_sig_, dataframe_bkg_, dataframe_bkgfd_
 
 def selectbiton(array_cand_type, mask):
     return [((cand_type & mask) == mask) for cand_type in array_cand_type]

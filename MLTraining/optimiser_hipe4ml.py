@@ -74,10 +74,12 @@ class Optimiserhipe4ml:
         self.v_sig = data_param["variables"]["var_signal"]
         # parameters
         self.p_nbkg = data_param["ml"]["nbkg"]
+        self.p_nbkgfd = data_param["ml"].get("nbkg", self.p_nbkg)
         self.p_nsig = data_param["ml"]["nsig"]
         self.v_fracbkgoversig = data_param["ml"].get("fracbkgoversig", None)
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
+        self.p_tagbkgfd = data_param["ml"]["sampletagforbkgfd"]
         self.p_binmin = binmin
         self.p_binmax = binmax
         self.rnd_shuffle = data_param["ml"]["rnd_shuffle"]
@@ -108,6 +110,7 @@ class Optimiserhipe4ml:
         self.ypredtest_hipe4ml = None
         # selections
         self.s_selbkgml = data_param["ml"]["sel_bkgml"]
+        self.s_selbkgmlfd = data_param["ml"].get("sel_bkgmlfd", None)
         self.s_selsigml = data_param["ml"]["sel_sigml"]
         self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
 
@@ -139,15 +142,20 @@ class Optimiserhipe4ml:
         self.df_data = selectdfquery(self.df_data, self.p_triggersel_data)
         self.df_mc = selectdfquery(self.df_mc, self.p_triggersel_mc)
 
-        arraydf = [self.df_data, self.df_mc]
+        arraydf = [self.df_data, self.df_mc, self.df_mc]
         self.df_mc = seldf_singlevar(self.df_mc, self.v_bin, self.p_binmin, self.p_binmax)
         self.df_data = seldf_singlevar(self.df_data, self.v_bin, self.p_binmin, self.p_binmax)
 
-        self.df_sig, self.df_bkg = arraydf[self.p_tagsig], arraydf[self.p_tagbkg]
+        self.df_sig, self.df_bkg, self.df_bkgfd = arraydf[self.p_tagsig], arraydf[self.p_tagbkg], arraydf[self.p_tagbkgfd]
         self.df_sig = seldf_singlevar(self.df_sig, self.v_bin, self.p_binmin, self.p_binmax)
         self.df_bkg = seldf_singlevar(self.df_bkg, self.v_bin, self.p_binmin, self.p_binmax)
+        self.df_bkgfd = seldf_singlevar(self.df_bkgfd, self.v_bin, self.p_binmin, self.p_binmax)
         self.df_sig = self.df_sig.query(self.s_selsigml)
         self.df_bkg = self.df_bkg.query(self.s_selbkgml)
+        if self.s_selbkgmlfd is not None:
+            self.df_bkgfd = self.df_bkgfd.query(self.s_selbkgmlfd)
+        else:
+            self.df_bkgfd = pd.DataFrame(columns=self.df_sig)
         self.df_bkg["ismcsignal"] = 0
         self.df_bkg["ismcprompt"] = 0
         self.df_bkg["ismcfd"] = 0
@@ -155,34 +163,51 @@ class Optimiserhipe4ml:
 
         self.p_nsig = min(len(self.df_sig), self.p_nsig)
         self.p_nbkg = min(len(self.df_bkg), self.p_nbkg)
+        self.p_nbkgfd = min(len(self.df_bkgfd), self.p_nbkgfd)
         if self.p_nsig < self.p_nbkg and self.v_fracbkgoversig is not None:
             self.p_nbkg = self.v_fracbkgoversig * self.p_nsig
             if len(self.df_bkg) < self.p_nbkg:
                 self.p_nbkg = len(self.df_bkg)
+        if self.p_nsig < self.p_nbkgfd and self.v_fracbkgoversig is not None:
+            self.p_nbkgfd = self.v_fracbkgoversig * self.p_nsig
+            if len(self.df_bkgfd) < self.p_nbkgfd:
+                self.p_nbkgfd = len(self.df_bkgfd)
 
         self.logger.info("Used number of signal events is %d", self.p_nsig)
         self.logger.info("Used number of background events is %d", self.p_nbkg)
+        self.logger.info("Used number of background events is %d", self.p_nbkgfd)
 
         self.df_ml = pd.DataFrame()
         self.df_sig = shuffle(self.df_sig, random_state=self.rnd_shuffle)
         self.df_bkg = shuffle(self.df_bkg, random_state=self.rnd_shuffle)
+        self.df_bkgfd = shuffle(self.df_bkgfd, random_state=self.rnd_shuffle)
         self.df_sig = self.df_sig[:self.p_nsig]
         self.df_bkg = self.df_bkg[:self.p_nbkg]
+        self.df_bkgfd = self.df_bkgfd[:self.p_nbkgfd]
         self.df_sig[self.v_sig] = 1
         self.df_bkg[self.v_sig] = 0
-        self.df_ml = pd.concat([self.df_sig, self.df_bkg])
+        self.df_bkgfd[self.v_sig] = 2
+        if len(self.df_bkgfd) == 0:
+            self.n_classes = 2
+            self.df_ml = pd.concat([self.df_sig, self.df_bkg])
+        else:
+            self.n_classes = 3
+            self.df_ml = pd.concat([self.df_bkg, self.df_sig, self.df_bkgfd])
         self.df_mltrain, self.df_mltest = train_test_split(self.df_ml, test_size=self.test_frac,
                                                            random_state=self.rnd_splt)
         self.df_mltrain = self.df_mltrain.reset_index(drop=True)
         self.df_mltest = self.df_mltest.reset_index(drop=True)
-        self.df_sigtrain, self.df_bkgtrain = split_df_sigbkg(self.df_mltrain, self.v_sig)
-        self.df_sigtest, self.df_bkgtest = split_df_sigbkg(self.df_mltest, self.v_sig)
+        self.df_sigtrain, self.df_bkgtrain, self.df_bkgfdtrain = split_df_sigbkg(self.df_mltrain, self.v_sig)
+        self.df_sigtest, self.df_bkgtest, self.df_bkgfdtest = split_df_sigbkg(self.df_mltest, self.v_sig)
         self.logger.info("Total number of candidates: train %d and test %d", len(self.df_mltrain),
                          len(self.df_mltest))
         self.logger.info("Number of signal candidates: train %d and test %d",
                          len(self.df_sigtrain), len(self.df_sigtest))
         self.logger.info("Number of bkg candidates: %d and test %d", len(self.df_bkgtrain),
                          len(self.df_bkgtest))
+        if len(self.df_bkgfd) != 0:
+            self.logger.info("Number of bkg FD candidates: %d and test %d", len(self.df_bkgfdtrain),
+                             len(self.df_bkgfdtest))
 
         self.df_xtrain = self.df_mltrain[self.v_train]
         self.df_ytrain = self.df_mltrain[self.v_sig]
@@ -203,14 +228,17 @@ class Optimiserhipe4ml:
     def do_hipe4mlhyperparopti(self):
         self.logger.info("Optimising hipe4ml hyperparameters (Bayesian)")
 
-        if not (self.average_method_hipe4ml in ['macro', 'weighted'] and
-                self.roc_method_hipe4ml in ['ovo', 'ovr']):
-            self.logger.fatal("Selected ROC configuration is not valid!")
+        if self.n_classes > 2:
+            if not (self.average_method_hipe4ml in ['macro', 'weighted'] and
+                    self.roc_method_hipe4ml in ['ovo', 'ovr']):
+                self.logger.fatal("Selected ROC configuration is not valid!")
 
-        if self.average_method_hipe4ml == 'weighted':
-            metric = f'roc_auc_{self.roc_method_hipe4ml}_{self.average_method_hipe4ml}'
+            if self.average_method_hipe4ml == 'weighted':
+                metric = f'roc_auc_{self.roc_method_hipe4ml}_{self.average_method_hipe4ml}'
+            else:
+                metric = f'roc_auc_{self.roc_method_hipe4ml}'
         else:
-            metric = f'roc_auc_{self.roc_method_hipe4ml}'
+            metric = 'roc_auc'
 
         hypparsfile = f'{self.dirmlout}/HyperParOpt_pT_{self.p_binmin}_{self.p_binmax}.txt'
         outfilehyppars = open(hypparsfile, 'wt')
@@ -226,12 +254,12 @@ class Optimiserhipe4ml:
         self.logger.info("Training + testing hipe4ml model")
         t0 = time.time()
 
-        self.p_hipe4ml_model.train_test_model(self.traintestdata, self.average_method_hipe4ml,
-                                              self.roc_method_hipe4ml)
+        self.ypredtest_hipe4ml = self.p_hipe4ml_model.train_test_model(self.traintestdata, True,
+                                                                       self.raw_output_hipe4ml,
+                                                                       self.average_method_hipe4ml,
+                                                                       self.roc_method_hipe4ml)
         self.ypredtrain_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[0],
                                                                self.raw_output_hipe4ml)
-        self.ypredtest_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[2],
-                                                              self.raw_output_hipe4ml)
 
         modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
@@ -246,16 +274,21 @@ class Optimiserhipe4ml:
 
         leglabels = ["Background", "Prompt signal"]
         outputlabels = ["Bkg", "SigPrompt"]
+        listdf = [self.df_bkgtrain, self.df_sigtrain]
+        if self.n_classes > 2:
+            leglabels = ["Background", "Prompt", "Feed-down"]
+            outputlabels = ["Bkg", "SigPrompt", "SigFeedDown"]
+            listdf = [self.df_bkgtrain, self.df_sigtrain, self.df_bkgfdtrain]
 
         # _____________________________________________
-        plot_utils.plot_distr([self.df_bkgtrain, self.df_sigtrain], self.v_train, 100, leglabels)
+        plot_utils.plot_distr(listdf, self.v_train, 100, leglabels, figsize=(12, 7),
+                              alpha=0.3, log=True, grid=False, density=True)
         plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
         figname = f'{self.dirmlplot}/DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
         plt.savefig(figname)
         plt.close('all')
         # _____________________________________________
-        corrmatrixfig = plot_utils.plot_corr([self.df_bkgtrain, self.df_sigtrain],
-                                             self.v_train, leglabels)
+        corrmatrixfig = plot_utils.plot_corr(listdf, self.v_train, leglabels)
         for figg, labb in zip(corrmatrixfig, outputlabels):
             plt.figure(figg.number)
             plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
@@ -267,8 +300,13 @@ class Optimiserhipe4ml:
                                                         80, self.raw_output_hipe4ml,
                                                         leglabels, self.train_test_log_hipe4ml,
                                                         density=True)
-        figname = f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-        mloutputfig.savefig(figname)
+        if self.n_classes > 2:
+            for figg, labb in zip(mloutputfig, outputlabels):
+                figname = f'{self.dirmlplot}/MLOutputDistr{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                figg.savefig(figname)
+        else:
+            figname = f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+            mloutputfig.savefig(figname)
         # _____________________________________________
         plt.rcParams["figure.figsize"] = (10, 9)
         roccurvefig = plot_utils.plot_roc(self.traintestdata[3], self.ypredtest_hipe4ml,
@@ -298,6 +336,13 @@ class Optimiserhipe4ml:
                                                             self.traintestdata[3],
                                                             self.p_hipe4ml_model,
                                                             leglabels)
-        figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
-                   f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
-        featuresimportancefig.savefig(figname)
+        n_plot = self.n_classes if self.n_classes > 2 else 1
+        for i, figg in enumerate(featuresimportancefig):
+            if i < n_plot:
+                figname = (f'{self.dirmlplot}/FeatureImportanceOpt{i}_'
+                           f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
+                featuresimportancefig[i].savefig(figname)
+            else:
+                figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
+                           f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
+                featuresimportancefig[i].savefig(figname)

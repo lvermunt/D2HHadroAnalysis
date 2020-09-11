@@ -209,7 +209,8 @@ class Optimiserhipe4mltree:
                                                             self.traintestdata[3],
                                                             self.p_hipe4ml_model,
                                                             leglabels)
-        figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
-                   f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
-        featuresimportancefig.savefig(figname)
+        for i in range(0,len(featuresimportancefig)):
+            figname = (f'{self.dirmlplot}/FeatureImportanceOpt{i}_'
+                       f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
+            featuresimportancefig[i].savefig(figname)
 
