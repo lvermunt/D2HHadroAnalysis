@@ -175,7 +175,7 @@ class Optimiserhipe4ml:
 
         self.logger.info("Used number of signal events is %d", self.p_nsig)
         self.logger.info("Used number of background events is %d", self.p_nbkg)
-        self.logger.info("Used number of background events is %d", self.p_nbkgfd)
+        self.logger.info("Used number of background events (FD) is %d", self.p_nbkgfd)
 
         self.df_ml = pd.DataFrame()
         self.df_sig = shuffle(self.df_sig, random_state=self.rnd_shuffle)
