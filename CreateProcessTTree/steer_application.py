@@ -54,14 +54,14 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
         case = k
         break
 
+    checkiffileexist = data_config.get("run_only_unprocessed_files", False)
+
     doapplydata = data_config["mlapplication"]["data"]["doapply"]
     doapplymc = data_config["mlapplication"]["mc"]["doapply"]
     doapplydatamodelhandler = data_config["mlapplication"]["data"]["doapplymodelhandler"]
     doapplymcmodelhandler = data_config["mlapplication"]["mc"]["doapplymodelhandler"]
     domergeapplydata = data_config["mlapplication"]["data"]["domergeapply"]
     domergeapplymc = data_config["mlapplication"]["mc"]["domergeapply"]
-    docontinueapplydata = data_config["mlapplication"]["data"]["docontinueafterstop"]
-    docontinueapplymc = data_config["mlapplication"]["mc"]["docontinueafterstop"]
 
     domlprefilterstep = data_config["mlapplication"]["domlprefilterstep"]
     domlprefilterstep_indb = data_param[case].get("doml_asprefilter", None)
@@ -102,14 +102,13 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
 
     #creating folder if not present
     counter = 0
-    if docontinueapplymc is False:
+    if checkiffileexist is False:
         if doapplymc is True:
             counter = counter + checkdirlist(dirpklskdecmc)
 
         if domergeapplymc is True:
             counter = counter + checkdirlist(dirpklskdec_mergedmc)
 
-    if docontinueapplydata is False:
         if doapplydata is True:
             counter = counter + checkdirlist(dirpklskdecdata)
 
@@ -120,14 +119,13 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
         sys.exit()
 
     # check and create directories
-    if docontinueapplymc is False:
+    if checkiffileexist is False:
         if doapplymc is True:
             checkmakedirlist(dirpklskdecmc)
 
         if domergeapplymc is True:
             checkmakedirlist(dirpklskdec_mergedmc)
 
-    if docontinueapplydata is False:
         if doapplydata is True:
             checkmakedirlist(dirpklskdecdata)
 
@@ -135,8 +133,8 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
             checkmakedirlist(dirpklskdec_mergeddata)
 
     proc_class = Processer
-    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc")
-    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data")
+    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc", checkiffileexist)
+    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data", checkiffileexist)
 
     #perform the analysis flow
     if doapplydata is True:

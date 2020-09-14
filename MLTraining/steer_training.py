@@ -172,9 +172,11 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
     if doml is True and domloption == 2:
         index = 0
         for binmin, binmax in zip(binminarray, binmaxarray):
-            myopthipe4ml = Optimiserhipe4ml(data_param[case], binmin, binmax,
+            myopthipe4ml = Optimiserhipe4ml(data_param[case], case, typean,
+                                            binmin, binmax,
                                             training_vars[index],
-                                            hipe4ml_hyper_pars[index])
+                                            hipe4ml_hyper_pars[index],
+                                            raahp[index])
 
             if opti_hyperpar_hipe4ml is True:
                 myopthipe4ml.do_hipe4mlhyperparopti()
@@ -183,6 +185,8 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 
             myopthipe4ml.do_hipe4mltrain()
             myopthipe4ml.do_hipe4mlplot()
+            if dosignifopt is True:
+                myopthipe4ml.do_significance()
             index = index + 1
 
     if doml is True and domloption == 3:

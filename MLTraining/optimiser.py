@@ -57,14 +57,14 @@ class Optimiser:
 
         self.logger = get_logger()
 
-        self.do_mlprefilter = datap.get("doml_asprefilter", None)
+        self.do_mlprefilter = data_param.get("doml_asprefilter", None)
         self.v_bin = data_param["var_binning"]
         # directory
         dirmcml = data_param["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"]
         dirdataml = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"]
         if self.do_mlprefilter is False: #FIXME for multiple periods
-            dirmcml = datap["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
-            dirdataml = datap["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
+            dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
+            dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
         dirdatatotsample = data_param["multi"]["data"]["pkl_evtcounter_all"]
         #directory
         self.dirmlout = data_param["ml"]["mlout"]
@@ -198,6 +198,8 @@ class Optimiser:
         self.f_reco_appliedmc = \
                 self.f_reco_appliedmc.replace(".pkl", "%s.pkl" % self.s_suffix)
 
+        self.multiclass_labels = data_param["ml"].get("multiclass_labels", None)
+
         print(training_var)
 
     def create_suffix(self):
@@ -256,8 +258,8 @@ class Optimiser:
                                            test_size=self.test_frac, random_state=self.rnd_splt)
         self.df_mltrain = self.df_mltrain.reset_index(drop=True)
         self.df_mltest = self.df_mltest.reset_index(drop=True)
-        self.df_sigtrain, self.df_bkgtrain = split_df_sigbkg(self.df_mltrain, self.v_sig)
-        self.df_sigtest, self.df_bkgtest = split_df_sigbkg(self.df_mltest, self.v_sig)
+        self.df_sigtrain, self.df_bkgtrain, _ = split_df_sigbkg(self.df_mltrain, self.v_sig)
+        self.df_sigtest, self.df_bkgtest, _ = split_df_sigbkg(self.df_mltest, self.v_sig)
         self.logger.info("Total number of candidates: train %d and test %d", len(self.df_mltrain),
                          len(self.df_mltest))
         self.logger.info("Number of signal candidates: train %d and test %d",
@@ -318,7 +320,7 @@ class Optimiser:
 
     def do_test(self):
         df_ml_test = test(self.p_mltype, self.p_classname, self.p_trainedmod,
-                          self.df_mltest, self.v_train, self.v_sig)
+                          self.df_mltest, self.v_train, self.v_sig, self.multiclass_labels)
         df_ml_test_to_df = self.dirmlout+"/testsample_%s_mldecision.pkl" % (self.s_suffix)
         df_ml_test_to_root = self.dirmlout+"/testsample_%s_mldecision.root" % (self.s_suffix)
         pickle.dump(df_ml_test, openfile(df_ml_test_to_df, "wb"), protocol=4)
@@ -326,9 +328,9 @@ class Optimiser:
 
     def do_apply(self):
         df_data = apply(self.p_mltype, self.p_classname, self.p_trainedmod,
-                        self.df_data, self.v_train)
+                        self.df_data, self.v_train, self.multiclass_labels)
         df_mc = apply(self.p_mltype, self.p_classname, self.p_trainedmod,
-                      self.df_mc, self.v_train)
+                      self.df_mc, self.v_train, self.multiclass_labels)
         pickle.dump(df_data, openfile(self.f_reco_applieddata, "wb"), protocol=4)
         pickle.dump(df_mc, openfile(self.f_reco_appliedmc, "wb"), protocol=4)
 
@@ -411,7 +413,7 @@ class Optimiser:
         plt.title("Efficiency vs Threshold", fontsize=20)
         df_sig = self.df_mltest[self.df_mltest["ismcprompt"] == 1]
         for name in self.p_classname:
-            eff_array, eff_err_array, x_axis = calc_sigeff_steps(self.p_nstepsign, df_sig, name)
+            eff_array, eff_err_array, x_axis = calc_sigeff_steps(self.p_nstepsign, df_sig, name, None)
             plt.figure(fig_eff.number)
             plt.errorbar(x_axis, eff_array, yerr=eff_err_array, alpha=0.3, label=f'{name}',
                          elinewidth=2.5, linewidth=4.0)
@@ -520,11 +522,11 @@ class Optimiser:
         df_sig = self.df_mltest[self.df_mltest["ismcprompt"] == 1]
 
         for name in self.p_classname:
-            eff_array, eff_err_array, x_axis = calc_sigeff_steps(self.p_nstepsign, df_sig, name)
+            eff_array, eff_err_array, x_axis = calc_sigeff_steps(self.p_nstepsign, df_sig, name, None)
             bkg_array, bkg_err_array, _ = calc_bkg(df_data_sideband, name, self.p_nstepsign,
                                                    self.p_mass_fit_lim, self.p_bkg_func,
                                                    self.p_bin_width, sig_region, self.p_savefit,
-                                                   self.dirmlplot, [self.p_binmin, self.p_binmax])
+                                                   self.dirmlplot, [self.p_binmin, self.p_binmax], None)
             sig_array = [eff * signal_yield for eff in eff_array]
             sig_err_array = [eff_err * signal_yield for eff_err in eff_err_array]
             bkg_array = [bkg / (self.p_bkgfracopt * self.p_nevtml) for bkg in bkg_array]

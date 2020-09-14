@@ -19,27 +19,31 @@ import os
 import sys
 import pickle
 import time
+from math import sqrt
+from array import array
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 import xgboost as xgb
 from hipe4ml import plot_utils
 from hipe4ml.model_handler import ModelHandler
+from ROOT import TFile, TCanvas, TH1F, TH2F, TF1, gROOT  # pylint: disable=import-error,no-name-in-module
 
 from machine_learning_hep.logger import get_logger
-from machine_learning_hep.utilities import openfile
+from machine_learning_hep.utilities import createstringselection, openfile
 from machine_learning_hep.utilities_selection import seldf_singlevar
 from machine_learning_hep.utilities_selection import selectdfquery
 from machine_learning_hep.utilities_selection import split_df_sigbkg
-
+from machine_learning_hep.ml_significance import calc_bkg, calc_signif, calc_eff, calc_sigeff_steps
 
 class Optimiserhipe4ml:
     # Class Attribute
     species = "optimiser_hipe4ml"
 
-    def __init__(self, data_param, binmin, binmax, training_var, hyper_pars):
+    def __init__(self, data_param, case, typean, binmin, binmax, training_var, hyper_pars, raahp):
 
         self.logger = get_logger()
 
@@ -51,6 +55,7 @@ class Optimiserhipe4ml:
         if self.do_mlprefilter is False: #FIXME for multiple periods
             dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
             dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
+        dirdatatotsample = data_param["multi"]["data"]["pkl_evtcounter_all"]
         # directory
         self.dirmlout = data_param["ml"]["mlout"]
         self.dirmlplot = data_param["ml"]["mlplot"]
@@ -63,16 +68,21 @@ class Optimiserhipe4ml:
         # ml file names
         self.n_reco = data_param["files_names"]["namefile_reco"]
         self.n_reco = self.n_reco.replace(".pkl", "_%s%d_%d.pkl" % (self.v_bin, binmin, binmax))
+        self.n_evt = data_param["files_names"]["namefile_evt"]
         self.n_gen = data_param["files_names"]["namefile_gen"]
         self.n_gen = self.n_gen.replace(".pkl", "_%s%d_%d.pkl" % (self.v_bin, binmin, binmax))
         # ml files
         self.f_gen_mc = os.path.join(dirmcml, self.n_gen)
         self.f_reco_mc = os.path.join(dirmcml, self.n_reco)
         self.f_reco_data = os.path.join(dirdataml, self.n_reco)
+        self.f_evt_data = os.path.join(dirdataml, self.n_evt)
+        self.f_evttotsample_data = os.path.join(dirdatatotsample, self.n_evt)
         # variables
         self.v_train = training_var
         self.v_sig = data_param["variables"]["var_signal"]
         # parameters
+        self.p_case = case
+        self.p_typean = typean
         self.p_nbkg = data_param["ml"]["nbkg"]
         self.p_nbkgfd = data_param["ml"].get("nbkg", self.p_nbkg)
         self.p_nsig = data_param["ml"]["nsig"]
@@ -85,6 +95,7 @@ class Optimiserhipe4ml:
         self.rnd_shuffle = data_param["ml"]["rnd_shuffle"]
         self.rnd_splt = data_param["ml"]["rnd_splt"]
         self.test_frac = data_param["ml"]["test_frac"]
+        self.p_dofullevtmerge = data_param["dofullevtmerge"]
 
         self.p_evtsel = data_param["ml"]["evtsel"]
         self.p_triggersel_mc = data_param["ml"]["triggersel"]["mc"]
@@ -92,6 +103,7 @@ class Optimiserhipe4ml:
 
         # dataframes
         self.df_mc = None
+        self.df_mcgen = None
         self.df_data = None
         self.df_sig = None
         self.df_bkg = None
@@ -108,12 +120,16 @@ class Optimiserhipe4ml:
         self.traintestdata = None
         self.ypredtrain_hipe4ml = None
         self.ypredtest_hipe4ml = None
+        self.df_evt_data = None
+        self.df_evttotsample_data = None
         # selections
         self.s_selbkgml = data_param["ml"]["sel_bkgml"]
         self.s_selbkgmlfd = data_param["ml"].get("sel_bkgmlfd", None)
         self.s_selsigml = data_param["ml"]["sel_sigml"]
         self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
 
+        self.s_suffix = None
+        self.create_suffix()
         self.preparesample()
 
         self.p_hipe4ml_model = None
@@ -130,20 +146,58 @@ class Optimiserhipe4ml:
         self.raw_output_hipe4ml = data_param["hipe4ml"]["raw_output"]
         self.train_test_log_hipe4ml = data_param["hipe4ml"]["train_test_log"]
 
+        #significance
+        self.is_fonll_from_root = data_param["ml"]["opt"]["isFONLLfromROOT"]
+        self.f_fonll = data_param["ml"]["opt"]["filename_fonll"]
+        if self.is_fonll_from_root and "fonll_particle" not in data_param["ml"]["opt"]:
+            self.logger.fatal("Attempt to read FONLL from ROOT file but field " \
+                    "\"fonll_particle\" not provided in database")
+        self.p_fonllparticle = data_param["ml"]["opt"].get("fonll_particle", "")
+        self.p_fonllband = data_param["ml"]["opt"]["fonll_pred"]
+        self.p_fragf = data_param["ml"]["opt"]["FF"]
+        self.p_sigmamb = data_param["ml"]["opt"]["sigma_MB"]
+        self.p_taa = data_param["ml"]["opt"]["Taa"]
+        self.p_br = data_param["ml"]["opt"]["BR"]
+        self.p_fprompt = data_param["ml"]["opt"]["f_prompt"]
+        self.p_bkgfracopt = data_param["ml"]["opt"]["bkg_data_fraction"]
+        self.p_nstepsign = data_param["ml"]["opt"]["num_steps"]
+        self.p_bkg_func = data_param["ml"]["opt"]["bkg_function"]
+        self.p_savefit = data_param["ml"]["opt"]["save_fit"]
+        self.p_nevtml = None
+        self.p_nevttot = None
+        self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
+        self.p_mass_fit_lim = data_param["analysis"]["opt"]['mass_fit_lim']
+        self.p_bin_width = data_param["analysis"]["opt"]['bin_width']
+        self.p_num_bins = int(round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) /
+                                    self.p_bin_width))
+        self.p_mass = data_param["mass"]
+        self.p_raahp = raahp
+
+        self.multiclass_labels = data_param["ml"].get("multiclass_labels", None)
+
         self.logger.info("Using the following training variables: %s", training_var)
+
+    def create_suffix(self):
+        string_selection = createstringselection(self.v_bin, self.p_binmin, self.p_binmax)
+        self.s_suffix = f"{self.p_case}_{string_selection}"
 
     def preparesample(self):
         self.logger.info("Prepare Sample for hipe4ml")
         self.df_data = pickle.load(openfile(self.f_reco_data, "rb"))
         self.df_mc = pickle.load(openfile(self.f_reco_mc, "rb"))
+        self.df_mcgen = pickle.load(openfile(self.f_gen_mc, "rb"))
         self.df_data = selectdfquery(self.df_data, self.p_evtsel)
         self.df_mc = selectdfquery(self.df_mc, self.p_evtsel)
+        self.df_mcgen = selectdfquery(self.df_mcgen, self.p_evtsel)
 
         self.df_data = selectdfquery(self.df_data, self.p_triggersel_data)
         self.df_mc = selectdfquery(self.df_mc, self.p_triggersel_mc)
+        self.df_mcgen = selectdfquery(self.df_mcgen, self.p_triggersel_mc)
 
+        self.df_mcgen = self.df_mcgen.query(self.p_presel_gen_eff)
         arraydf = [self.df_data, self.df_mc, self.df_mc]
         self.df_mc = seldf_singlevar(self.df_mc, self.v_bin, self.p_binmin, self.p_binmax)
+        self.df_mcgen = seldf_singlevar(self.df_mcgen, self.v_bin, self.p_binmin, self.p_binmax)
         self.df_data = seldf_singlevar(self.df_data, self.v_bin, self.p_binmin, self.p_binmax)
 
         self.df_sig, self.df_bkg, self.df_bkgfd = arraydf[self.p_tagsig], arraydf[self.p_tagbkg], arraydf[self.p_tagbkgfd]
@@ -260,11 +314,17 @@ class Optimiserhipe4ml:
                                                                        self.roc_method_hipe4ml)
         self.ypredtrain_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[0],
                                                                self.raw_output_hipe4ml)
+        print(self.ypredtrain_hipe4ml)
 
         modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
         modelfile = f'{self.dirmlout}/Model_pT_{self.p_binmin}_{self.p_binmax}.model'
         self.p_hipe4ml_model.dump_original_model(modelfile)
+
+        #filename_xtrain = self.dirmlout+"/xtrain_%s.pkl" % (self.s_suffix)
+        #filename_ytrain = self.dirmlout+"/ytrain_%s.pkl" % (self.s_suffix)
+        #pickle.dump(self.df_xtrain, openfile(filename_xtrain, "wb"), protocol=4)
+        #pickle.dump(self.df_ytrain, openfile(filename_ytrain, "wb"), protocol=4)
 
         self.logger.info("Training + testing hipe4ml: Done!")
         self.logger.info("Time elapsed = %.3f", time.time() - t0)
@@ -346,3 +406,164 @@ class Optimiserhipe4ml:
                 figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
                            f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
                 featuresimportancefig[i].savefig(figname)
+
+    #pylint: disable=too-many-locals
+    def do_significance(self):
+        self.logger.info("Doing significance optimisation")
+        gROOT.SetBatch(True)
+        gROOT.ProcessLine("gErrorIgnoreLevel = kWarning;")
+        #first extract the number of data events in the ml sample
+        self.df_evt_data = pickle.load(openfile(self.f_evt_data, 'rb'))
+        if self.p_dofullevtmerge is True:
+            self.df_evttotsample_data = pickle.load(openfile(self.f_evttotsample_data, 'rb'))
+        else:
+            self.logger.warning("The total merged event dataframe was not merged for space limits")
+            self.df_evttotsample_data = pickle.load(openfile(self.f_evt_data, 'rb'))
+        #and the total number of events
+        self.p_nevttot = len(self.df_evttotsample_data)
+        self.p_nevtml = len(self.df_evt_data)
+        self.logger.debug("Number of data events used for ML: %d", self.p_nevtml)
+        self.logger.debug("Total number of data events: %d", self.p_nevttot)
+        #calculate acceptance correction. we use in this case all
+        #the signal from the mc sample, without limiting to the n. signal
+        #events used for training
+        denacc = len(self.df_mcgen[self.df_mcgen["ismcprompt"] == 1])
+        numacc = len(self.df_mc[self.df_mc["ismcprompt"] == 1])
+        acc, acc_err = calc_eff(numacc, denacc)
+        self.logger.debug("Acceptance: %.3e +/- %.3e", acc, acc_err)
+        #calculation of the expected fonll signals
+        ptmin = self.p_binmin
+        ptmax = self.p_binmax
+        delta_pt = ptmax - ptmin
+        if self.is_fonll_from_root:
+            df_fonll = TFile.Open(self.f_fonll)
+            df_fonll_Lc = df_fonll.Get(self.p_fonllparticle+"pred_"+self.p_fonllband)
+            prod_cross = df_fonll_Lc.Integral(ptmin*20, ptmax*20)* self.p_fragf * 1e-12 / delta_pt
+            signal_yield = 2. * prod_cross * delta_pt * acc * self.p_taa \
+                           / (self.p_sigmamb * self.p_fprompt)
+            #now we plot the fonll expectation
+            cFONLL = TCanvas('cFONLL', 'The FONLL expectation')
+            df_fonll_Lc.GetXaxis().SetRangeUser(0, 16)
+            df_fonll_Lc.Draw("")
+            cFONLL.SaveAs("%s/FONLL_curve_%s.png" % (self.dirmlplot, self.s_suffix))
+        else:
+            df_fonll = pd.read_csv(self.f_fonll)
+            df_fonll_in_pt = df_fonll.query('(pt >= @ptmin) and (pt < @ptmax)')[self.p_fonllband]
+            prod_cross = df_fonll_in_pt.sum() * self.p_fragf * 1e-12 / delta_pt
+            signal_yield = 2. * prod_cross * delta_pt * self.p_br * acc * self.p_taa \
+                           / (self.p_sigmamb * self.p_fprompt)
+            #now we plot the fonll expectation
+            plt.figure(figsize=(20, 15))
+            plt.subplot(111)
+            plt.plot(df_fonll['pt'], df_fonll[self.p_fonllband] * self.p_fragf, linewidth=4.0)
+            plt.xlabel('P_t [GeV/c]', fontsize=20)
+            plt.ylabel('Cross Section [pb/GeV]', fontsize=20)
+            plt.title("FONLL cross section " + self.p_case, fontsize=20)
+            plt.semilogy()
+            plt.savefig(f'{self.dirmlplot}/FONLL_curve_{self.s_suffix}.png')
+
+        self.logger.debug("Expected signal yield: %.3e", signal_yield)
+        signal_yield = self.p_raahp * signal_yield
+        self.logger.debug("Expected signal yield x RAA hp: %.3e", signal_yield)
+
+        df_data_sideband = self.df_data.query(self.s_selbkgml)
+        df_data_sideband = shuffle(df_data_sideband, random_state=self.rnd_shuffle)
+        df_data_sideband = df_data_sideband.tail(round(len(df_data_sideband) * self.p_bkgfracopt))
+        hmass = TH1F('hmass', '', self.p_num_bins, self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+        df_mc_signal = self.df_mc[self.df_mc["ismcsignal"] == 1]
+        mass_array = df_mc_signal['inv_mass'].values
+        for mass_value in np.nditer(mass_array):
+            hmass.Fill(mass_value)
+
+        gaus_fit = TF1("gaus_fit", "gaus", self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])
+        gaus_fit.SetParameters(0, hmass.Integral())
+        gaus_fit.SetParameters(1, self.p_mass)
+        gaus_fit.SetParameters(2, 0.02)
+        self.logger.debug("To fit the signal a gaussian function is used")
+        fitsucc = hmass.Fit("gaus_fit", "RQ")
+
+        if int(fitsucc) != 0:
+            self.logger.warning("Problem in signal peak fit")
+            sigma = 0.
+
+        sigma = gaus_fit.GetParameter(2)
+        self.logger.debug("Mean of the gaussian: %.3e", gaus_fit.GetParameter(1))
+        self.logger.debug("Sigma of the gaussian: %.3e", sigma)
+        sig_region = [self.p_mass - 3 * sigma, self.p_mass + 3 * sigma]
+        fig_signif_pevt = plt.figure(figsize=(20, 15))
+        plt.xlabel('Threshold', fontsize=20)
+        plt.ylabel(r'Significance Per Event ($3 \sigma$)', fontsize=20)
+        plt.title("Significance Per Event vs Threshold", fontsize=20)
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
+        fig_signif = plt.figure(figsize=(20, 15))
+        plt.xlabel('Threshold', fontsize=20)
+        plt.ylabel(r'Significance ($3 \sigma$)', fontsize=20)
+        plt.title("Significance vs Threshold", fontsize=20)
+        plt.xticks(fontsize=18)
+        plt.yticks(fontsize=18)
+
+        df_sig = self.df_mltest[self.df_mltest["ismcprompt"] == 1]
+
+        #hipe4ml only has xgboost, to keep same style as mlhep, use ["xgboost"]
+        for name in ["xgboost"]:
+            eff_array, eff_err_array, x_axis = calc_sigeff_steps(self.p_nstepsign, df_sig, name,
+                                                                 self.multiclass_labels)
+            bkg_array, bkg_err_array, _ = calc_bkg(df_data_sideband, name, self.p_nstepsign,
+                                                   self.p_mass_fit_lim, self.p_bkg_func,
+                                                   self.p_bin_width, sig_region, self.p_savefit,
+                                                   self.dirmlplot, [self.p_binmin, self.p_binmax],
+                                                   self.multiclass_labels)
+            sig_array = [eff * signal_yield for eff in eff_array]
+            sig_err_array = [eff_err * signal_yield for eff_err in eff_err_array]
+            bkg_array = [bkg / (self.p_bkgfracopt * self.p_nevtml) for bkg in bkg_array]
+            bkg_err_array = [bkg_err / (self.p_bkgfracopt * self.p_nevtml) \
+                             for bkg_err in bkg_err_array]
+            signif_array, signif_err_array = calc_signif(sig_array, sig_err_array, bkg_array,
+                                                         bkg_err_array)
+
+            if len(self.multiclass_labels) == 1 or self.multiclass_labels is None:
+                plt.figure(fig_signif_pevt.number)
+                plt.errorbar(x_axis, signif_array, yerr=signif_err_array, label=f'{name}',
+                             elinewidth=2.5, linewidth=5.0)
+                signif_array_ml = [sig * sqrt(self.p_nevtml) for sig in signif_array]
+                signif_err_array_ml = [sig_err * sqrt(self.p_nevtml) for sig_err in signif_err_array]
+                plt.figure(fig_signif.number)
+                plt.errorbar(x_axis, signif_array_ml, yerr=signif_err_array_ml,
+                             label=f'{name}_ML_dataset', elinewidth=2.5, linewidth=5.0)
+                signif_array_tot = [sig * sqrt(self.p_nevttot) for sig in signif_array]
+                signif_err_array_tot = [sig_err * sqrt(self.p_nevttot) for sig_err in signif_err_array]
+                plt.figure(fig_signif.number)
+                plt.errorbar(x_axis, signif_array_tot, yerr=signif_err_array_tot,
+                             label=f'{name}_Tot', elinewidth=2.5, linewidth=5.0)
+                plt.figure(fig_signif_pevt.number)
+                plt.legend(loc="upper left", prop={'size': 30})
+                plt.savefig(f'{self.dirmlplot}/Significance_PerEvent_{self.s_suffix}.png')
+                plt.figure(fig_signif.number)
+                plt.legend(loc="upper left", prop={'size': 30})
+                plt.savefig(f'{self.dirmlplot}/Significance_{self.s_suffix}.png')
+                with open(f'{self.dirmlplot}/Significance_{self.s_suffix}.pickle', 'wb') as out:
+                    pickle.dump(fig_signif, out)
+            else:
+                hsignfvscut = TH2F(f'hsignfvscut_pT{self.p_binmin}_{self.p_binmax}',
+                                   f';{self.multiclass_labels[0]};{self.multiclass_labels[1]};Expected Significance',
+                                   len(x_axis) - 1, array("d", x_axis), len(x_axis) - 1, array("d", x_axis))
+                for i0, thr0 in enumerate(x_axis):
+                    for i1, thr1 in enumerate(x_axis):
+                        binvar0 = hsignfvscut.GetXaxis().FindBin(thr0)
+                        binvar1 = hsignfvscut.GetXaxis().FindBin(thr1)
+                        hsignfvscut.SetBinContent(binvar0, binvar1, signif_array[i0 + i1 * len(x_axis)])
+
+                        csignf = TCanvas(f'csignf_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                        hFrame = csignf.cd(1).DrawFrame(x_axis[0], x_axis[-1], x_axis[0], x_axis[-1],
+                                                        f';{self.multiclass_labels[0]};{self.multiclass_labels[1]};Expected Significance')
+                        hFrame.GetXaxis().SetNdivisions(505)
+                        hFrame.GetYaxis().SetNdivisions(505)
+                        hFrame.GetXaxis().SetDecimals()
+                        hFrame.GetYaxis().SetDecimals()
+                        hsignfvscut.DrawCopy('colzsame')
+                        csignf.SaveAs(f'{self.dirmlplot}/Significance2D_{self.s_suffix}.eps')
+                        fout = TFile(f'{self.dirmlplot}/Significance2D_{self.s_suffix}.root', "RECREATE")
+                        fout.cd()
+                        hsignfvscut.Write()
+                        fout.Close()

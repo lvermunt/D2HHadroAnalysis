@@ -57,6 +57,8 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
         case = k
         break
 
+    checkiffileexist = data_config.get("run_only_unprocessed_files", False)
+
     doconversionmc = data_config["conversion"]["mc"]["activate"]
     doconversiondata = data_config["conversion"]["data"]["activate"]
     domergingmc = data_config["merging"]["mc"]["activate"]
@@ -79,11 +81,12 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
 
     #creating folder if not present
     counter = 0
-    if doconversionmc is True:
-        counter = counter + checkdirlist(dirpklmc)
+    if checkiffileexist is False:
+        if doconversionmc is True:
+            counter = counter + checkdirlist(dirpklmc)
 
-    if doconversiondata is True:
-        counter = counter + checkdirlist(dirpkldata)
+        if doconversiondata is True:
+            counter = counter + checkdirlist(dirpkldata)
 
     if doskimmingmc is True:
         checkdirlist(dirpklskmc)
@@ -109,11 +112,12 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
         sys.exit()
 
     # check and create directories
-    if doconversionmc is True:
-        checkmakedirlist(dirpklmc)
+    if checkiffileexist is False:
+        if doconversionmc is True:
+            checkmakedirlist(dirpklmc)
 
-    if doconversiondata is True:
-        checkmakedirlist(dirpkldata)
+        if doconversiondata is True:
+            checkmakedirlist(dirpkldata)
 
     if doskimmingmc is True:
         checkmakedirlist(dirpklskmc)
@@ -136,8 +140,8 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
         checkmakedir(dirpklmltotdata)
 
     proc_class = Processer
-    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc")
-    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data")
+    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc", checkiffileexist)
+    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data", checkiffileexist)
 
     if doconversionmc == 1:
         mymultiprocessmc.multi_unpack_allperiods()

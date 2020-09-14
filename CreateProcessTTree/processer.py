@@ -41,10 +41,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
     def __init__(self, case, datap, run_param, mcordata, p_maxfiles,
                  d_root, d_pkl, d_pklsk, d_pkl_ml, p_period,
                  p_chunksizeunp, p_chunksizeskim, p_maxprocess,
-                 p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged):
+                 p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged,
+                 checkiffileexist):
 
         self.datap = datap
         self.case = case
+        self.first_check_if_file_exists = checkiffileexist
 
         #directories
         self.d_root = d_root
@@ -162,10 +164,10 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.mptfiles_recosk = []
         self.mptfiles_gensk = []
         self.mptfiles_recosk = [createlist(self.d_pklsk, self.l_path,
-                                self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
+                                           self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         if self.mcordata == "mc":
             self.mptfiles_gensk = [createlist(self.d_pklsk, self.l_path,
-                                    self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
+                                              self.lpt_gensk[ipt]) for ipt in range(self.p_nptbins)]
 
         #Variables for ML applying
         self.do_mlprefilter = datap.get("doml_asprefilter", None)
@@ -182,7 +184,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.lpt_modhandler_hipe4ml = appendmainfoldertolist(self.dirmodel, self.lpt_modhandler_hipe4ml)
 
         self.doml = datap["doml"]
-        if self.do_mlprefilter is not None and self.doml == False:
+        if self.do_mlprefilter is not None and self.doml is False:
             print("FATAL error: The ML prefilter feature cannot combine with rectangular cuts")
         if not self.doml:
             datap["mlapplication"]["probcutpresel"][self.mcordata] = [0 for _ in self.lpt_anbinmin]
@@ -210,10 +212,10 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.mptfiles_recosk_forapply = []
         if self.do_mlprefilter is False:
             self.mptfiles_recosk_forapply = [createlist(inputdir_forapply, self.l_path,
-                                            self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
+                                                        self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         else:
             self.mptfiles_recosk_forapply = [createlist(self.d_pklsk, self.l_path,
-                                             self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
+                                                        self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         self.lpt_recodec = None
         if self.doml is True:
             if self.do_mlprefilter is True:
@@ -236,7 +238,39 @@ class Processer: # pylint: disable=too-many-instance-attributes
             self.lpt_gendecmerged = [os.path.join(self.d_pkl_decmerged, self.lpt_gensk[ipt])
                                      for ipt in range(self.p_nptbins)]
 
+        self.multiclass_labels = datap["ml"].get("multiclass_labels", None)
+
     def unpack(self, file_index):
+
+        file_exists = True
+        if self.first_check_if_file_exists is True:
+            file_exists = self.check_if_file_exists(self.l_reco[file_index])
+            if self.mcordata == "mc" and file_exists is True:
+                file_exists = self.check_if_file_exists(self.l_reco[file_index])
+            if file_exists is True:
+                file_exists = self.check_if_file_exists(self.l_evt[file_index])
+            if file_exists is True:
+                file_exists = self.check_if_file_exists(self.l_evtorig[file_index])
+
+        #Probably this is not needed and slows it down much. To be checked once
+        if file_exists is True and self.mcordata == "mc":
+            try:
+                pickle.load(openfile(self.l_gen[file_index], "rb"))
+            except Exception as e:
+                print("Failed to load file", self.l_gen[file_index])
+                print("Possible error", str(e))
+                file_exists = False
+        if file_exists is True and self.mcordata == "data":
+            try:
+                pickle.load(openfile(self.l_reco[file_index], "rb"))
+            except Exception as e:
+                print("Failed to load file", self.l_reco[file_index])
+                print("Possible error", str(e))
+                file_exists = False
+
+        if file_exists is True:
+            return
+
         treeevtorig = uproot.open(self.l_root[file_index])[self.n_treeevt]
         try:
             dfevtorig = treeevtorig.pandas.df(branches=self.v_evt)
@@ -374,7 +408,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     print("Model file not present in bin %d" % ipt)
                 mod = pickle.load(openfile(self.lpt_model[ipt], 'rb'))
                 dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
-                                   dfrecosk, self.v_train[ipt])
+                                   dfrecosk, self.v_train[ipt], None)
                 probvar = "y_test_prob" + self.p_modelname
                 dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
             else:
@@ -384,7 +418,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if self.do_mlprefilter is True and self.mcordata == "mc":
                 dfgensk = pickle.load(openfile(self.mptfiles_gensk[ipt][file_index], "rb"))
                 pickle.dump(dfgensk, openfile(self.mptfiles_genskmldec[ipt][file_index], "wb"),
-                        protocol=4)
+                            protocol=4)
 
     def applymodel_hipe4ml(self, file_index):
         for ipt in range(self.p_nptbins):
@@ -397,8 +431,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     print("hipe4ml model file not present in bin %d" % ipt)
                 modhandler = pickle.load(openfile(self.lpt_modhandler_hipe4ml[ipt], 'rb'))
                 mod = modhandler.get_original_model()
-                dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
-                                   dfrecosk, self.v_train[ipt])
+                if len(self.multiclass_labels) == 1 or self.multiclass_labels is None:
+                    dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
+                                       dfrecosk, self.v_train[ipt], None)
+                else:
+                    dfrecoskml = apply("MultiClassification", [self.p_modelname], [mod],
+                                       dfrecosk, self.v_train[ipt], self.multiclass_labels)
                 probvar = "y_test_prob" + self.p_modelname
                 dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
             else:
@@ -487,3 +525,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
             merge_method(self.mptfiles_recoskmldec[ipt], self.lpt_recodecmerged[ipt])
             if self.mcordata == "mc":
                 merge_method(self.mptfiles_gensk[ipt], self.lpt_gendecmerged[ipt])
+
+    def check_if_file_exists(self, filename):
+        if os.path.exists(filename):
+            if os.stat(filename).st_size != 0:
+                return True
+        return False

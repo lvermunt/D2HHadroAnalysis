@@ -22,11 +22,12 @@ from machine_learning_hep.utilities import merge_method
 
 class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-statements
     species = "multiprocesser"
-    def __init__(self, case, proc_class, datap, run_param, mcordata):
+    def __init__(self, case, proc_class, datap, run_param, mcordata, checkiffileexist):
         self.case = case
         self.datap = datap
         self.run_param = run_param
         self.mcordata = mcordata
+        self.first_check_if_file_exists = checkiffileexist
         self.prodnumber = len(datap["multi"][self.mcordata]["unmerged_tree_dir"])
         self.p_period = datap["multi"][self.mcordata]["period"]
         self.p_fracmerge = datap["multi"][self.mcordata]["fracmerge"]
@@ -95,7 +96,8 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
                                    self.p_chunksizeskim[indexp], self.p_nparall,
                                    self.p_fracmerge[indexp], self.p_seedmerge[indexp],
                                    self.dlper_reco_modapp[indexp],
-                                   self.dlper_reco_modappmerged[indexp])
+                                   self.dlper_reco_modappmerged[indexp],
+                                   self.first_check_if_file_exists)
             self.process_listsample.append(myprocess)
 
     def multi_unpack_allperiods(self):

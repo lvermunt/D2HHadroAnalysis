@@ -84,6 +84,8 @@ class Optimiserhipe4mltree:
         self.raw_output_hipe4ml = data_param["hipe4ml"]["raw_output"]
         self.train_test_log_hipe4ml = data_param["hipe4ml"]["train_test_log"]
 
+        self.multiclass_labels = data_param["ml"].get("multiclass_labels", None)
+
         self.logger.info("Using the following training variables: %s", self.v_train)
 
     def preparesample(self):

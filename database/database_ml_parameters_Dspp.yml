@@ -145,13 +145,14 @@ Dspp:
     sel_sigml: ismcprompt == 1
     sel_bkgml: inv_mass<1.832 or inv_mass>2.012
     sel_bkgmlfd: ismcfd == 1
+    multiclass_labels: [Bkg, SigPr, SigFD]
     nkfolds: 5
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
     binmin: [1,2,4,6,8,12] #list of nbins
     binmax: [2,4,6,8,12,24] #list of nbins
-    mltype: BinaryClassification
+    mltype: MultiClassification
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10
@@ -174,6 +175,8 @@ Dspp:
       save_fit: True # save bkg fits with the various cuts on ML output
       raahp: [1,1,1,1,1,1] #list of nbins
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
+      mass_fit_lim: [1.69, 2.21] # region for the fit of the invariant mass distribution [GeV/c^2]
+      bin_width: 0.001 # bin width of the invariant mass histogram
 
   hipe4ml:
     raw_output: False        # use raw_output (True) of probability (False) as output of the model

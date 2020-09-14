@@ -22,7 +22,7 @@ from machine_learning_hep.logger import get_logger
 
 
 def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_region, save_fit,
-             out_dir, pt_lims):
+             out_dir, pt_lims, multiclass_labels):
     """
     Estimate the number of background candidates under the signal peak. This is obtained
     from real data with a fit of the sidebands of the invariant mass distribution.
@@ -47,30 +47,59 @@ def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_regio
         out_file.cd()
 
     logger.debug("To fit the bkg a %s function is used", bkg_func)
-    for thr in x_axis:
-        bkg = 0.
-        bkg_err = 0.
-        hmass = TH1F(f'hmass_{thr:.5f}', '', num_bins, fit_region[0], fit_region[1])
-        bkg_sel_mask = df_bkg['y_test_prob' + name].values >= thr
-        sel_mass_array = df_bkg[bkg_sel_mask]['inv_mass'].values
+    if len(multiclass_labels) > 1:
+        for thr0 in x_axis:
+            for thr1 in x_axis:
+                bkg = 0.
+                bkg_err = 0.
+                hmass = TH1F(f'hmass_{thr0:.5f}_{thr1:.5f}', '', num_bins, fit_region[0], fit_region[1])
+                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' >= ' + thr0
+                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + thr1
+                mlsel_multi = mlsel_multi0 + ' and ' + mlsel_multi1
+                sel_mass_array = df_bkg.query(mlsel_multi)['inv_mass'].values
 
-        if len(sel_mass_array) > 5:
-            for mass_value in np.nditer(sel_mass_array):
-                hmass.Fill(mass_value)
-            fit = hmass.Fit(bkg_func, 'Q', '', fit_region[0], fit_region[1])
-            if save_fit:
+                if len(sel_mass_array) > 5:
+                    for mass_value in np.nditer(sel_mass_array):
+                        hmass.Fill(mass_value)
+                    fit = hmass.Fit(bkg_func, 'Q', '', fit_region[0], fit_region[1])
+                    if save_fit:
+                        hmass.Write()
+                    if int(fit) == 0:
+                        fit_func = hmass.GetFunction(bkg_func)
+                        bkg = fit_func.Integral(sig_region[0], sig_region[1]) / bin_width
+                        bkg_err = fit_func.IntegralError(sig_region[0], sig_region[1]) / bin_width
+                        del fit_func
+                elif save_fit:
+                    hmass.Write()
+
+                bkg_array.append(bkg)
+                bkg_err_array.append(bkg_err)
+                del hmass
+    else:
+        for thr in x_axis:
+            bkg = 0.
+            bkg_err = 0.
+            hmass = TH1F(f'hmass_{thr:.5f}', '', num_bins, fit_region[0], fit_region[1])
+            bkg_sel_mask = df_bkg['y_test_prob' + name].values >= thr
+            sel_mass_array = df_bkg[bkg_sel_mask]['inv_mass'].values
+
+            if len(sel_mass_array) > 5:
+                for mass_value in np.nditer(sel_mass_array):
+                    hmass.Fill(mass_value)
+                fit = hmass.Fit(bkg_func, 'Q', '', fit_region[0], fit_region[1])
+                if save_fit:
+                    hmass.Write()
+                if int(fit) == 0:
+                    fit_func = hmass.GetFunction(bkg_func)
+                    bkg = fit_func.Integral(sig_region[0], sig_region[1]) / bin_width
+                    bkg_err = fit_func.IntegralError(sig_region[0], sig_region[1]) / bin_width
+                    del fit_func
+            elif save_fit:
                 hmass.Write()
-            if int(fit) == 0:
-                fit_func = hmass.GetFunction(bkg_func)
-                bkg = fit_func.Integral(sig_region[0], sig_region[1]) / bin_width
-                bkg_err = fit_func.IntegralError(sig_region[0], sig_region[1]) / bin_width
-                del fit_func
-        elif save_fit:
-            hmass.Write()
 
-        bkg_array.append(bkg)
-        bkg_err_array.append(bkg_err)
-        del hmass
+            bkg_array.append(bkg)
+            bkg_err_array.append(bkg_err)
+            del hmass
 
     if save_fit:
         out_file.Close()
@@ -108,7 +137,7 @@ def calc_eff(num, den):
     return eff, eff_err
 
 
-def calc_sigeff_steps(num_steps, df_sig, name):
+def calc_sigeff_steps(num_steps, df_sig, name, multiclass_labels):
     logger = get_logger()
     ns_left = int(num_steps / 10) - 1
     ns_right = num_steps - ns_left
@@ -123,11 +152,23 @@ def calc_sigeff_steps(num_steps, df_sig, name):
     num_tot_cand = len(df_sig)
     eff_array = []
     eff_err_array = []
-    for thr in x_axis:
-        num_sel_cand = len(df_sig[df_sig['y_test_prob' + name].values >= thr])
-        eff, err_eff = calc_eff(num_sel_cand, num_tot_cand)
-        eff_array.append(eff)
-        eff_err_array.append(err_eff)
+    if len(multiclass_labels) > 1:
+        for thr0 in x_axis:
+            for thr1 in x_axis:
+                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' >= ' + thr0
+                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + thr1
+                mlsel_multi = mlsel_multi0 + ' and ' + mlsel_multi1
+                print(mlsel_multi)
+                num_sel_cand = len(df_sig.query(mlsel_multi))
+                eff, err_eff = calc_eff(num_sel_cand, num_tot_cand)
+                eff_array.append(eff)
+                eff_err_array.append(err_eff)
+    else:
+        for thr in x_axis:
+            num_sel_cand = len(df_sig[df_sig['y_test_prob' + name].values >= thr])
+            eff, err_eff = calc_eff(num_sel_cand, num_tot_cand)
+            eff_array.append(eff)
+            eff_err_array.append(err_eff)
 
     return eff_array, eff_err_array, x_axis
 
