@@ -73,11 +73,17 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
     dirpklskmc = data_param[case]["multi"]["mc"]["pkl_skimmed"]
     dirpklmlmc = data_param[case]["multi"]["mc"]["pkl_skimmed_merge_for_ml"]
     dirpklmltotmc = data_param[case]["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"]
+    dirpklmlmcmax = [s + "_max" for s in data_param[case]["multi"]["mc"]["pkl_skimmed_merge_for_ml"]]
+    dirpklmltotmcmax = data_param[case]["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"] + "_max"
     dirpkldata = data_param[case]["multi"]["data"]["pkl"]
     dirpklevtcounter_alldata = data_param[case]["multi"]["data"]["pkl_evtcounter_all"]
     dirpklskdata = data_param[case]["multi"]["data"]["pkl_skimmed"]
     dirpklmldata = data_param[case]["multi"]["data"]["pkl_skimmed_merge_for_ml"]
     dirpklmltotdata = data_param[case]["multi"]["data"]["pkl_skimmed_merge_for_ml_all"]
+    dirpklmldatamax = [s + "_max" for s in data_param[case]["multi"]["data"]["pkl_skimmed_merge_for_ml"]]
+    dirpklmltotdatamax = data_param[case]["multi"]["data"]["pkl_skimmed_merge_for_ml_all"] + "_max"
+
+    v_max_ncand_merge = data_param[case]["multi"].get("max_ncand_merge", -1)
 
     #creating folder if not present
     counter = 0
@@ -98,15 +104,23 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
 
     if domergingmc is True:
         counter = counter + checkdirlist(dirpklmlmc)
+        if v_max_ncand_merge > 0:
+            counter = counter + checkdirlist(dirpklmlmcmax)
 
     if domergingdata is True:
         counter = counter + checkdirlist(dirpklmldata)
+        if v_max_ncand_merge > 0:
+            counter = counter + checkdirlist(dirpklmldatamax)
 
     if domergingperiodsmc is True:
         counter = counter + checkdir(dirpklmltotmc)
+        if v_max_ncand_merge > 0:
+            counter = counter + checkdir(dirpklmltotmcmax)
 
     if domergingperiodsdata is True:
         counter = counter + checkdir(dirpklmltotdata)
+        if v_max_ncand_merge > 0:
+            counter = counter + checkdir(dirpklmltotdatamax)
 
     if counter < 0:
         sys.exit()
@@ -129,15 +143,23 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
 
     if domergingmc is True:
         checkmakedirlist(dirpklmlmc)
+        if v_max_ncand_merge > 0:
+            checkmakedirlist(dirpklmlmcmax)
 
     if domergingdata is True:
         checkmakedirlist(dirpklmldata)
+        if v_max_ncand_merge > 0:
+            checkmakedirlist(dirpklmldatamax)
 
     if domergingperiodsmc is True:
         checkmakedir(dirpklmltotmc)
+        if v_max_ncand_merge > 0:
+            checkmakedirlist(dirpklmltotmcmax)
 
     if domergingperiodsdata is True:
         checkmakedir(dirpklmltotdata)
+        if v_max_ncand_merge > 0:
+            checkmakedirlist(dirpklmltotdatamax)
 
     proc_class = Processer
     mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc", checkiffileexist)
