@@ -74,12 +74,18 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
         self.lptper_genml = [[os.path.join(direc, self.lpt_gensk[ipt]) \
                               for direc in self.dlper_pklml] \
                               for ipt in range(self.p_nptbins)]
+        self.lptper_recomlmax = [[os.path.join(direc + "_max", self.lpt_recosk[ipt]) \
+                               for direc in self.dlper_pklml] \
+                              for ipt in range(self.p_nptbins)]
+
         self.lpt_recoml_mergedallp = [os.path.join(self.d_pklml_mergedallp, self.lpt_recosk[ipt]) \
                                     for ipt in range(self.p_nptbins)]
         self.lpt_genml_mergedallp = [os.path.join(self.d_pklml_mergedallp, self.lpt_gensk[ipt]) \
                                     for ipt in range(self.p_nptbins)]
         self.f_evtml_mergedallp = os.path.join(self.d_pklml_mergedallp, self.n_evt)
         self.f_evtorigml_mergedallp = os.path.join(self.d_pklml_mergedallp, self.n_evtorig)
+        self.lpt_recoml_mergedallpmax = [os.path.join(self.d_pklml_mergedallp + "_max", self.lpt_recosk[ipt]) \
+                                    for ipt in range(self.p_nptbins)]
         self.lper_evt = [os.path.join(direc, self.n_evt) for direc in self.dlper_pkl]
         self.lper_evtorig = [os.path.join(direc, self.n_evtorig) for direc in self.dlper_pkl]
 
@@ -113,21 +119,23 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
 
     def multi_mergeml_allperiods(self):
         for indexp in range(self.prodnumber):
-            if self.v_max_ncand_merge < 0:
-                self.process_listsample[indexp].process_mergeforml()
-            else:
+            self.process_listsample[indexp].process_mergeforml()
+            if self.v_max_ncand_merge > 0:
                 self.process_listsample[indexp].process_mergeforml_max()
 
     def multi_mergeml_allinone(self):
         for ipt in range(self.p_nptbins):
             merge_method(self.lptper_recoml[ipt], self.lpt_recoml_mergedallp[ipt])
 
-        if self.v_max_ncand_merge < 0:
+        for ipt in range(self.p_nptbins):
+            if self.mcordata == "mc":
+                merge_method(self.lptper_genml[ipt], self.lpt_genml_mergedallp[ipt])
+        merge_method(self.lper_evtml, self.f_evtml_mergedallp)
+        merge_method(self.lper_evtorigml, self.f_evtorigml_mergedallp)
+
+        if self.v_max_ncand_merge > 0:
             for ipt in range(self.p_nptbins):
-                if self.mcordata == "mc":
-                    merge_method(self.lptper_genml[ipt], self.lpt_genml_mergedallp[ipt])
-            merge_method(self.lper_evtml, self.f_evtml_mergedallp)
-            merge_method(self.lper_evtorigml, self.f_evtorigml_mergedallp)
+                merge_method(self.lptper_recomlmax[ipt], self.lpt_recoml_mergedallpmax[ipt])
 
     def multi_apply_allperiods(self):
         for indexp in range(self.prodnumber):

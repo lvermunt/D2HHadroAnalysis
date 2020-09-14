@@ -160,6 +160,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
                              for ipt in range(self.p_nptbins)]
         self.lpt_gen_ml = [os.path.join(self.d_pkl_ml, self.lpt_gensk[ipt]) \
                             for ipt in range(self.p_nptbins)]
+        self.lpt_reco_mlmax = [os.path.join(self.d_pkl_ml + '_max', self.lpt_recosk[ipt]) \
+                              for ipt in range(self.p_nptbins)]
 
         self.mptfiles_recosk = []
         self.mptfiles_gensk = []
@@ -518,7 +520,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             ntomerge = (int)(nfiles * self.p_max_frac_merge[ipt])
             filesel = rd.sample(range(0, nfiles), ntomerge)
             list_sel_recosk = [self.mptfiles_recosk[ipt][j] for j in filesel]
-            merge_method_max2(list_sel_recosk, self.lpt_reco_ml[ipt], self.v_max_ncand_merge)
+            merge_method_max2(list_sel_recosk, self.lpt_reco_mlmax[ipt], self.v_max_ncand_merge)
 
     def process_mergedec(self):
         for ipt in range(self.p_nptbins):

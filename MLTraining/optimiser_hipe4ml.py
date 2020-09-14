@@ -52,6 +52,9 @@ class Optimiserhipe4ml:
         # directory
         dirmcml = data_param["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"]
         dirdataml = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"]
+        dirmcml_max = data_param["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"] + "_max"
+        dirdataml_max = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"] + "_max"
+        self.v_max_ncand_merge = datap["multi"]["max_ncand_merge"]
         if self.do_mlprefilter is False: #FIXME for multiple periods
             dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
             dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
@@ -75,6 +78,8 @@ class Optimiserhipe4ml:
         self.f_gen_mc = os.path.join(dirmcml, self.n_gen)
         self.f_reco_mc = os.path.join(dirmcml, self.n_reco)
         self.f_reco_data = os.path.join(dirdataml, self.n_reco)
+        self.f_reco_mc_max = os.path.join(dirmcml_max, self.n_reco)
+        self.f_reco_data_max = os.path.join(dirdataml_max, self.n_reco)
         self.f_evt_data = os.path.join(dirdataml, self.n_evt)
         self.f_evttotsample_data = os.path.join(dirdatatotsample, self.n_evt)
         # variables
@@ -105,6 +110,7 @@ class Optimiserhipe4ml:
         self.df_mc = None
         self.df_mcgen = None
         self.df_data = None
+        self.df_data_signf = None
         self.df_sig = None
         self.df_bkg = None
         self.df_ml = None
@@ -184,6 +190,9 @@ class Optimiserhipe4ml:
     def preparesample(self):
         self.logger.info("Prepare Sample for hipe4ml")
         self.df_data = pickle.load(openfile(self.f_reco_data, "rb"))
+        self.df_data_signf = pickle.load(openfile(self.f_reco_data, "rb"))
+        if self.v_max_ncand_merge > 0:
+            self.df_data = pickle.load(openfile(self.f_reco_data_max, "rb"))
         self.df_mc = pickle.load(openfile(self.f_reco_mc, "rb"))
         self.df_mcgen = pickle.load(openfile(self.f_gen_mc, "rb"))
         self.df_data = selectdfquery(self.df_data, self.p_evtsel)
@@ -466,7 +475,7 @@ class Optimiserhipe4ml:
         signal_yield = self.p_raahp * signal_yield
         self.logger.debug("Expected signal yield x RAA hp: %.3e", signal_yield)
 
-        df_data_sideband = self.df_data.query(self.s_selbkgml)
+        df_data_sideband = self.df_data_signf.query(self.s_selbkgml)
         df_data_sideband = shuffle(df_data_sideband, random_state=self.rnd_shuffle)
         df_data_sideband = df_data_sideband.tail(round(len(df_data_sideband) * self.p_bkgfracopt))
         hmass = TH1F('hmass', '', self.p_num_bins, self.p_mass_fit_lim[0], self.p_mass_fit_lim[1])

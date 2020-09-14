@@ -105,10 +105,11 @@ Dspp0inf:
 
   multi:
     #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
-    max_ncand_merge: 1000000
+    max_ncand_merge: 1000000 # if < 0, use default merging. Otherwise process_mergeforml_max (with merge_method_max2)
     data:
       nprocessesparallel: 50
-      fracmerge : [1.0] #list of periods
+      fracmerge : [0.01] #list of periods. Only used in default merging, with process_mergeforml (with merge_method)
+                         #if max_ncand_merge > 0, this will only be used for significance calculation
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC161718pp] #list of periods
       unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200901_ROOT6-1/pp_data/497_20200901-1725/merged] #list of periods
