@@ -146,6 +146,7 @@ Dspp0inf:
     sel_sigml: ismcprompt == 1
     sel_bkgml: inv_mass<1.832 or inv_mass>2.012
     sel_bkgmlfd: ismcfd == 1
+    multiclass_labels: [Bkg, SigPr, SigFD]
     nkfolds: 5
     rnd_shuffle: 12
     rnd_splt: 12
