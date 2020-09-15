@@ -37,6 +37,7 @@ from machine_learning_hep.utilities import createstringselection, openfile
 from machine_learning_hep.utilities_selection import seldf_singlevar
 from machine_learning_hep.utilities_selection import selectdfquery
 from machine_learning_hep.utilities_selection import split_df_sigbkg
+from machine_learning_hep.ml_functions import apply
 from machine_learning_hep.ml_significance import calc_bkg, calc_signif, calc_eff, calc_sigeff_steps
 
 class Optimiserhipe4ml:
@@ -85,6 +86,8 @@ class Optimiserhipe4ml:
         self.f_evttotsample_data = os.path.join(dirdatatotsample, self.n_evt)
         # variables
         self.v_train = training_var
+        if isinstance(self.v_train[0], list):
+            self.logger.error("Training hipe4ml not yet suitable for pT dependent training variables")
         self.v_sig = data_param["variables"]["var_signal"]
         # parameters
         self.p_case = case
@@ -133,6 +136,7 @@ class Optimiserhipe4ml:
         self.s_selbkgml = data_param["ml"]["sel_bkgml"]
         self.s_selbkgmlfd = data_param["ml"].get("sel_bkgmlfd", None)
         self.s_selsigml = data_param["ml"]["sel_sigml"]
+        self.p_mltype = data_param["ml"]["mltype"]
         self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
 
         self.s_suffix = None
@@ -140,6 +144,7 @@ class Optimiserhipe4ml:
         self.preparesample()
 
         self.p_hipe4ml_model = None
+        self.p_hipe4ml_origmodel = None
         self.v_hipe4ml_pars = hyper_pars
         self.load_hipe4mlmodel()
 
@@ -173,8 +178,8 @@ class Optimiserhipe4ml:
         self.p_nevtml = None
         self.p_nevttot = None
         self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
-        self.p_mass_fit_lim = data_param["analysis"]["opt"]['mass_fit_lim']
-        self.p_bin_width = data_param["analysis"]["opt"]['bin_width']
+        self.p_mass_fit_lim = data_param["ml"]["opt"]['mass_fit_lim']
+        self.p_bin_width = data_param["ml"]["opt"]['bin_width']
         self.p_num_bins = int(round((self.p_mass_fit_lim[1] - self.p_mass_fit_lim[0]) /
                                     self.p_bin_width))
         self.p_mass = data_param["mass"]
@@ -324,7 +329,6 @@ class Optimiserhipe4ml:
                                                                        self.roc_method_hipe4ml)
         self.ypredtrain_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[0],
                                                                self.raw_output_hipe4ml)
-        print(self.ypredtrain_hipe4ml)
 
         modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
@@ -338,6 +342,12 @@ class Optimiserhipe4ml:
 
         self.logger.info("Training + testing hipe4ml: Done!")
         self.logger.info("Time elapsed = %.3f", time.time() - t0)
+
+    def get_hipe4mlmodel(self):
+        self.logger.info("Getting already saved hipe4ml model")
+        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
+        self.p_hipe4ml_model = pickle.load(openfile(modelhandlerfile, 'rb'))
+        self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
     def do_hipe4mlplot(self):
         self.logger.info("Plotting hipe4ml model")
@@ -513,6 +523,11 @@ class Optimiserhipe4ml:
         plt.yticks(fontsize=18)
 
         df_sig = self.df_mltest[self.df_mltest["ismcprompt"] == 1]
+
+        df_sig = apply(self.p_mltype, ["xgboost"], [self.p_hipe4ml_origmodel],
+                       df_sig, self.v_train, self.multiclass_labels)
+        df_data_sideband = apply(self.p_mltype, ["xgboost"], [self.p_hipe4ml_origmodel],
+                                 df_data_sideband, self.v_train, self.multiclass_labels)
 
         #hipe4ml only has xgboost, to keep same style as mlhep, use ["xgboost"]
         for name in ["xgboost"]:

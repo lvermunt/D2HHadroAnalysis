@@ -158,8 +158,8 @@ Dspp:
     doearlystopping: True #available for XGBoost only
     num_early_stopping_rounds: 50 #available for XGBoost only
     ncorescrossval: 10
-    mlplot: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/mlplot0inf # to be removed
-    mlout: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/mlout0inf   # to be removed
+    mlplot: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/mlplot # to be removed
+    mlout: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/mlout   # to be removed
     opt:
       isFONLLfromROOT: true
       #TODO: UPDATE
@@ -185,7 +185,7 @@ Dspp:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth':3, 'learning_rate':0.0238, 'n_estimators':1028, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
+    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.021947248325413154, 'n_estimators': 904, 'min_child_weight': 7.975182623592539, 'subsample': 0.8164292138123602, 'colsample_bytree': 0.9828823955724552},
                          {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
                          {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
                          {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},

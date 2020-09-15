@@ -53,8 +53,8 @@ def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_regio
                 bkg = 0.
                 bkg_err = 0.
                 hmass = TH1F(f'hmass_{thr0:.5f}_{thr1:.5f}', '', num_bins, fit_region[0], fit_region[1])
-                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' >= ' + thr0
-                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + thr1
+                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' <= ' + str(thr0)
+                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + str(thr1)
                 mlsel_multi = mlsel_multi0 + ' and ' + mlsel_multi1
                 sel_mass_array = df_bkg.query(mlsel_multi)['inv_mass'].values
 
@@ -155,10 +155,9 @@ def calc_sigeff_steps(num_steps, df_sig, name, multiclass_labels):
     if len(multiclass_labels) > 1:
         for thr0 in x_axis:
             for thr1 in x_axis:
-                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' >= ' + thr0
-                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + thr1
+                mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' <= ' + str(thr0)
+                mlsel_multi1 = 'y_test_prob' + name + multiclass_labels[1] + ' >= ' + str(thr1)
                 mlsel_multi = mlsel_multi0 + ' and ' + mlsel_multi1
-                print(mlsel_multi)
                 num_sel_cand = len(df_sig.query(mlsel_multi))
                 eff, err_eff = calc_eff(num_sel_cand, num_tot_cand)
                 eff_array.append(eff)

@@ -119,7 +119,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 
     #creating folder if not present
     counter = 0
-    if doml is True:
+    if doml is True and dotraining is True:
         counter = counter + checkdir(mlout)
         counter = counter + checkdir(mlplot)
 
@@ -127,7 +127,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
         sys.exit()
 
     # check and create directories
-    if doml is True:
+    if doml is True and dotraining is True:
         checkmakedir(mlout)
         checkmakedir(mlplot)
 
@@ -183,8 +183,11 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
             else:
                 myopthipe4ml.set_hipe4ml_modelpar()
 
-            myopthipe4ml.do_hipe4mltrain()
-            myopthipe4ml.do_hipe4mlplot()
+            if dotraining:
+                myopthipe4ml.do_hipe4mltrain()
+                myopthipe4ml.do_hipe4mlplot()
+            else:
+                myopthipe4ml.get_hipe4mlmodel()
             if dosignifopt is True:
                 myopthipe4ml.do_significance(index)
             index = index + 1
