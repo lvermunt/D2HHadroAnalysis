@@ -186,7 +186,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
             myopthipe4ml.do_hipe4mltrain()
             myopthipe4ml.do_hipe4mlplot()
             if dosignifopt is True:
-                myopthipe4ml.do_significance()
+                myopthipe4ml.do_significance(index)
             index = index + 1
 
     if doml is True and domloption == 3:

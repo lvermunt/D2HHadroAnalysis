@@ -494,20 +494,21 @@ class Processer: # pylint: disable=too-many-instance-attributes
         if nfiles == 0:
             print("increase the fraction of merged files or the total number")
             print(" of files you process")
-        ntomerge = (int)(nfiles * self.p_frac_merge)
-        rd.seed(self.p_rd_merge)
-        filesel = rd.sample(range(0, nfiles), ntomerge)
         for ipt in range(self.p_nptbins):
+            ntomerge = (int)(nfiles * self.p_frac_merge[ipt])
+            rd.seed(self.p_rd_merge) #make sure we start with the same files for each pT bin
+            filesel = rd.sample(range(0, nfiles), ntomerge)
             list_sel_recosk = [self.mptfiles_recosk[ipt][j] for j in filesel]
             merge_method(list_sel_recosk, self.lpt_reco_ml[ipt])
             if self.mcordata == "mc":
                 list_sel_gensk = [self.mptfiles_gensk[ipt][j] for j in filesel]
                 merge_method(list_sel_gensk, self.lpt_gen_ml[ipt])
-
-        list_sel_evt = [self.l_evt[j] for j in filesel]
-        list_sel_evtorig = [self.l_evtorig[j] for j in filesel]
-        merge_method(list_sel_evt, self.f_evt_ml)
-        merge_method(list_sel_evtorig, self.f_evtorig_ml)
+            #only merge event for first pT bin (smallest)
+            if ipt == 0:
+                list_sel_evt = [self.l_evt[j] for j in filesel]
+                list_sel_evtorig = [self.l_evtorig[j] for j in filesel]
+                merge_method(list_sel_evt, self.f_evt_ml)
+                merge_method(list_sel_evtorig, self.f_evtorig_ml)
 
     def process_mergeforml_max(self):
         print("doing merging_max", self.mcordata, self.period)

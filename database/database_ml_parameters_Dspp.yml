@@ -108,7 +108,7 @@ Dspp:
     max_ncand_merge: 1000000 # if < 0, use default merging. Otherwise process_mergeforml_max (with merge_method_max2)
     data:
       nprocessesparallel: 50
-      fracmerge : [0.1] #list of periods. Only used in default merging, with process_mergeforml (with merge_method)
+      fracmerge : [[0.002, 0.0015, 0.01, 0.01, 0.3, 0.3]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
                         #if max_ncand_merge > 0, this will only be used for significance calculation
       max_frac_merge: [0.01, 0.05, 0.1, 0.2, 0.5, 1.0] #list of pT bins
       period: [LHC161718pp] #list of periods
@@ -122,15 +122,15 @@ Dspp:
     mc:
       nprocessesparallel: 50
       chunksizeskim: [1000] #list of periods
-      fracmerge : [1.0] #list of periods
+      fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC161718pp_Ds] #list of periods
-      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/merged] #list of periods
-      pkl: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/pp_mc_prodD2H_mltot
-      pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/pp_mc_prodD2H_evttot
+      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/merged] #list of periods
+      pkl: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/pp_mc_prodD2H_mltot
+      pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/pp_mrc_prodD2H_evttot
       #mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_161718]
   ml:
     evtsel: is_ev_rej==0
@@ -162,7 +162,7 @@ Dspp:
     opt:
       isFONLLfromROOT: true
       #TODO: UPDATE
-      filename_fonll: 'data/fonll/D0DplusDstarPredictions_13TeV_y05_all_300416_BDShapeCorrected.root' # file with FONLL predictions
+      filename_fonll: 'InputAnalyses/Analysis_D2HvsMult//fonll/DmesonLcPredictions_13TeV_y05_FFee_BRpythia8.root' # file with FONLL predictions
       fonll_particle: 'hDsPhipitoKkpi'
       fonll_pred: 'max' # edge of the FONLL prediction
       FF: 0.1281 # fragmentation fraction
@@ -170,7 +170,7 @@ Dspp:
       Taa: 1 # 23260 [b^-1] in 0-10% Pb-Pb, 3917 [b^-1] in 30-50% Pb-Pb, 1 for pp
       BR: 2.27e-2 # branching ratio of the decay Lc->pK0s * K0s->pi+pi-
       f_prompt: 0.9 # estimated fraction of prompt candidates
-      bkg_data_fraction: 0.1 # fraction of real data used in the estimation
+      bkg_data_fraction: 0.25 # fraction of real data used in the estimation
       num_steps: 111 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
@@ -210,8 +210,8 @@ Dspp:
       pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/skpkldec] #list of periods
       pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/skpkldecmerged] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/skpkldecmerged] #list of periods
     modelname: xgboost
     modelsperptbin: [Model_pT_1_2.model,
                      Model_pT_2_4.model,
@@ -274,8 +274,8 @@ Dspp:
         resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/resultsMBvspt_ntrkl
       mc:
         runselection: [null]
-        results: [/data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/500_20200906-2241/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200901_ROOT6-1/pp_sim_Ds/resultsMBvspt_ntrkl
+        results: [/data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/resultsMBvspt_ntrkl] #list of periods
+        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/resultsMBvspt_ntrkl
 
       # The global mass limits
       mass_fit_lim: [1.69, 2.21] # region for the fit of the invariant mass distribution [GeV/c^2]

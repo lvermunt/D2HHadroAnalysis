@@ -54,11 +54,12 @@ class Optimiserhipe4ml:
         dirdataml = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"]
         dirmcml_max = data_param["multi"]["mc"]["pkl_skimmed_merge_for_ml_all"] + "_max"
         dirdataml_max = data_param["multi"]["data"]["pkl_skimmed_merge_for_ml_all"] + "_max"
-        self.v_max_ncand_merge = datap["multi"]["max_ncand_merge"]
+        self.v_max_ncand_merge = data_param["multi"]["max_ncand_merge"]
         if self.do_mlprefilter is False: #FIXME for multiple periods
             dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
             dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
         dirdatatotsample = data_param["multi"]["data"]["pkl_evtcounter_all"]
+        self.p_fracmerge = data_param["multi"]["data"]["fracmerge"][0] #FIXME for multiple periods
         # directory
         self.dirmlout = data_param["ml"]["mlout"]
         self.dirmlplot = data_param["ml"]["mlplot"]
@@ -417,20 +418,19 @@ class Optimiserhipe4ml:
                 featuresimportancefig[i].savefig(figname)
 
     #pylint: disable=too-many-locals
-    def do_significance(self):
+    def do_significance(self, ptbin):
         self.logger.info("Doing significance optimisation")
         gROOT.SetBatch(True)
         gROOT.ProcessLine("gErrorIgnoreLevel = kWarning;")
         #first extract the number of data events in the ml sample
         self.df_evt_data = pickle.load(openfile(self.f_evt_data, 'rb'))
+        self.p_nevtml = self.p_fracmerge[ptbin] * len(self.df_evt_data) / self.p_fracmerge[0]
+        self.p_nevttot = self.p_nevtml
         if self.p_dofullevtmerge is True:
             self.df_evttotsample_data = pickle.load(openfile(self.f_evttotsample_data, 'rb'))
+            self.p_nevttot = len(self.df_evttotsample_data)
         else:
             self.logger.warning("The total merged event dataframe was not merged for space limits")
-            self.df_evttotsample_data = pickle.load(openfile(self.f_evt_data, 'rb'))
-        #and the total number of events
-        self.p_nevttot = len(self.df_evttotsample_data)
-        self.p_nevtml = len(self.df_evt_data)
         self.logger.debug("Number of data events used for ML: %d", self.p_nevtml)
         self.logger.debug("Total number of data events: %d", self.p_nevttot)
         #calculate acceptance correction. we use in this case all
