@@ -125,7 +125,8 @@ Dspp:
       fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC161718pp_Ds] #list of periods
-      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/merged] #list of periods
+      select_children: [["child_11", "child_12", "child_13"]] # select children explicitly
+      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim/505_20200911-2319/merged] #list of periods
       pkl: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pkl] #list of periods
       pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklsk] #list of periods
       pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklskml] #list of periods

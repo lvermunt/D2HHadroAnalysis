@@ -39,7 +39,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
     # Initializer / Instance Attributes
     # pylint: disable=too-many-statements, too-many-arguments
     def __init__(self, case, datap, run_param, mcordata, p_maxfiles,
-                 d_root, d_pkl, d_pklsk, d_pkl_ml, p_period,
+                 d_root, d_pkl, d_pklsk, d_pkl_ml, p_period, i_period,
                  p_chunksizeunp, p_chunksizeskim, p_maxprocess,
                  p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged,
                  checkiffileexist):
@@ -59,6 +59,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.p_frac_merge = p_frac_merge
         self.p_rd_merge = p_rd_merge
         self.period = p_period
+        self.select_children = datap["multi"][mcordata].get("select_children", None)
+        if self.select_children:
+            # Make sure we have "<child>/" instead if <child> only. Cause in the latter case
+            # "child_1" might select further children like "child_11"
+            self.select_children = [f"{child}/" for child in self.select_children[i_period]]
         self.runlist = run_param.get(self.period, None)
         self.p_maxfiles = p_maxfiles
         self.p_chunksizeunp = p_chunksizeunp
@@ -134,9 +139,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #list of files names
         self.l_path = None
         if os.path.isdir(self.d_root):
-            self.l_path = list_folders(self.d_root, self.n_root, self.p_maxfiles)
+            self.l_path = list_folders(self.d_root, self.n_root, self.p_maxfiles,
+                                       self.select_children)
         else:
-            self.l_path = list_folders(self.d_pkl, self.n_reco, self.p_maxfiles)
+            self.l_path = list_folders(self.d_pkl, self.n_reco, self.p_maxfiles,
+                                       self.select_children)
 
         self.l_root = createlist(self.d_root, self.l_path, self.n_root)
         self.l_reco = createlist(self.d_pkl, self.l_path, self.n_reco)
