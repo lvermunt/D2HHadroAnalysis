@@ -139,11 +139,12 @@ def calc_eff(num, den):
 
 def calc_sigeff_steps(num_steps, df_sig, name, multiclass_labels):
     logger = get_logger()
-    ns_left = int(num_steps / 10) - 1
-    ns_right = num_steps - ns_left
-    x_axis_left = np.linspace(0., 0.49, ns_left)
-    x_axis_right = np.linspace(0.5, 1.0, ns_right)
-    x_axis = np.concatenate((x_axis_left, x_axis_right))
+    #ns_left = int(num_steps / 10) - 1
+    #ns_right = num_steps - ns_left
+    #x_axis_left = np.linspace(0., 0.49, ns_left)
+    #x_axis_right = np.linspace(0.5, 1.0, ns_right)
+    #x_axis = np.concatenate((x_axis_left, x_axis_right))
+    x_axis = np.linspace(0, 1.0, num_steps)
     if df_sig.empty:
         logger.error("In division denominator is empty")
         eff_array = [0] * num_steps

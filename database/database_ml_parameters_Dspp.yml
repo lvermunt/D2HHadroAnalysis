@@ -138,8 +138,8 @@ Dspp:
     triggersel:
       data: null #"trigger_hasbit_INT7==1"
       mc: null
-    nbkg: 500000
-    nsig: 500000
+    nbkg: 50000
+    nsig: 50000
     fracbkgoversig: 2
     sampletagforsignal: 1
     sampletagforbkg: 0
@@ -171,8 +171,8 @@ Dspp:
       Taa: 1 # 23260 [b^-1] in 0-10% Pb-Pb, 3917 [b^-1] in 30-50% Pb-Pb, 1 for pp
       BR: 2.27e-2 # branching ratio of the decay Lc->pK0s * K0s->pi+pi-
       f_prompt: 0.9 # estimated fraction of prompt candidates
-      bkg_data_fraction: 0.25 # fraction of real data used in the estimation
-      num_steps: 111 # number of steps used in efficiency and signif. estimation
+      bkg_data_fraction: 0.5 # fraction of real data used in the estimation
+      num_steps: 200 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
       raahp: [1,1,1,1,1,1] #list of nbins
@@ -185,15 +185,15 @@ Dspp:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.021947248325413154, 'n_estimators': 904, 'min_child_weight': 7.975182623592539, 'subsample': 0.8164292138123602, 'colsample_bytree': 0.9828823955724552},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist},
-                         {'max_depth':4, 'learning_rate':0.0210, 'n_estimators':1282, 'min_child_weight':5, 'colsample':0.9, 'n_jobs':3, 'tree_method':hist}]
+    hipe4ml_hyper_pars: [{'max_depth': 4, 'learning_rate': 0.036210622617823776, 'n_estimators': 651, 'min_child_weight': 2, 'subsample': 0.8732723686587384, 'colsample_bytree': 0.8863890037284232},
+                         {'max_depth': 4, 'learning_rate': 0.0386044454383514, 'n_estimators': 651, 'min_child_weight': 2, 'subsample': 0.8717078079485423, 'colsample_bytree': 0.8874053975399065},
+                         {'max_depth': 4, 'learning_rate': 0.07677688981775443, 'n_estimators': 526, 'min_child_weight': 9, 'subsample': 0.8396681743010983, 'colsample_bytree': 0.8208777447870581},
+                         {'max_depth': 4, 'learning_rate': 0.07677688981775443, 'n_estimators': 526, 'min_child_weight': 9, 'subsample': 0.8396681743010983, 'colsample_bytree': 0.8208777447870581},
+                         {'max_depth': 4, 'learning_rate': 0.07677688981775443, 'n_estimators': 526, 'min_child_weight': 9, 'subsample': 0.8396681743010983, 'colsample_bytree': 0.8208777447870581},
+                         {'max_depth': 4, 'learning_rate': 0.07677688981775443, 'n_estimators': 526, 'min_child_weight': 9, 'subsample': 0.8396681743010983, 'colsample_bytree': 0.8208777447870581}]
                          # list of dicts of hyperparameters (one for each pT bin)
     hyper_par_opt:
-      do_hyp_opt: True # whether to do the parameter optimization
+      do_hyp_opt: False # whether to do the parameter optimization
       njobs: -1        # number of parallel jobs used in hyper-parameter optimization, -1. to use all
       nfolds: 5        # number of folds used in cross validation
       initpoints: 10   # steps of random exploration you want to perform

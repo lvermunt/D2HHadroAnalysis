@@ -137,8 +137,8 @@ Dspp8inf:
     triggersel:
       data: null #"trigger_hasbit_INT7==1"
       mc: null
-    nbkg: 500000
-    nsig: 500000
+    nbkg: 50000
+    nsig: 50000
     fracbkgoversig: 2
     sampletagforsignal: 1
     sampletagforbkg: 0
@@ -170,8 +170,8 @@ Dspp8inf:
       Taa: 1 # 23260 [b^-1] in 0-10% Pb-Pb, 3917 [b^-1] in 30-50% Pb-Pb, 1 for pp
       BR: 2.27e-2 # branching ratio of the decay Lc->pK0s * K0s->pi+pi-
       f_prompt: 0.9 # estimated fraction of prompt candidates
-      bkg_data_fraction: 0.1 # fraction of real data used in the estimation
-      num_steps: 111 # number of steps used in efficiency and signif. estimation
+      bkg_data_fraction: 0.5 # fraction of real data used in the estimation
+      num_steps: 200 # number of steps used in efficiency and signif. estimation
       bkg_function: pol2 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
       raahp: [1,1] #list of nbins
