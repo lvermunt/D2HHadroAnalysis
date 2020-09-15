@@ -108,7 +108,7 @@ Dspp:
     max_ncand_merge: 1000000 # if < 0, use default merging. Otherwise process_mergeforml_max (with merge_method_max2)
     data:
       nprocessesparallel: 50
-      fracmerge : [[0.002, 0.0015, 0.01, 0.01, 0.3, 0.3]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
+      fracmerge: [[0.002, 0.0015, 0.01, 0.01, 0.3, 0.3]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
                         #if max_ncand_merge > 0, this will only be used for significance calculation
       max_frac_merge: [0.01, 0.05, 0.1, 0.2, 0.5, 1.0] #list of pT bins
       period: [LHC161718pp] #list of periods

@@ -261,24 +261,24 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if file_exists is True:
                 file_exists = self.check_if_file_exists(self.l_evtorig[file_index])
 
-        #Probably this is not needed and slows it down much. To be checked once
-        if file_exists is True and self.mcordata == "mc":
-            try:
-                pickle.load(openfile(self.l_gen[file_index], "rb"))
-            except Exception as e:
-                print("Failed to load file", self.l_gen[file_index])
-                print("Possible error", str(e))
-                file_exists = False
-        if file_exists is True and self.mcordata == "data":
-            try:
-                pickle.load(openfile(self.l_reco[file_index], "rb"))
-            except Exception as e:
-                print("Failed to load file", self.l_reco[file_index])
-                print("Possible error", str(e))
-                file_exists = False
+            #Probably this is not needed and slows it down much. To be checked once
+            if file_exists is True and self.mcordata == "mc":
+                try:
+                    pickle.load(openfile(self.l_gen[file_index], "rb"))
+                except Exception as e:
+                    print("Failed to load file", self.l_gen[file_index])
+                    print("Possible error", str(e))
+                    file_exists = False
+            if file_exists is True and self.mcordata == "data":
+                try:
+                    pickle.load(openfile(self.l_reco[file_index], "rb"))
+                except Exception as e:
+                    print("Failed to load file", self.l_reco[file_index])
+                    print("Possible error", str(e))
+                    file_exists = False
 
-        if file_exists is True:
-            return
+            if file_exists is True:
+                return
 
         treeevtorig = uproot.open(self.l_root[file_index])[self.n_treeevt]
         try:
