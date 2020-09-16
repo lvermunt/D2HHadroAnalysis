@@ -443,11 +443,15 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 if len(self.multiclass_labels) == 1 or self.multiclass_labels is None:
                     dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
                                        dfrecosk, self.v_train[ipt], None)
+                    probvar = "y_test_prob" + self.p_modelname
+                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
                 else:
                     dfrecoskml = apply("MultiClassification", [self.p_modelname], [mod],
                                        dfrecosk, self.v_train[ipt], self.multiclass_labels)
-                probvar = "y_test_prob" + self.p_modelname
-                dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
+                    probvar0 = 'y_test_prob' + self.p_modelname + self.multiclass_labels[0]
+                    probvar1 = 'y_test_prob' + self.p_modelname + self.multiclass_labels[1]
+                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar0] <= self.lpt_probcutpre[ipt][0] &
+                                                dfrecoskml[probvar1] >= self.lpt_probcutpre[ipt][1]]
             else:
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
