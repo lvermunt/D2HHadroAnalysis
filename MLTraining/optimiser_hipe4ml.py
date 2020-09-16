@@ -576,7 +576,7 @@ class Optimiserhipe4ml:
                     for i1, thr1 in enumerate(x_axis):
                         binvar0 = hsignfvscut.GetXaxis().FindBin(thr0)
                         binvar1 = hsignfvscut.GetXaxis().FindBin(thr1)
-                        hsignfvscut.SetBinContent(binvar0, binvar1, signif_array[i0 + i1 * len(x_axis)])
+                        hsignfvscut.SetBinContent(binvar0, binvar1, signif_array[i1 + i0 * len(x_axis)])
 
                 csignf = TCanvas(f'csignf_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
                 hFrame = csignf.cd(1).DrawFrame(x_axis[0], x_axis[0], x_axis[-1], x_axis[-1],

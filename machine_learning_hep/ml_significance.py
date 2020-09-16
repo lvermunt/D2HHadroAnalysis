@@ -28,11 +28,12 @@ def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_regio
     from real data with a fit of the sidebands of the invariant mass distribution.
     """
     logger = get_logger()
-    ns_left = int(num_steps / 10) - 1
-    ns_right = num_steps - ns_left
-    x_axis_left = np.linspace(0., 0.49, ns_left)
-    x_axis_right = np.linspace(0.5, 1.0, ns_right)
-    x_axis = np.concatenate((x_axis_left, x_axis_right))
+    #ns_left = int(num_steps / 10) - 1
+    #ns_right = num_steps - ns_left
+    #x_axis_left = np.linspace(0., 0.49, ns_left)
+    #x_axis_right = np.linspace(0.5, 1.0, ns_right)
+    #x_axis = np.concatenate((x_axis_left, x_axis_right))
+    x_axis = np.linspace(0, 1.0, num_steps)
     bkg_array = []
     bkg_err_array = []
     num_bins = (fit_region[1] - fit_region[0]) / bin_width
