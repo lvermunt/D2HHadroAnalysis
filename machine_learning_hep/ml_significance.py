@@ -28,12 +28,14 @@ def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_regio
     from real data with a fit of the sidebands of the invariant mass distribution.
     """
     logger = get_logger()
-    #ns_left = int(num_steps / 10) - 1
-    #ns_right = num_steps - ns_left
-    #x_axis_left = np.linspace(0., 0.49, ns_left)
-    #x_axis_right = np.linspace(0.5, 1.0, ns_right)
-    #x_axis = np.concatenate((x_axis_left, x_axis_right))
-    x_axis = np.linspace(0, 1.0, num_steps)
+    if multiclass_labels is None:
+        ns_left = int(num_steps / 10) - 1
+        ns_right = num_steps - ns_left
+        x_axis_left = np.linspace(0., 0.49, ns_left)
+        x_axis_right = np.linspace(0.5, 1.0, ns_right)
+        x_axis = np.concatenate((x_axis_left, x_axis_right))
+    else:
+        x_axis = np.linspace(0, 0.4, num_steps)
     bkg_array = []
     bkg_err_array = []
     num_bins = (fit_region[1] - fit_region[0]) / bin_width
@@ -48,7 +50,7 @@ def calc_bkg(df_bkg, name, num_steps, fit_region, bkg_func, bin_width, sig_regio
         out_file.cd()
 
     logger.debug("To fit the bkg a %s function is used", bkg_func)
-    if len(multiclass_labels) > 1:
+    if multiclass_labels is not None:
         for thr0 in x_axis:
             for thr1 in x_axis:
                 bkg = 0.
@@ -140,12 +142,14 @@ def calc_eff(num, den):
 
 def calc_sigeff_steps(num_steps, df_sig, name, multiclass_labels):
     logger = get_logger()
-    #ns_left = int(num_steps / 10) - 1
-    #ns_right = num_steps - ns_left
-    #x_axis_left = np.linspace(0., 0.49, ns_left)
-    #x_axis_right = np.linspace(0.5, 1.0, ns_right)
-    #x_axis = np.concatenate((x_axis_left, x_axis_right))
-    x_axis = np.linspace(0, 1.0, num_steps)
+    if multiclass_labels is None:
+        ns_left = int(num_steps / 10) - 1
+        ns_right = num_steps - ns_left
+        x_axis_left = np.linspace(0., 0.49, ns_left)
+        x_axis_right = np.linspace(0.5, 1.0, ns_right)
+        x_axis = np.concatenate((x_axis_left, x_axis_right))
+    else:
+        x_axis = np.linspace(0, 0.4, num_steps)
     if df_sig.empty:
         logger.error("In division denominator is empty")
         eff_array = [0] * num_steps
@@ -154,7 +158,7 @@ def calc_sigeff_steps(num_steps, df_sig, name, multiclass_labels):
     num_tot_cand = len(df_sig)
     eff_array = []
     eff_err_array = []
-    if len(multiclass_labels) > 1:
+    if multiclass_labels is not None:
         for thr0 in x_axis:
             for thr1 in x_axis:
                 mlsel_multi0 = 'y_test_prob' + name + multiclass_labels[0] + ' <= ' + str(thr0)

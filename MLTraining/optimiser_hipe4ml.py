@@ -138,6 +138,14 @@ class Optimiserhipe4ml:
         self.s_selsigml = data_param["ml"]["sel_sigml"]
         self.p_mltype = data_param["ml"]["mltype"]
         self.p_presel_gen_eff = data_param["ml"]["opt"]["presel_gen_eff"]
+        # mask missing values
+        data_maskmissingvalues = data_param.get("maskmissingvalues", None)
+        if data_maskmissingvalues is not None:
+            self.b_maskmissing = data_param["maskmissingvalues"].get("activate", False)
+            self.v_varstomask = data_param["maskmissingvalues"].get("tomask", None)
+        else:
+            self.b_maskmissing = False
+            self.v_varstomask = None
 
         self.s_suffix = None
         self.create_suffix()
@@ -201,6 +209,12 @@ class Optimiserhipe4ml:
             self.df_data = pickle.load(openfile(self.f_reco_data_max, "rb"))
         self.df_mc = pickle.load(openfile(self.f_reco_mc, "rb"))
         self.df_mcgen = pickle.load(openfile(self.f_gen_mc, "rb"))
+
+        if self.b_maskmissing:
+            self.df_data = self.df_data.replace(self.v_varstomask, value=np.nan)
+            self.df_data_signf = self.df_data_signf.replace(self.v_varstomask, value=np.nan)
+            self.df_mc = self.df_mc.replace(self.v_varstomask, value=np.nan)
+
         self.df_data = selectdfquery(self.df_data, self.p_evtsel)
         self.df_mc = selectdfquery(self.df_mc, self.p_evtsel)
         self.df_mcgen = selectdfquery(self.df_mcgen, self.p_evtsel)
@@ -334,6 +348,8 @@ class Optimiserhipe4ml:
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
         modelfile = f'{self.dirmlout}/Model_pT_{self.p_binmin}_{self.p_binmax}.model'
         self.p_hipe4ml_model.dump_original_model(modelfile)
+
+        self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
         #filename_xtrain = self.dirmlout+"/xtrain_%s.pkl" % (self.s_suffix)
         #filename_ytrain = self.dirmlout+"/ytrain_%s.pkl" % (self.s_suffix)
@@ -546,7 +562,7 @@ class Optimiserhipe4ml:
             signif_array, signif_err_array = calc_signif(sig_array, sig_err_array, bkg_array,
                                                          bkg_err_array)
 
-            if len(self.multiclass_labels) == 1 or self.multiclass_labels is None:
+            if self.n_classes <= 2:
                 plt.figure(fig_signif_pevt.number)
                 plt.errorbar(x_axis, signif_array, yerr=signif_err_array, label=f'{name}',
                              elinewidth=2.5, linewidth=5.0)

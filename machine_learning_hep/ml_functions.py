@@ -186,14 +186,12 @@ def test(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, myvariabl
         y_test_prediction = y_test_prediction.reshape(len(y_test_prediction),)
         test_set_['y_test_prediction'+name] = pd.Series(y_test_prediction, index=test_set_.index)
 
+        y_test_prob = model.predict_proba(x_test_)
         if ml_type == "BinaryClassification":
-            if len(labels_) == 1 or labels_ is None:
-                y_test_prob = model.predict_proba(x_test_)[:, 1]
-                test_set_['y_test_prob'+name] = pd.Series(y_test_prob, index=test_set_.index)
-        if ml_type == "MultiClassification" or len(labels_) > 1:
+            test_set_['y_test_prob'+name] = pd.Series(y_test_prob[:, 1], index=test_set_.index)
+        if ml_type == "MultiClassification" and labels_ is not None:
             for pred, lab in enumerate(labels_):
-                y_test_prob = model.predict_proba(x_test_)[:, pred]
-                test_set_['y_test_prob' + name + lab] = pd.Series(y_test_prob, index=test_set_.index)
+                test_set_['y_test_prob' + name + lab] = pd.Series(y_test_prob[:, pred], index=test_set_.index)
     return test_set_
 
 
@@ -206,14 +204,12 @@ def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_, 
         y_test_prediction = y_test_prediction.reshape(len(y_test_prediction),)
         test_set_['y_test_prediction'+name] = pd.Series(y_test_prediction, index=test_set_.index)
 
+        y_test_prob = model.predict_proba(x_values)
         if ml_type == "BinaryClassification":
-            if len(labels_) == 1 or labels_ is None:
-                y_test_prob = model.predict_proba(x_values)[:, 1]
-                test_set_['y_test_prob'+name] = pd.Series(y_test_prob, index=test_set_.index)
-        if ml_type == "MultiClassification" or len(labels_) > 1:
+            test_set_['y_test_prob'+name] = pd.Series(y_test_prob[:, 1], index=test_set_.index)
+        if ml_type == "MultiClassification" and labels_ is not None:
             for pred, lab in enumerate(labels_):
-                y_test_prob = model.predict_proba(x_values)[:, pred]
-                test_set_['y_test_prob' + name + lab] = pd.Series(y_test_prob, index=test_set_.index)
+                test_set_['y_test_prob' + name + lab] = pd.Series(y_test_prob[:, pred], index=test_set_.index)
     return test_set_
 
 

@@ -128,13 +128,19 @@ def do_preperation(data_config: dict, data_param: dict, run_param: dict):
     # check and create directories
     if checkiffileexist is False:
         if doconversionmc is True:
-            checkmakedirlist(dirpklmc)
+            if dirpklmc[0] == dirpklmc[-1]:
+                checkmakedir(dirpklmc[0])
+            else:
+                checkmakedirlist(dirpklmc)
 
         if doconversiondata is True:
             checkmakedirlist(dirpkldata)
 
     if doskimmingmc is True:
-        checkmakedirlist(dirpklskmc)
+        if dirpklskmc[0] == dirpklskmc[-1]:
+            checkmakedir(dirpklskmc[0])
+        else:
+            checkmakedirlist(dirpklskmc)
         checkmakedir(dirpklevtcounter_allmc)
 
     if doskimmingdata is True:

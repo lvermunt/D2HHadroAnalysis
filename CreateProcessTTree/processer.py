@@ -95,6 +95,14 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.s_gen_unp = datap["sel_gen_unp"]
         self.s_reco_skim = datap["sel_reco_skim"]
         self.s_gen_skim = datap["sel_gen_skim"]
+        # mask missing values
+        data_maskmissingvalues = datap.get("maskmissingvalues", None)
+        if data_maskmissingvalues is not None:
+            self.b_maskmissing = datap["maskmissingvalues"].get("activate", False)
+            self.v_varstomask = datap["maskmissingvalues"].get("tomask", None)
+        else:
+            self.b_maskmissing = False
+            self.v_varstomask = None
 
         #bitmap
         self.b_trackcuts = datap["sel_reco_singletrac_unp"]
@@ -181,6 +189,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #Variables for ML applying
         self.do_mlprefilter = datap.get("doml_asprefilter", None)
         self.p_modelname = datap["mlapplication"]["modelname"]
+        self.mltype = datap["ml"]["mltype"]
         self.lpt_model = datap["mlapplication"]["modelsperptbin"]
         self.lpt_modhandler_hipe4ml = datap["mlapplication"]["modelsperptbin_hipe4ml"]
         self.dirmodel = datap["ml"]["mlout"]
@@ -204,8 +213,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
             self.lpt_probcutpre = datap["mlapplication"]["ml_prefilter_probcut"]
         else:
             self.lpt_probcutpre = datap["mlapplication"]["probcutpresel"][self.mcordata]
-            if self.lpt_probcutfin < self.lpt_probcutpre:
-                print("FATAL error: probability cut final must be tighter!")
+            if not isinstance(self.lpt_probcutpre[0], list):
+                if self.lpt_probcutfin < self.lpt_probcutpre:
+                    print("FATAL error: probability cut final must be tighter!")
 
         self.d_pkl_dec = d_pkl_dec
         self.d_pkl_decmerged = d_pkl_decmerged
@@ -230,9 +240,15 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if self.do_mlprefilter is True:
                 self.lpt_recodec = self.lpt_recosk
             else:
-                self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
-                                   (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
-                                    self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
+                if not isinstance(self.lpt_probcutpre[0], list):
+                    self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
+                                       (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                        self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
+                else:
+                    self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f%.2f.pkl" % \
+                                       (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                        self.lpt_probcutpre[i][0], self.lpt_probcutpre[i][1])) \
+                                        for i in range(self.p_nptbins)]
         else:
             self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_std.pkl" % \
                                (self.lpt_anbinmin[i], self.lpt_anbinmax[i])) \
@@ -385,6 +401,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
         except Exception as e: # pylint: disable=broad-except
             print('failed to open file', self.l_reco[file_index], str(e))
             sys.exit()
+        #To (hopefully) fix double signd0 issue with database when unpacking
+        dfreco = dfreco.loc[:,~dfreco.columns.duplicated()]
 
         for ipt in range(self.p_nptbins):
             dfrecosk = seldf_singlevar(dfreco, self.v_var_binning,
@@ -415,6 +433,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if self.doml is True:
                 if os.path.isfile(self.lpt_model[ipt]) is False:
                     print("Model file not present in bin %d" % ipt)
+                if self.b_maskmissing:
+                    dfrecosk = dfrecosk.replace(self.v_varstomask, value=np.nan)
                 mod = pickle.load(openfile(self.lpt_model[ipt], 'rb'))
                 dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
                                    dfrecosk, self.v_train[ipt], None)
@@ -438,20 +458,22 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if self.doml is True:
                 if os.path.isfile(self.lpt_modhandler_hipe4ml[ipt]) is False:
                     print("hipe4ml model file not present in bin %d" % ipt)
+                if self.b_maskmissing:
+                    dfrecosk = dfrecosk.replace(self.v_varstomask, value=np.nan)
                 modhandler = pickle.load(openfile(self.lpt_modhandler_hipe4ml[ipt], 'rb'))
                 mod = modhandler.get_original_model()
-                if len(self.multiclass_labels) == 1 or self.multiclass_labels is None:
-                    dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
-                                       dfrecosk, self.v_train[ipt], None)
-                    probvar = "y_test_prob" + self.p_modelname
-                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
-                else:
+                if self.mltype == "MultiClassification":
                     dfrecoskml = apply("MultiClassification", [self.p_modelname], [mod],
                                        dfrecosk, self.v_train[ipt], self.multiclass_labels)
                     probvar0 = 'y_test_prob' + self.p_modelname + self.multiclass_labels[0]
                     probvar1 = 'y_test_prob' + self.p_modelname + self.multiclass_labels[1]
-                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar0] <= self.lpt_probcutpre[ipt][0] &
-                                                dfrecoskml[probvar1] >= self.lpt_probcutpre[ipt][1]]
+                    dfrecoskml = dfrecoskml.loc[(dfrecoskml[probvar0] <= self.lpt_probcutpre[ipt][0]) &
+                                                (dfrecoskml[probvar1] >= self.lpt_probcutpre[ipt][1])]
+                else:
+                    dfrecoskml = apply("BinaryClassification", [self.p_modelname], [mod],
+                                       dfrecosk, self.v_train[ipt], None)
+                    probvar = "y_test_prob" + self.p_modelname
+                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
             else:
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),

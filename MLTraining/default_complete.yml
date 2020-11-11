@@ -1,15 +1,15 @@
 case: Dspp # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
 
 analysis:
-  type: MBvspt_ntrkl
+  type: MBvspt
 
 ml_study:
   activate: true
   dohipe4ml: 2 #1 default MLHEP, 2 is hipe4ml, 3 = hipe4ml_fromttrees
   domlprefilterstep: false
 
-  dotraining: false
-  dosignifopt: false
+  dotraining: true
+  dosignifopt: true
 
   dopca: false
   docorrelation: false

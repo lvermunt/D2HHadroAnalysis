@@ -143,7 +143,7 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
         else:
             mymultiprocessdata.multi_apply_allperiods()
     if doapplymc is True:
-        if doapplydatamodelhandler is True:
+        if doapplymcmodelhandler is True:
             mymultiprocessmc.multi_apply_hipe4ml_allperiods()
         else:
             mymultiprocessmc.multi_apply_allperiods()

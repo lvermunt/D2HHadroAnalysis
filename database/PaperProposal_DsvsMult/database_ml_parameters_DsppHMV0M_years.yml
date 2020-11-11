@@ -12,7 +12,7 @@
 ##   along with this program. if not, see <https://www.gnu.org/licenses/>. ##
 #############################################################################
 
-Dspp:
+Dspp_years:
   nprongs: 3
   doml: true
   doml_asprefilter: null #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
@@ -106,33 +106,58 @@ Dspp:
   multi:
     #default values that can be changed here: seedmerge=12, maxfiles=-1, chunksizeunp=100, chunksizeskim=100
     max_ncand_merge: 1000000 # if < 0, use default merging. Otherwise process_mergeforml_max (with merge_method_max2)
+    #IMPORTANT, USING SAME FOLDERS HERE (pp_data) FOR EACH YEAR. NOT SURE IT THIS WORKS IN MLHEP
+    #IT WAS PROCESSED WITH A DIFFERENT SCRIPT, MERGING '16 '17 '18.  DON'T WANT TO DO IT AGAIN
+    #SO USING THIS SHORTCUT. KEEP IN MIND FOR NEXT PRODUCTIONS TO CHANGE TO pp_2016_data ETC
     data:
       nprocessesparallel: 50
-      fracmerge: [[0.002, 0.0015, 0.01, 0.01, 0.3, 0.3]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
+      fracmerge: [[0.002, 0.0015, 0.01, 0.01, 0.3, 0.3], [0.002, 0.0015, 0.01, 0.01, 0.3, 0.3], [0.002, 0.0015, 0.01, 0.01, 0.3, 0.3]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
                         #if max_ncand_merge > 0, this will only be used for significance calculation
       max_frac_merge: [0.01, 0.05, 0.1, 0.2, 0.5, 1.0] #list of pT bins
-      period: [LHC161718pp] #list of periods
-      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/merged] #list of periods
-      pkl: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklskml] #list of periods
+      period: [LHC16pp,LHC17pp,LHC18pp] #list of periods
+      select_children: [["child_1", "child_2", "child_3", "child_4", "child_5", "child_6", "child_7", "child_8", "child_9"], ["child_12", "child_13", "child_14", "child_15", "child_16", "child_17", "child_18", "child_19", "child_20", "child_21"], ["child_22", "child_23", "child_24", "child_25", "child_26", "child_27", "child_28", "child_29", "child_30", "child_31", "child_32", "child_33", "child_34", "child_35"]] # select children explicitly
+      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/merged,
+                          /data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/merged,
+                          /data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/merged] #list of periods
+      pkl: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pkl,
+            /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pkl,
+            /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pkl] #list of periods
+      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklsk,
+                    /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklsk,
+                    /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklskml,
+                                 /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklskml,
+                                 /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/pklskml] #list of periods
       pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/pp_data_mltot
       pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/pp_data_evttot
-      #mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_161718] #list of periods
+      weights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2016_train504,
+                ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2017_train504,
+                ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/data_2018_train504] #list of periods
     mc:
       nprocessesparallel: 50
-      chunksizeskim: [1000] #list of periods
-      fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
+      chunksizeskim: [1000, 1000, 1000] #list of periods
+      fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],[1.0, 1.0, 1.0, 1.0, 1.0, 1.0],[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
-      period: [LHC161718pp_Ds] #list of periods
-      select_children: [["child_11", "child_12", "child_13"]] # select children explicitly
-      unmerged_tree_dir: [/data/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim/505_20200911-2319/merged] #list of periods
-      pkl: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pkl] #list of periods
-      pkl_skimmed: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/pp_mc_prodD2H_mltot
-      pkl_evtcounter_all: /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/pp_mrc_prodD2H_evttot
-      #mcreweights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodD2H_161718]
+      period: [LHC16pp_DsHM, LHC17pp_DsHM, LHC18pp_DsHM] #list of periods
+      select_children: [["child_1"], ["child_2"], ["child_3"]] # select children explicitly
+      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_D2HvsMult/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim/506_20200911-2319/merged,
+                          /mnt/temp/OngoingAnalysis_D2HvsMult/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim/506_20200911-2319/merged,
+                          /mnt/temp/OngoingAnalysis_D2HvsMult/TTree/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim/506_20200911-2319/merged]
+      pkl: [/mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pkl,
+            /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pkl,
+            /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pkl]
+      pkl_skimmed: [/mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklsk,
+                    /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklsk,
+                    /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklsk]
+      pkl_skimmed_merge_for_ml: [/mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklskml,
+                                 /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklskml,
+                                 /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/506_20200911-2319/pklskml]
+      pkl_skimmed_merge_for_ml_all: /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/pp_mc_prodD2H_mltot
+      pkl_evtcounter_all: /mnt/temp/OngoingAnalysis_D2HvsMult/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2HHMV0/pp_mrc_prodD2H_evttot
+      weights: [../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodDsHMV0_2016_train506,
+                ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodDsHMV0_2017_train506,
+                ../Analyses/ALICE_D2H_vs_mult_pp13/reweighting/prodDsHMV0_2018_train506]
+
   ml:
     evtsel: is_ev_rej==0
     triggersel:
@@ -208,11 +233,20 @@ Dspp:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2016_data/504_20200911-2312/skpkldec,
+                        /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2017_data/504_20200911-2312/skpkldec,
+                        /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2018_data/504_20200911-2312/skpkldec] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2016_data/504_20200911-2312/skpkldecmerged,
+                              /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2017_data/504_20200911-2312/skpkldecmerged,
+                              /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2018_data/504_20200911-2312/skpkldecmerged] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2016_sim_D2HHMV0/506_20200911-2319/skpkldec,
+                        /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2017_sim_D2HHMV0/506_20200911-2319/skpkldec,
+                        /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2018_sim_D2HHMV0/506_20200911-2319/skpkldec]
+      pkl_skimmed_decmerged: [/data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2016_sim_D2HHMV0/506_20200911-2319/skpkldecmerged,
+                              /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2017_sim_D2HHMV0/506_20200911-2319/skpkldecmerged,
+                              /data/Derived/DsppvsMult/vAN-20200910_ROOT6-1/pp_2018_sim_D2HHMV0/506_20200911-2319/skpkldecmerged]
+
     modelname: xgboost
     modelsperptbin: [Model_pT_1_2.model,
                      Model_pT_2_4.model,
@@ -220,12 +254,12 @@ Dspp:
                      Model_pT_6_8.model,
                      Model_pT_8_12.model,
                      Model_pT_12_24.model]
-    modelsperptbin_hipe4ml: [ModelHandler_pT_1_2.pickle,
-                             ModelHandler_pT_2_4.pickle,
-                             ModelHandler_pT_4_6.pickle,
-                             ModelHandler_pT_6_8.pickle,
-                             ModelHandler_pT_8_12.pickle,
-                             ModelHandler_pT_12_24.pickle]
+    modelsperptbin_hipe4ml: [ModelHandler_pT_1_2.pkl,
+                             ModelHandler_pT_2_4.pkl,
+                             ModelHandler_pT_4_6.pkl,
+                             ModelHandler_pT_6_8.pkl,
+                             ModelHandler_pT_8_12.pkl,
+                             ModelHandler_pT_12_24.pkl]
     ml_prefilter_probcut: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
     probcutpresel:
       data: [[0.2, 0.0], [0.2, 0.0], [0.2, 0.0], [0.4, 0.0], [0.4, 0.0], [0.6, 0.0]] #list of nbins
@@ -275,8 +309,8 @@ Dspp:
         resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/resultsMBvspt_ntrkl
       mc:
         runselection: [null]
-        results: [/data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/resultsMBvspt_ntrkl
+        results: [/data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2H/505_20200911-2319/resultsMBvspt_ntrkl] #list of periods
+        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_D2H/resultsMBvspt_ntrkl
 
       # The global mass limits
       mass_fit_lim: [1.69, 2.21] # region for the fit of the invariant mass distribution [GeV/c^2]
@@ -359,5 +393,6 @@ Dspp:
       weights_min_pt: 0
       weights_max_pt: 40
       weights_bins: 400
+
 
 

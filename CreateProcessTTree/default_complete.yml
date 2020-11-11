@@ -1,35 +1,35 @@
-case: Dspp0inf # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
+case: LcpK0s010_2018 # used to find the database file unless specified explicitly as do_entire_analysis -d database_analysis
 
 run_only_unprocessed_files: false # set to true to resume interrupted processing (existing corrupted output will be overwritten)
 
 conversion: # pkl
   mc:
-    activate: true
+    activate: false
   data:
-    activate: true
+    activate: false
 skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
   mc:
-    activate: true
+    activate: false
   data:
-    activate: true
+    activate: false
 merging: # pkl_skimmed_merge_for_ml (pklskml)
   mc:
-    activate: true
+    activate: false
   data:
-    activate: true
+    activate: false
 mergingperiods: # pkl_skimmed_merge_for_ml_all
   mc:
-    activate: true
+    activate: false
   data:
-    activate: true
+    activate: false
 
 mlapplication:
-  domlprefilterstep: true
+  domlprefilterstep: false
   data:
     doapply: true # pkl_skimmed_dec (pklskdec)
-    doapplymodelhandler: false #for hipe4ml package
+    doapplymodelhandler: true #for hipe4ml package
     domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
   mc:
     doapply: true # pkl_skimmed_dec (pklskdec)
-    doapplymodelhandler: false #for hipe4ml package
+    doapplymodelhandler: true #for hipe4ml package
     domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
