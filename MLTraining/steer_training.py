@@ -77,6 +77,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
     dosignifopt = data_config["ml_study"]['dosignifopt']
     doscancuts = data_config["ml_study"]["doscancuts"]
     doplotdistr = data_config["ml_study"]["doplotdistr"]
+    domlplots = data_config["ml_study"].get("domlplots", False)
 
     typean = data_config["analysis"]["type"]
 
@@ -188,6 +189,8 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
                 myopthipe4ml.do_hipe4mlplot()
             else:
                 myopthipe4ml.get_hipe4mlmodel()
+            if domlplots is True and dotraining is False:
+                myopthipe4ml.do_hipe4mlplot(False)
             if dosignifopt is True:
                 myopthipe4ml.do_significance(index)
             index = index + 1

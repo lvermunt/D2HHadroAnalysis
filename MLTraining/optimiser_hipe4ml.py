@@ -365,7 +365,7 @@ class Optimiserhipe4ml:
         self.p_hipe4ml_model = pickle.load(openfile(modelhandlerfile, 'rb'))
         self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
-    def do_hipe4mlplot(self):
+    def do_hipe4mlplot(self, didtraining = True):
         self.logger.info("Plotting hipe4ml model")
 
         leglabels = ["Background", "Prompt signal"]
@@ -377,71 +377,73 @@ class Optimiserhipe4ml:
             listdf = [self.df_bkgtrain, self.df_sigtrain, self.df_bkgfdtrain]
 
         # _____________________________________________
-        plot_utils.plot_distr(listdf, self.v_train, 100, leglabels, figsize=(12, 7),
+        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "inv_mass_K0s", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, 100, leglabels, figsize=(12, 7),
                               alpha=0.3, log=True, grid=False, density=True)
         plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
         figname = f'{self.dirmlplot}/DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
         plt.savefig(figname)
         plt.close('all')
         # _____________________________________________
-        corrmatrixfig = plot_utils.plot_corr(listdf, self.v_train, leglabels)
+        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "inv_mass_K0s", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, leglabels)
         for figg, labb in zip(corrmatrixfig, outputlabels):
             plt.figure(figg.number)
             plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
             figname = f'{self.dirmlplot}/CorrMatrix{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
             figg.savefig(figname)
-        # _____________________________________________
-        plt.rcParams["figure.figsize"] = (10, 7)
-        mloutputfig = plot_utils.plot_output_train_test(self.p_hipe4ml_model, self.traintestdata,
-                                                        80, self.raw_output_hipe4ml,
-                                                        leglabels, self.train_test_log_hipe4ml,
-                                                        density=True)
-        if self.n_classes > 2:
-            for figg, labb in zip(mloutputfig, outputlabels):
-                figname = f'{self.dirmlplot}/MLOutputDistr{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-                figg.savefig(figname)
-        else:
-            figname = f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-            mloutputfig.savefig(figname)
-        # _____________________________________________
-        plt.rcParams["figure.figsize"] = (10, 9)
-        roccurvefig = plot_utils.plot_roc(self.traintestdata[3], self.ypredtest_hipe4ml,
-                                          None, leglabels, self.average_method_hipe4ml,
-                                          self.roc_method_hipe4ml)
-        figname = f'{self.dirmlplot}/ROCCurveAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-        roccurvefig.savefig(figname)
-        # _____________________________________________
-        plt.rcParams["figure.figsize"] = (10, 9)
-        roccurvettfig = plot_utils.plot_roc_train_test(self.traintestdata[3],
-                                                       self.ypredtest_hipe4ml,
-                                                       self.traintestdata[1],
-                                                       self.ypredtrain_hipe4ml, None,
-                                                       leglabels, self.average_method_hipe4ml,
-                                                       self.roc_method_hipe4ml)
-        figname = f'{self.dirmlplot}/ROCCurveTrainTest_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-        roccurvettfig.savefig(figname)
-        # _____________________________________________
-        precisionrecallfig = plot_utils.plot_precision_recall(self.traintestdata[3],
-                                                              self.ypredtest_hipe4ml,
-                                                              leglabels)
-        figname = f'{self.dirmlplot}/PrecisionRecallAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
-        precisionrecallfig.savefig(figname)
-        # _____________________________________________
-        plt.rcParams["figure.figsize"] = (12, 7)
-        featuresimportancefig = plot_utils.plot_feature_imp(self.traintestdata[2][self.v_train],
-                                                            self.traintestdata[3],
-                                                            self.p_hipe4ml_model,
-                                                            leglabels)
-        n_plot = self.n_classes if self.n_classes > 2 else 1
-        for i, figg in enumerate(featuresimportancefig):
-            if i < n_plot:
-                figname = (f'{self.dirmlplot}/FeatureImportanceOpt{i}_'
-                           f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
-                featuresimportancefig[i].savefig(figname)
+
+        if didtraining:
+            # _____________________________________________
+            plt.rcParams["figure.figsize"] = (10, 7)
+            mloutputfig = plot_utils.plot_output_train_test(self.p_hipe4ml_model, self.traintestdata,
+                                                            80, self.raw_output_hipe4ml,
+                                                            leglabels, self.train_test_log_hipe4ml,
+                                                            density=True)
+            if self.n_classes > 2:
+                for figg, labb in zip(mloutputfig, outputlabels):
+                    figname = f'{self.dirmlplot}/MLOutputDistr{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                    figg.savefig(figname)
             else:
-                figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
-                           f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
-                featuresimportancefig[i].savefig(figname)
+                figname = f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                mloutputfig.savefig(figname)
+            # _____________________________________________
+            plt.rcParams["figure.figsize"] = (10, 9)
+            roccurvefig = plot_utils.plot_roc(self.traintestdata[3], self.ypredtest_hipe4ml,
+                                              None, leglabels, self.average_method_hipe4ml,
+                                              self.roc_method_hipe4ml)
+            figname = f'{self.dirmlplot}/ROCCurveAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+            roccurvefig.savefig(figname)
+            # _____________________________________________
+            plt.rcParams["figure.figsize"] = (10, 9)
+            roccurvettfig = plot_utils.plot_roc_train_test(self.traintestdata[3],
+                                                           self.ypredtest_hipe4ml,
+                                                           self.traintestdata[1],
+                                                           self.ypredtrain_hipe4ml, None,
+                                                           leglabels, self.average_method_hipe4ml,
+                                                           self.roc_method_hipe4ml)
+            figname = f'{self.dirmlplot}/ROCCurveTrainTest_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+            roccurvettfig.savefig(figname)
+            # _____________________________________________
+            precisionrecallfig = plot_utils.plot_precision_recall(self.traintestdata[3],
+                                                                  self.ypredtest_hipe4ml,
+                                                                  leglabels)
+            figname = f'{self.dirmlplot}/PrecisionRecallAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+            precisionrecallfig.savefig(figname)
+            # _____________________________________________
+            plt.rcParams["figure.figsize"] = (12, 7)
+            featuresimportancefig = plot_utils.plot_feature_imp(self.traintestdata[2][self.v_train],
+                                                                self.traintestdata[3],
+                                                                self.p_hipe4ml_model,
+                                                                leglabels)
+            n_plot = self.n_classes if self.n_classes > 2 else 1
+            for i, figg in enumerate(featuresimportancefig):
+                if i < n_plot:
+                    figname = (f'{self.dirmlplot}/FeatureImportanceOpt{i}_'
+                               f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
+                    featuresimportancefig[i].savefig(figname)
+                else:
+                    figname = (f'{self.dirmlplot}/FeatureImportanceAll_'
+                               f'pT_{self.p_binmin}_{self.p_binmax}.pdf')
+                    featuresimportancefig[i].savefig(figname)
 
     #pylint: disable=too-many-locals
     def do_significance(self, ptbin):
