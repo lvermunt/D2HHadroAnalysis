@@ -206,77 +206,60 @@ LcpK0s3050_2018:
 
 #TO UPDATE FROM HERE
   analysis:
-    #TODO: To update
-    indexhptspectrum: 3 #kD0Kpi=0, kDplusKpipi=1, kDstarD0pi=2, kDsKKpi=3, kLctopKpi=4, kLcK0Sp=5
+    indexhptspectrum: 5 #kD0Kpi=0, kDplusKpipi=1, kDstarD0pi=2, kDsKKpi=3, kLctopKpi=4, kLcK0Sp=5
     fd_method: 2 #knone=0, kfc=1, kNb=2
     cctype: 1 #kpp7
-    sigmav0: 57.8e-3 #NB: multiplied by 1e12 before giving to HFPtSpectrum!
-    inputfonllpred: data/fonll/D0DplusDstarPredictions_13TeV_y05_all_300416_BDShapeCorrected.root
-    dir_general_plots: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/analysis_plots
+    #TO CHECK IF THERE ARE NO ROUNDING ISSUES HERE
+    sigmav0: 1.e-12 #NB: multiplied by 1e12 before giving to HFPtSpectrum!
+    inputfonllpred: InputAnalyses/Analysis_LcPbPb/fonll/DmesonLcPredictions_502TeV_y05_FFptDepLHCb_BRpythia8.root
+    dir_general_plots: /data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/test812_3050/binary50k/analysis_plots
 
     MBvspt:
-      proc_type: Dhadrons_mult
-      useperiod: [1,1]
+      proc_type: Dhadrons
+      useperiod: [1]
       plotbin: [1]
-      usesinglebineff: null
-      fprompt_from_mb: true
-      corresp_mb_typean: null
-      corrEffMult: [false]
-      sel_binmin2: [0] #list of var2 splittng nbins
-      sel_binmax2: [9999] #list of var2 splitting nbins
-      var_binning2: n_tracklets_corr_sub
-      var_binning2_gen: n_tracklets_corr
-      nbinshisto: 200
-      minvaluehisto: -0.5
-      maxvaluehisto: 199.5
-      triggereff: [1]
-      triggereffunc: [0]
-      triggerbit: INT7
-      sel_an_binmin: [1,8]  # [1,2,4,6,8,12] #list of pt nbins
-      sel_an_binmax: [8,24]  # [2,4,6,8,12,24] #list of pt nbins
-      binning_matching: [0,1]  # [0,1,2,2,3,4] #list of pt nbins
+      #triggerbit: INT7
+      sel_an_binmin: [8] #list of pt nbins
+      sel_an_binmax: [12] #list of pt nbins
+      binning_matching: [0] #list of pt nbins
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
       evtsel: is_ev_rej==0
       triggersel:
-        data: "trigger_hasbit_INT7==1"
+        data: null
         mc: null
-        weighttrig: false
+      #do_eff_vs_cent: False
+      #eff_vs_cent_binmin: [ 0, 10, 20, 30, 40, 50, 60, 70]
+      #eff_vs_cent_binmax: [10, 20, 30, 40, 50, 60, 70, 80]
 
       data:
         runselection: [null]
-        results: [/data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/504_20200911-2312/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_data/resultsMBvspt_ntrkl
+        results: [/data/DerivedResults/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/test812_3050/binary50k/resultsMBvspt] #list of periods
+        resultsallp: /data/DerivedResults/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/test812_3050/binary50k/resultsMBvspt
       mc:
         runselection: [null]
-        results: [/data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/505_20200911-2319/resultsMBvspt_ntrkl] #list of periods
-        resultsallp: /data/DerivedResults/DsppvsMult/vAN-20200910_ROOT6-1/pp_sim_Ds/resultsMBvspt_ntrkl
+        results: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/517_20201106-2357/test812_3050/binary50k/resultsMBvspt_MC] #list of periods
+        resultsallp: /data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/test812_3050/binary50k/resultsMBvspt_MC
 
       # The global mass limits
-      mass_fit_lim: [1.69, 2.21] # region for the fit of the invariant mass distribution [GeV/c^2]
+      mass_fit_lim: [2.14, 2.48]  # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
       # To initialize the individual fits in pT bins
       # Decide whether to take the sigma from MC or data for individual fits
-      init_fits_from: [data, data] # data or mc
-      sgnfunc: [kGaus, kGaus]
-      bkgfunc: [kExpo, kExpo]
-      masspeak: 1.969
-      massmin: [1.75, 1.75]
-      massmax: [2.15, 2.15]
-      rebin: [[6], [6]]
-      includesecpeak: [[true], [true]]
-      masssecpeak: 1.869
-      fix_masssecpeak: [[false], [true]]
-      #Fraction Dplus/Ds (taken from pp5TeV as we don't store it in TTrees)
-      widthsecpeak: 0.91
-      fix_widthsecpeak: true
+      init_fits_from: [mc] # data or mc
+      sgnfunc: [kGaus]
+      bkgfunc: [kExpo]
+      masspeak: 2.2864
+      massmin: [2.14]
+      massmax: [2.436]
+      rebin: [6]
       # Fix mean and/or sigma
       FixedMean: False
-      SetFixGaussianSigma: [true, true]
+      SetFixGaussianSigma: [true]
       # Use value set for "masspeak" for initializing total fit, otherwise what is derived from MC fit is used
       SetInitialGaussianMean: true
       # Use values set for "sigmaarray" for initializing total fit (per pT bin),
       # otherwise what is derived from MC fit is used
-      SetInitialGaussianSigma: [false, false]
+      SetInitialGaussianSigma: [false]
       # Max percentage deviation in sigma (from init) to be considered as a good fit
       MaxPercSigmaDeviation: 0.5
       # Number of initial signal sigmas around the mean to be excluded for side-band fit
@@ -284,11 +267,10 @@ LcpK0s3050_2018:
       # Sigma around mean where signal is integrated after total fit has been done
       nsigma_signal: 3
       dolikelihood: true
-      sigmaarray: [0.01,0.01]
+      sigmaarray: [0.01]
       FixedSigma: false
-      fitcase: Ds
-      latexnamehadron: "D_{s}^{+}"
-      latexbin2var: "n_{trkl}"
+      fitcase: Lc
+      latexnamehadron: "#Lambda_{c}^{pK0s}"
       nevents: null
       dodoublecross: false
 
