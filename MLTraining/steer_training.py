@@ -187,10 +187,10 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
             if dotraining:
                 myopthipe4ml.do_hipe4mltrain()
                 myopthipe4ml.do_hipe4mlplot()
+            elif domlplots is True and dotraining is False:
+                myopthipe4ml.do_hipe4mlplot(False)
             else:
                 myopthipe4ml.get_hipe4mlmodel()
-            if domlplots is True and dotraining is False:
-                myopthipe4ml.do_hipe4mlplot(False)
             if dosignifopt is True:
                 myopthipe4ml.do_significance(index)
             index = index + 1

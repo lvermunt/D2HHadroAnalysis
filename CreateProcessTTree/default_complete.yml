@@ -14,22 +14,22 @@ skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
     activate: false
 merging: # pkl_skimmed_merge_for_ml (pklskml)
   mc:
-    activate: false
+    activate: true
   data:
     activate: false
 mergingperiods: # pkl_skimmed_merge_for_ml_all
   mc:
-    activate: false
+    activate: true
   data:
     activate: false
 
 mlapplication:
   domlprefilterstep: false
   data:
-    doapply: true # pkl_skimmed_dec (pklskdec)
-    doapplymodelhandler: true #for hipe4ml package
-    domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
+    doapply: false # pkl_skimmed_dec (pklskdec)
+    doapplymodelhandler: false #for hipe4ml package
+    domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)
   mc:
-    doapply: true # pkl_skimmed_dec (pklskdec)
-    doapplymodelhandler: true #for hipe4ml package
-    domergeapply: true # pkl_skimmed_decmerged (pklskdecmerged)
+    doapply: false # pkl_skimmed_dec (pklskdec)
+    doapplymodelhandler: false #for hipe4ml package
+    domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)

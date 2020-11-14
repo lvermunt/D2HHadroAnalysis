@@ -454,6 +454,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
                 if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
                     continue
+            print(self.mptfiles_recosk[ipt][file_index])
             dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
             if self.doml is True:
                 if os.path.isfile(self.lpt_modhandler_hipe4ml[ipt]) is False:

@@ -195,14 +195,17 @@ def test(ml_type, names_, trainedmodels_, test_set_, mylistvariables_, myvariabl
     return test_set_
 
 
-def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_, labels_):
+def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_, labels_, usepred_=False):
     x_values = test_set_[mylistvariablestraining_]
     for name, model in zip(names_, trainedmodels_):
         y_test_prediction = []
         y_test_prob = []
-        y_test_prediction = model.predict(x_values)
-        y_test_prediction = y_test_prediction.reshape(len(y_test_prediction),)
-        test_set_['y_test_prediction'+name] = pd.Series(y_test_prediction, index=test_set_.index)
+        if usepred_:
+            y_test_prediction = model.predict(x_values)
+            y_test_prediction = y_test_prediction.reshape(len(y_test_prediction),)
+            test_set_['y_test_prediction'+name] = pd.Series(y_test_prediction, index=test_set_.index)
+        else:
+            test_set_['y_test_prediction'+name] = 1
 
         y_test_prob = model.predict_proba(x_values)
         if ml_type == "BinaryClassification":

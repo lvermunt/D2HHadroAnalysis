@@ -347,7 +347,7 @@ class Optimiserhipe4ml:
         modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
         modelfile = f'{self.dirmlout}/Model_pT_{self.p_binmin}_{self.p_binmax}.model'
-        self.p_hipe4ml_model.dump_original_model(modelfile)
+        self.p_hipe4ml_model.dump_original_model(modelfile, True)
 
         self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
