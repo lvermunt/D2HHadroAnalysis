@@ -22,11 +22,12 @@ from machine_learning_hep.utilities import merge_method
 
 class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-statements
     species = "multiprocesser"
-    def __init__(self, case, proc_class, datap, run_param, mcordata, checkiffileexist):
+    def __init__(self, case, proc_class, datap, run_param, mcordata, checkiffileexist, doapply=False):
         self.case = case
         self.datap = datap
         self.run_param = run_param
         self.mcordata = mcordata
+        self.doapply = doapply
         self.first_check_if_file_exists = checkiffileexist
         self.prodnumber = len(datap["multi"][self.mcordata]["unmerged_tree_dir"])
         self.p_period = datap["multi"][self.mcordata]["period"]
@@ -103,7 +104,8 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
                                    self.p_fracmerge[indexp], self.p_seedmerge[indexp],
                                    self.dlper_reco_modapp[indexp],
                                    self.dlper_reco_modappmerged[indexp],
-                                   self.first_check_if_file_exists)
+                                   self.first_check_if_file_exists,
+                                   self.doapply)
             self.process_listsample.append(myprocess)
 
     def multi_unpack_allperiods(self):
@@ -147,4 +149,7 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
 
     def multi_mergeapply_allperiods(self):
         for indexp in range(self.prodnumber):
-            self.process_listsample[indexp].process_mergedec()
+            if self.v_max_ncand_merge > 0 and self.mcordata == "data":
+                self.process_listsample[indexp].process_mergedec_max()
+            else:
+                self.process_listsample[indexp].process_mergedec()

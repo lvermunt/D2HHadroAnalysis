@@ -81,8 +81,10 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 
     typean = data_config["analysis"]["type"]
 
-    binminarray = data_param[case]["ml"]["binmin"]
-    binmaxarray = data_param[case]["ml"]["binmax"]
+    binmintrarray = data_param[case]["ml"]["binmin"]
+    binmaxtrarray = data_param[case]["ml"]["binmax"]
+    binminarray = data_param[case]["ml"].get("binminsk", binmintrarray)
+    binmaxarray = data_param[case]["ml"].get("binmaxsk", binmaxtrarray)
     raahp = data_param[case]["ml"]["opt"]["raahp"]
     mltype = data_param[case]["ml"]["mltype"]
     training_vars = data_param[case]["variables"]["var_training"]
@@ -172,9 +174,10 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 
     if doml is True and domloption == 2:
         index = 0
-        for binmin, binmax in zip(binminarray, binmaxarray):
+        for binmin, binmax, binmintr, binmaxtr in zip(binminarray, binmaxarray, binmintrarray, binmaxtrarray):
             myopthipe4ml = Optimiserhipe4ml(data_param[case], case, typean,
                                             binmin, binmax,
+                                            binmintr, binmaxtr,
                                             training_vars[index],
                                             hipe4ml_hyper_pars[index],
                                             raahp[index])

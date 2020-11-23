@@ -21,7 +21,7 @@ LcpK0s3050_2018:
 
   nprongs: 3
   doml: true
-  doml_asprefilter: null #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
+  doml_asprefilter: false #null = 1 training, true = 2 training-prefilter step, false = 2 training-analysis step
   mass: 2.2864
   sel_reco_unp: "pt_cand>1"
   sel_reco_singletrac_unp: null
@@ -154,8 +154,8 @@ LcpK0s3050_2018:
     binmax: [4,6,8,12,24] #list of nbins sel_skim_binmin bins
     mltype: BinaryClassification
     ncorescrossval: 10
-    mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201106_ROOT6-1/mlplot_binary_3050_201120 # to be removed
-    mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201106_ROOT6-1/mlout_binary_3050_201120 # to be removed
+    mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201106_ROOT6-1/mlplot_binary_3050_201120_seq # to be removed
+    mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201106_ROOT6-1/mlout_binary_3050_201120_seq # to be removed
     opt:
       isFONLLfromROOT: true
       filename_fonll: 'InputAnalyses/Analysis_LcPbPb/fonll/DmesonLcPredictions_502TeV_y05_FFptDepLHCb_BRpythia8.root' # file with FONLL predictions
@@ -209,30 +209,22 @@ LcpK0s3050_2018:
 
   mlapplication:
     data:
-      pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/model_binary_201120/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/model_binary_201120/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/model_binary_201120/skpkldec_seq] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_data_3050/516_20201107-0052/model_binary_201120/skpkldecmerged_seq] #list of periods
     mc:
-      pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/517_20201106-2357/model_binary_201120/skpkldec] #list of periods
-      pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/517_20201106-2357/model_binary_201120/skpkldecmerged] #list of periods
+      pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/517_20201106-2357/model_binary_201120/skpkldec_seq] #list of periods
+      pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201106_ROOT6-1/PbPb_sim_3050/517_20201106-2357/model_binary_201120/skpkldecmerged_seq] #list of periods
     modelname: xgboost
-    #modelsperptbin: [Model_pT_2_4.model]
     modelsperptbin: [Model_pT_2_4.model,
                      Model_pT_4_6.model,
                      Model_pT_6_8.model,
                      Model_pT_8_12.model,
                      Model_pT_12_24.model]
-    #modelsperptbin: [Model_pT_6_8.model,
-    #                 Model_pT_8_12.model,
-    #                 Model_pT_12_24.model]
-    #modelsperptbin_hipe4ml: [ModelHandler_pT_2_4.pkl]
     modelsperptbin_hipe4ml: [ModelHandler_pT_2_4.pkl,
                              ModelHandler_pT_4_6.pkl,
                              ModelHandler_pT_6_8.pkl,
                              ModelHandler_pT_8_12.pkl,
                              ModelHandler_pT_12_24.pkl]
-    #modelsperptbin_hipe4ml: [ModelHandler_pT_6_8.pkl,
-    #                         ModelHandler_pT_8_12.pkl,
-    #                         ModelHandler_pT_12_24.pkl]
     ml_prefilter_probcut: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
     probcutpresel:
       data: [0.4, 0.3, 0.3, 0.3, 0.3] #[0.7, 0.6, 0.6, 0.5, 0.5]

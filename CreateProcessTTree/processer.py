@@ -42,11 +42,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
                  d_root, d_pkl, d_pklsk, d_pkl_ml, p_period, i_period,
                  p_chunksizeunp, p_chunksizeskim, p_maxprocess,
                  p_frac_merge, p_rd_merge, d_pkl_dec, d_pkl_decmerged,
-                 checkiffileexist):
+                 checkiffileexist, doapply):
 
         self.datap = datap
         self.case = case
         self.first_check_if_file_exists = checkiffileexist
+        self.doapply = doapply
 
         #directories
         self.d_root = d_root
@@ -121,6 +122,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #variables name
         self.lpt_anbinmin = datap["sel_skim_binmin"]
         self.lpt_anbinmax = datap["sel_skim_binmax"]
+        self.lpt_anbinmintr = datap["ml"].get("binmin", self.lpt_anbinmin)
+        self.lpt_anbinmaxtr = datap["ml"].get("binmax", self.lpt_anbinmax)
+        if len(self.lpt_anbinmintr) > len(self.lpt_anbinmin) and self.doapply:
+        #if self.doapply:
+            self.lpt_anbinmin = datap["ml"]["binminsk"]
+            self.lpt_anbinmax = datap["ml"]["binmaxsk"]
         self.p_nptbins = len(self.lpt_anbinmin)
         self.v_all = datap["variables"]["var_all"]
         self.v_train = datap["variables"]["var_training"]
@@ -242,16 +249,16 @@ class Processer: # pylint: disable=too-many-instance-attributes
             else:
                 if not isinstance(self.lpt_probcutpre[0], list):
                     self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f.pkl" % \
-                                       (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                       (self.lpt_anbinmintr[i], self.lpt_anbinmaxtr[i], \
                                         self.lpt_probcutpre[i])) for i in range(self.p_nptbins)]
                 else:
                     self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_%.2f%.2f.pkl" % \
-                                       (self.lpt_anbinmin[i], self.lpt_anbinmax[i], \
+                                       (self.lpt_anbinmintr[i], self.lpt_anbinmaxtr[i], \
                                         self.lpt_probcutpre[i][0], self.lpt_probcutpre[i][1])) \
                                         for i in range(self.p_nptbins)]
         else:
             self.lpt_recodec = [self.n_reco.replace(".pkl", "%d_%d_std.pkl" % \
-                               (self.lpt_anbinmin[i], self.lpt_anbinmax[i])) \
+                               (self.lpt_anbinmintr[i], self.lpt_anbinmaxtr[i])) \
                                                     for i in range(self.p_nptbins)]
         self.mptfiles_recoskmldec = [createlist(self.d_pkl_dec, self.l_path, \
                                      self.lpt_recodec[ipt]) for ipt in range(self.p_nptbins)]
@@ -456,6 +463,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     continue
             print(self.mptfiles_recosk[ipt][file_index])
             dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
+            dfrecosk = seldf_singlevar(dfrecosk, self.v_var_binning,
+                                       self.lpt_anbinmintr[ipt], self.lpt_anbinmaxtr[ipt])
             if self.doml is True:
                 if os.path.isfile(self.lpt_modhandler_hipe4ml[ipt]) is False:
                     print("hipe4ml model file not present in bin %d" % ipt)
@@ -562,6 +571,22 @@ class Processer: # pylint: disable=too-many-instance-attributes
             merge_method(self.mptfiles_recoskmldec[ipt], self.lpt_recodecmerged[ipt])
             if self.mcordata == "mc":
                 merge_method(self.mptfiles_gensk[ipt], self.lpt_gendecmerged[ipt])
+
+    def process_mergedec_max(self):
+        print("doing merging_max", self.mcordata, self.period)
+        nfiles = len(self.mptfiles_recoskmldec[0])
+        if nfiles == 0:
+            print("increase the fraction of merged files or the total number")
+            print(" of files you process")
+        rd.seed(self.p_rd_merge)
+        for ipt in range(self.p_nptbins):
+            ntomerge = (int)(nfiles * self.p_max_frac_merge[ipt])
+            filesel = rd.sample(range(0, nfiles), ntomerge)
+            list_sel_recoskmldec = [self.mptfiles_recoskmldec[ipt][j] for j in filesel]
+            merge_method_max2(list_sel_recoskmldec, self.lpt_recodecmerged[ipt], self.v_max_ncand_merge)
+            if self.mcordata == "mc":
+                list_sel_gensk = [self.mptfiles_gensk[ipt][j] for j in filesel]
+                merge_method_max2(list_sel_gensk, self.lpt_gendecmerged[ipt], self.v_max_ncand_merge)
 
     def check_if_file_exists(self, filename):
         if os.path.exists(filename):

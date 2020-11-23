@@ -133,8 +133,8 @@ def do_application(data_config: dict, data_param: dict, run_param: dict):
             checkmakedirlist(dirpklskdec_mergeddata)
 
     proc_class = Processer
-    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc", checkiffileexist)
-    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data", checkiffileexist)
+    mymultiprocessmc = MultiProcesser(case, proc_class, data_param[case], run_param, "mc", checkiffileexist, True)
+    mymultiprocessdata = MultiProcesser(case, proc_class, data_param[case], run_param, "data", checkiffileexist, True)
 
     #perform the analysis flow
     if doapplydata is True:

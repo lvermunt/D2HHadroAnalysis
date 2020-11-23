@@ -44,7 +44,7 @@ class Optimiserhipe4ml:
     # Class Attribute
     species = "optimiser_hipe4ml"
 
-    def __init__(self, data_param, case, typean, binmin, binmax, training_var, hyper_pars, raahp):
+    def __init__(self, data_param, case, typean, binmin, binmax, binmintr, binmaxtr, training_var, hyper_pars, raahp):
 
         self.logger = get_logger()
 
@@ -59,6 +59,8 @@ class Optimiserhipe4ml:
         if self.do_mlprefilter is False: #FIXME for multiple periods
             dirmcml = data_param["mlapplication"]["mc"]["pkl_skimmed_decmerged"][0] + "/prefilter"
             dirdataml = data_param["mlapplication"]["data"]["pkl_skimmed_decmerged"][0] + "/prefilter"
+            dirmcml_max = dirmcml
+            dirdataml_max = dirdataml
         dirdatatotsample = data_param["multi"]["data"]["pkl_evtcounter_all"]
         self.p_fracmerge = data_param["multi"]["data"]["fracmerge"][0] #FIXME for multiple periods
         # directory
@@ -99,8 +101,16 @@ class Optimiserhipe4ml:
         self.p_tagsig = data_param["ml"]["sampletagforsignal"]
         self.p_tagbkg = data_param["ml"]["sampletagforbkg"]
         self.p_tagbkgfd = data_param["ml"].get("sampletagforbkgfd", 2)
-        self.p_binmin = binmin
-        self.p_binmax = binmax
+        self.p_binmin = binmintr
+        self.p_binmax = binmaxtr
+        if not isinstance(binmintr, int) or not isinstance(binmaxtr, int):
+            self.p_binminsave = int(10*binmintr)
+            self.p_binmaxsave = int(10*binmaxtr)
+        else:
+            self.p_binminsave = binmintr
+            self.p_binmaxsave = binmaxtr
+        #self.p_binminsave = int(10*binmintr)
+        #self.p_binmaxsave = int(10*binmaxtr)
         self.rnd_shuffle = data_param["ml"]["rnd_shuffle"]
         self.rnd_splt = data_param["ml"]["rnd_splt"]
         self.test_frac = data_param["ml"]["test_frac"]
@@ -146,6 +156,10 @@ class Optimiserhipe4ml:
         else:
             self.b_maskmissing = False
             self.v_varstomask = None
+
+        self.scan_input_distr = data_param.get("prob_scan", False)
+        if self.scan_input_distr:
+            self.scan_input_distr = data_param["prob_scan"]["activate"]
 
         self.s_suffix = None
         self.create_suffix()
@@ -194,6 +208,15 @@ class Optimiserhipe4ml:
         self.p_raahp = raahp
 
         self.multiclass_labels = data_param["ml"].get("multiclass_labels", None)
+
+        self.scan_input_distr = data_param.get("prob_scan", False)
+        if self.scan_input_distr:
+            self.scan_input_distr = data_param["prob_scan"]["activate"]
+            filenamebkg = data_param["prob_scan"]["filenamebkg"]
+            filenamesig = data_param["prob_scan"]["filenamesig"]
+            self.prob_sel_for_scan = data_param["prob_scan"]["prob_sel"]
+            self.df_bkg_applied = pickle.load(openfile(filenamebkg, "rb"))
+            self.df_sig_applied = pickle.load(openfile(filenamesig, "rb"))
 
         self.logger.info("Using the following training variables: %s", training_var)
 
@@ -323,7 +346,7 @@ class Optimiserhipe4ml:
         else:
             metric = 'roc_auc'
 
-        hypparsfile = f'{self.dirmlout}/HyperParOpt_pT_{self.p_binmin}_{self.p_binmax}.txt'
+        hypparsfile = f'{self.dirmlout}/HyperParOpt_pT_{self.p_binminsave}_{self.p_binmaxsave}.txt'
         outfilehyppars = open(hypparsfile, 'wt')
         sys.stdout = outfilehyppars
         self.p_hipe4ml_model.optimize_params_bayes(self.traintestdata, self.bayesoptconfig_hipe4ml,
@@ -344,9 +367,9 @@ class Optimiserhipe4ml:
         self.ypredtrain_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[0],
                                                                self.raw_output_hipe4ml)
 
-        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
+        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binminsave}_{self.p_binmaxsave}.pkl'
         self.p_hipe4ml_model.dump_model_handler(modelhandlerfile)
-        modelfile = f'{self.dirmlout}/Model_pT_{self.p_binmin}_{self.p_binmax}.model'
+        modelfile = f'{self.dirmlout}/Model_pT_{self.p_binminsave}_{self.p_binmaxsave}.model'
         self.p_hipe4ml_model.dump_original_model(modelfile, True)
 
         self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
@@ -361,7 +384,7 @@ class Optimiserhipe4ml:
 
     def get_hipe4mlmodel(self):
         self.logger.info("Getting already saved hipe4ml model")
-        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binmin}_{self.p_binmax}.pkl'
+        modelhandlerfile = f'{self.dirmlout}/ModelHandler_pT_{self.p_binminsave}_{self.p_binmaxsave}.pkl'
         self.p_hipe4ml_model = pickle.load(openfile(modelhandlerfile, 'rb'))
         self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
@@ -370,21 +393,44 @@ class Optimiserhipe4ml:
 
         leglabels = ["Background", "Prompt signal"]
         outputlabels = ["Bkg", "SigPrompt"]
+
+        # _____________________________________________
+        if self.scan_input_distr:
+            for selml in self.prob_sel_for_scan:
+                self.df_bkg_applied = self.df_bkg_applied.query("y_test_probxgboost>%s" % selml)
+                self.df_sig_applied = self.df_sig_applied.query("y_test_probxgboost>%s" % selml)
+                listdf = [self.df_bkg_applied, self.df_sig_applied]
+
+                plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, 100, leglabels, figsize=(12, 7),
+                                      alpha=0.3, log=True, grid=False, density=True)
+                plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
+                figname = f'{self.dirmlplot}/Scan0{100*selml}_DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                plt.savefig(figname)
+                plt.close('all')
+
+                corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, leglabels)
+                for figg, labb in zip(corrmatrixfig, outputlabels):
+                    plt.figure(figg.number)
+                    plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
+                    figname = f'{self.dirmlplot}/Scan0{100*selml}_CorrMatrix{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                    figg.savefig(figname)
+
         listdf = [self.df_bkgtrain, self.df_sigtrain]
+
         if self.n_classes > 2:
             leglabels = ["Background", "Prompt", "Feed-down"]
             outputlabels = ["Bkg", "SigPrompt", "SigFeedDown"]
             listdf = [self.df_bkgtrain, self.df_sigtrain, self.df_bkgfdtrain]
 
         # _____________________________________________
-        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "inv_mass_K0s", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, 100, leglabels, figsize=(12, 7),
+        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "y_test_probxgboost"] + self.v_train, 100, leglabels, figsize=(12, 7),
                               alpha=0.3, log=True, grid=False, density=True)
         plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
         figname = f'{self.dirmlplot}/DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
         plt.savefig(figname)
         plt.close('all')
         # _____________________________________________
-        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "inv_mass_K0s", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, leglabels)
+        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "y_test_probxgboost"] + self.v_train, leglabels)
         for figg, labb in zip(corrmatrixfig, outputlabels):
             plt.figure(figg.number)
             plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
@@ -475,7 +521,8 @@ class Optimiserhipe4ml:
         if self.is_fonll_from_root:
             df_fonll = TFile.Open(self.f_fonll)
             df_fonll_Lc = df_fonll.Get(self.p_fonllparticle+"pred_"+self.p_fonllband)
-            prod_cross = df_fonll_Lc.Integral(ptmin*20, ptmax*20)* self.p_fragf * 1e-12 / delta_pt
+            prod_cross = df_fonll_Lc.Integral(df_fonll_Lc.GetXaxis().FindBin(ptmin), \
+                           df_fonll_Lc.GetXaxis().FindBin(ptmax))* self.p_fragf * 1e-12 / delta_pt
             signal_yield = 2. * prod_cross * delta_pt * acc * self.p_taa \
                            / (self.p_sigmamb * self.p_fprompt)
             #now we plot the fonll expectation

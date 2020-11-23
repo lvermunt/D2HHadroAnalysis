@@ -134,7 +134,7 @@ LcpK0s3050_2018:
   ml:
     evtsel: is_ev_rej==0
     triggersel:
-      data: "ctau_K0s < 30" # null
+      data: null #"ctau_K0s < 30"
       mc: null
     nbkg: 200000
     nsig: 200000
