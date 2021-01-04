@@ -30,7 +30,7 @@ from machine_learning_hep.utilities import list_folders, createlist, appendmainf
 from machine_learning_hep.utilities import merge_method, merge_method_max2
 from machine_learning_hep.utilities_selection import filter_bit_df, tag_bit_df, selectdfrunlist
 from machine_learning_hep.utilities_selection import selectfidacc, selectdfquery, seldf_singlevar
-from machine_learning_hep.ml_functions import apply
+from machine_learning_hep.ml_functions import apply, apply_mlprob
 
 class Processer: # pylint: disable=too-many-instance-attributes
     # Class Attribute
@@ -93,6 +93,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.s_reco_unp = datap["sel_reco_unp"]
         self.s_good_evt_unp = datap["sel_good_evt_unp"]
         self.s_cen_unp = datap["sel_cen_unp"]
+        if isinstance(self.s_cen_unp, list):
+            if self.mcordata == "data":
+                self.s_cen_unp = datap["sel_cen_unp"][0]
+            else:
+                self.s_cen_unp = datap["sel_cen_unp"][1]
         self.s_gen_unp = datap["sel_gen_unp"]
         self.s_reco_skim = datap["sel_reco_skim"]
         self.s_gen_skim = datap["sel_gen_skim"]
@@ -195,6 +200,9 @@ class Processer: # pylint: disable=too-many-instance-attributes
 
         #Variables for ML applying
         self.do_mlprefilter = datap.get("doml_asprefilter", None)
+        self.overwrite_mlprob_mc = None
+        if self.mcordata == "mc":
+            self.overwrite_mlprob_mc = datap.get("overwrite_mlprob_mc", None)
         self.p_modelname = datap["mlapplication"]["modelname"]
         self.mltype = datap["ml"]["mltype"]
         self.lpt_model = datap["mlapplication"]["modelsperptbin"]
@@ -216,7 +224,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
             datap["mlapplication"]["probcutoptimal"] = [0 for _ in self.lpt_anbinmin]
             datap["mlapplication"]["ml_prefilter_probcut"] = [0 for _ in self.lpt_anbinmin]
         self.lpt_probcutfin = datap["mlapplication"]["probcutoptimal"]
-        if self.do_mlprefilter is True:
+        if self.do_mlprefilter is True or self.overwrite_mlprob_mc is True:
             self.lpt_probcutpre = datap["mlapplication"]["ml_prefilter_probcut"]
         else:
             self.lpt_probcutpre = datap["mlapplication"]["probcutpresel"][self.mcordata]
@@ -244,7 +252,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                                         self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         self.lpt_recodec = None
         if self.doml is True:
-            if self.do_mlprefilter is True:
+            if self.do_mlprefilter is True or self.overwrite_mlprob_mc is True:
                 self.lpt_recodec = self.lpt_recosk
             else:
                 if not isinstance(self.lpt_probcutpre[0], list):
@@ -472,6 +480,10 @@ class Processer: # pylint: disable=too-many-instance-attributes
                     dfrecosk = dfrecosk.replace(self.v_varstomask, value=np.nan)
                 modhandler = pickle.load(openfile(self.lpt_modhandler_hipe4ml[ipt], 'rb'))
                 mod = modhandler.get_original_model()
+
+                #njobsgrid = {'n_jobs': -1}
+                #mod.set_params(**njobsgrid)
+
                 if self.mltype == "MultiClassification":
                     dfrecoskml = apply("MultiClassification", [self.p_modelname], [mod],
                                        dfrecosk, self.v_train[ipt], self.multiclass_labels)
@@ -488,6 +500,43 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
                         protocol=4)
+
+    def applymodel_hipe4ml_mlprob(self, file_index):
+        for ipt in range(self.p_nptbins):
+            if os.path.exists(self.mptfiles_recoskmldec[ipt][file_index]):
+                if os.stat(self.mptfiles_recoskmldec[ipt][file_index]).st_size != 0:
+                    continue
+            print(self.mptfiles_recosk[ipt][file_index])
+            dfrecosk = pickle.load(openfile(self.mptfiles_recosk[ipt][file_index], "rb"))
+            dfrecosk = seldf_singlevar(dfrecosk, self.v_var_binning,
+                                       self.lpt_anbinmintr[ipt], self.lpt_anbinmaxtr[ipt])
+            if self.doml is True:
+                if os.path.isfile(self.lpt_modhandler_hipe4ml[ipt]) is False:
+                    print("hipe4ml model file not present in bin %d" % ipt)
+                if self.b_maskmissing:
+                    dfrecosk = dfrecosk.replace(self.v_varstomask, value=np.nan)
+                modhandler = pickle.load(openfile(self.lpt_modhandler_hipe4ml[ipt], 'rb'))
+                mod = modhandler.get_original_model()
+                if self.mltype == "MultiClassification":
+                    dfrecoskml = apply_mlprob("MultiClassification", [self.p_modelname], [mod],
+                                              dfrecosk, self.v_train[ipt], self.multiclass_labels)
+                    probvar0 = 'ml_prob_' + self.multiclass_labels[0]
+                    probvar1 = 'ml_prob_' + self.multiclass_labels[1]
+                    dfrecoskml = dfrecoskml.loc[(dfrecoskml[probvar0] <= self.lpt_probcutpre[ipt][0]) &
+                                                (dfrecoskml[probvar1] >= self.lpt_probcutpre[ipt][1])]
+                else:
+                    dfrecoskml = apply_mlprob("BinaryClassification", [self.p_modelname], [mod],
+                                              dfrecosk, self.v_train[ipt], None)
+                    probvar = "ml_prob"
+                    dfrecoskml = dfrecoskml.loc[dfrecoskml[probvar] > self.lpt_probcutpre[ipt]]
+            else:
+                dfrecoskml = dfrecosk.query("isstd == 1")
+            pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
+                        protocol=4)
+            if self.overwrite_mlprob_mc is True and self.mcordata == "mc":
+                dfgensk = pickle.load(openfile(self.mptfiles_gensk[ipt][file_index], "rb"))
+                pickle.dump(dfgensk, openfile(self.mptfiles_genskmldec[ipt][file_index], "wb"),
+                            protocol=4)
 
     @staticmethod
     def callback(ex):
@@ -530,6 +579,12 @@ class Processer: # pylint: disable=too-many-instance-attributes
         create_folder_struc(self.d_pkl_dec, self.l_path)
         arguments = [(i,) for i in range(len(self.mptfiles_recosk[0]))]
         self.parallelizer(self.applymodel_hipe4ml, arguments, self.p_chunksizeskim)
+
+    def process_applymodel_hipe4ml_mlprob_par(self):
+        print("doing apply model", self.mcordata, self.period)
+        create_folder_struc(self.d_pkl_dec, self.l_path)
+        arguments = [(i,) for i in range(len(self.mptfiles_recosk[0]))]
+        self.parallelizer(self.applymodel_hipe4ml_mlprob, arguments, self.p_chunksizeskim)
 
     def process_mergeforml(self):
         print("doing merging", self.mcordata, self.period)

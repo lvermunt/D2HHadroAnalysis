@@ -16,6 +16,10 @@
 main script for doing data processing, machine learning and analysis
 """
 
+import os
+#os.environ['MKL_NUM_THREADS'] = '1'
+#os.environ['NUMEXPR_NUM_THREADS'] = '1'
+#os.environ['OMP_NUM_THREADS'] = '30'
 from MLTraining.steer_training import main
 
 main()

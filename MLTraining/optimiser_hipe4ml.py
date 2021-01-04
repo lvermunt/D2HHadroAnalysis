@@ -44,7 +44,7 @@ class Optimiserhipe4ml:
     # Class Attribute
     species = "optimiser_hipe4ml"
 
-    def __init__(self, data_param, case, typean, binmin, binmax, binmintr, binmaxtr, training_var, hyper_pars, raahp):
+    def __init__(self, data_param, case, typean, binmin, binmax, binmintr, binmaxtr, training_var, bkg_sel, hyper_pars, raahp):
 
         self.logger = get_logger()
 
@@ -119,6 +119,11 @@ class Optimiserhipe4ml:
         self.p_evtsel = data_param["ml"]["evtsel"]
         self.p_triggersel_mc = data_param["ml"]["triggersel"]["mc"]
         self.p_triggersel_data = data_param["ml"]["triggersel"]["data"]
+        self.p_candsel_mc = None
+        self.p_candsel_data = None
+        if data_param["ml"].get("candsel", None):
+            self.p_candsel_mc = data_param["ml"]["candsel"].get("mc", None)
+            self.p_candsel_data = data_param["ml"]["candsel"].get("data", None)
 
         # dataframes
         self.df_mc = None
@@ -143,7 +148,7 @@ class Optimiserhipe4ml:
         self.df_evt_data = None
         self.df_evttotsample_data = None
         # selections
-        self.s_selbkgml = data_param["ml"]["sel_bkgml"]
+        self.s_selbkgml = bkg_sel #data_param["ml"]["sel_bkgml"]
         self.s_selbkgmlfd = data_param["ml"].get("sel_bkgmlfd", None)
         self.s_selsigml = data_param["ml"]["sel_sigml"]
         self.p_mltype = data_param["ml"]["mltype"]
@@ -212,12 +217,11 @@ class Optimiserhipe4ml:
         self.scan_input_distr = data_param.get("prob_scan", False)
         if self.scan_input_distr:
             self.scan_input_distr = data_param["prob_scan"]["activate"]
-            filenamebkg = data_param["prob_scan"]["filenamebkg"]
-            filenamesig = data_param["prob_scan"]["filenamesig"]
+            self.filenamebkg = data_param["prob_scan"].get("filenamebkg", None)
+            self.filenamesig = data_param["prob_scan"].get("filenamesig", None)
             self.prob_sel_for_scan = data_param["prob_scan"]["prob_sel"]
-            self.df_bkg_applied = pickle.load(openfile(filenamebkg, "rb"))
-            self.df_sig_applied = pickle.load(openfile(filenamesig, "rb"))
-
+            self.df_bkg_applied = None
+            self.df_sig_applied = None
         self.logger.info("Using the following training variables: %s", training_var)
 
     def create_suffix(self):
@@ -245,6 +249,9 @@ class Optimiserhipe4ml:
         self.df_data = selectdfquery(self.df_data, self.p_triggersel_data)
         self.df_mc = selectdfquery(self.df_mc, self.p_triggersel_mc)
         self.df_mcgen = selectdfquery(self.df_mcgen, self.p_triggersel_mc)
+
+        self.df_data = selectdfquery(self.df_data, self.p_candsel_data)
+        self.df_mc = selectdfquery(self.df_mc, self.p_candsel_mc)
 
         self.df_mcgen = self.df_mcgen.query(self.p_presel_gen_eff)
         arraydf = [self.df_data, self.df_mc, self.df_mc]
@@ -396,24 +403,83 @@ class Optimiserhipe4ml:
 
         # _____________________________________________
         if self.scan_input_distr:
+
+            if self.p_hipe4ml_origmodel is None:
+                self.get_hipe4mlmodel()
+
+            if self.filenamebkg:
+                self.df_bkg_applied = pickle.load(openfile(filenamebkg, "rb"))
+            else:
+                self.df_bkg_applied = apply(self.p_mltype, ["xgboost"], [self.p_hipe4ml_origmodel],
+                                            self.df_bkgtest, self.v_train, self.multiclass_labels)
+            if self.filenamesig:
+                self.df_sig_applied = pickle.load(openfile(filenamesig, "rb"))
+            else:
+                self.df_sig_applied = apply(self.p_mltype, ["xgboost"], [self.p_hipe4ml_origmodel],
+                                            self.df_sigtest, self.v_train, self.multiclass_labels)
+
             for selml in self.prob_sel_for_scan:
                 self.df_bkg_applied = self.df_bkg_applied.query("y_test_probxgboost>%s" % selml)
                 self.df_sig_applied = self.df_sig_applied.query("y_test_probxgboost>%s" % selml)
                 listdf = [self.df_bkg_applied, self.df_sig_applied]
 
-                plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, 100, leglabels, figsize=(12, 7),
+                plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "cos_t_star", "signd0"] + self.v_train, 100, leglabels, figsize=(12, 7),
                                       alpha=0.3, log=True, grid=False, density=True)
                 plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
                 figname = f'{self.dirmlplot}/Scan0{100*selml}_DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
                 plt.savefig(figname)
                 plt.close('all')
 
-                corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2"] + self.v_train, leglabels)
+                corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "cos_t_star", "signd0"] + self.v_train, leglabels)
                 for figg, labb in zip(corrmatrixfig, outputlabels):
                     plt.figure(figg.number)
                     plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
                     figname = f'{self.dirmlplot}/Scan0{100*selml}_CorrMatrix{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
                     figg.savefig(figname)
+
+                htofsig = TH2F(f'htofsig_Scan0{100*selml}', 'Signal;#it{p}_{T} (GeV/#it{c});nsigTOF', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_sig_applied['pt_prong0'].values
+                nsigarray = self.df_sig_applied['nsigTOF_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htofsig.Fill(pt, nsig)
+                ctofsig = TCanvas(f'ctofsig_Scan0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctofsig.cd()
+                htofsig.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan0{100*selml}_nsigTOF_signal_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctofsig.SaveAs(figname)
+
+                htofbkg = TH2F(f'htofbkg_Scan0{100*selml}', 'Background;#it{p}_{T} (GeV/#it{c});nsigTOF', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_bkg_applied['pt_prong0'].values
+                nsigarray = self.df_bkg_applied['nsigTOF_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htofbkg.Fill(pt, nsig)
+                ctofbkg = TCanvas(f'ctofbkg_Scan0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctofbkg.cd()
+                htofbkg.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan0{100*selml}_nsigTOF_background_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctofbkg.SaveAs(figname)
+
+                htpcsig = TH2F(f'htpcsig_Scan0{100*selml}', 'Signal;#it{p}_{T} (GeV/#it{c});nsigTPC', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_sig_applied['pt_prong0'].values
+                nsigarray = self.df_sig_applied['nsigTPC_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htpcsig.Fill(pt, nsig)
+                ctpcsig = TCanvas(f'ctpcsig_Scan0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctpcsig.cd()
+                htpcsig.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan0{100*selml}_nsigTPC_signal_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctpcsig.SaveAs(figname)
+
+                htpcbkg = TH2F(f'htpcbkg_Scan0{100*selml}', 'Background;#it{p}_{T} (GeV/#it{c});nsigTPC', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_bkg_applied['pt_prong0'].values
+                nsigarray = self.df_bkg_applied['nsigTPC_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htpcbkg.Fill(pt, nsig)
+                ctpcbkg = TCanvas(f'ctpcbkg_Scan0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctpcbkg.cd()
+                htpcbkg.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan0{100*selml}_nsigTPC_background_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctpcbkg.SaveAs(figname)
 
         listdf = [self.df_bkgtrain, self.df_sigtrain]
 
@@ -423,14 +489,14 @@ class Optimiserhipe4ml:
             listdf = [self.df_bkgtrain, self.df_sigtrain, self.df_bkgfdtrain]
 
         # _____________________________________________
-        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "y_test_probxgboost"] + self.v_train, 100, leglabels, figsize=(12, 7),
+        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand"] + self.v_train, 100, leglabels, figsize=(12, 7),
                               alpha=0.3, log=True, grid=False, density=True)
         plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
         figname = f'{self.dirmlplot}/DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
         plt.savefig(figname)
         plt.close('all')
         # _____________________________________________
-        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "y_test_probxgboost"] + self.v_train, leglabels)
+        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand"] + self.v_train, leglabels)
         for figg, labb in zip(corrmatrixfig, outputlabels):
             plt.figure(figg.number)
             plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)

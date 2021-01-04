@@ -53,7 +53,7 @@ class Optimiser:
     species = "optimiser"
 
     def __init__(self, data_param, case, typean, model_config, binmin,
-                 binmax, raahp, training_var):
+                 binmax, raahp, training_var, bkg_sel):
 
         self.logger = get_logger()
 
@@ -152,7 +152,7 @@ class Optimiser:
         self.df_xtest = None
         self.df_ytest = None
         #selections
-        self.s_selbkgml = data_param["ml"]["sel_bkgml"]
+        self.s_selbkgml = bkg_sel #data_param["ml"]["sel_bkgml"]
         self.s_selsigml = data_param["ml"]["sel_sigml"]
         #model param
         self.db_model = model_config

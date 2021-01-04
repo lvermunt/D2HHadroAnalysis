@@ -91,8 +91,50 @@ LcpK0s3050_2018:
     ##Pre apply variables, w/o PID and Lc variables
     ##var_training: [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s]
     ##2nd training after GRID application
-    var_training: [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
-                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star] #, inv_mass_K0s, cos_t_star, signd0
+    var_training: [[dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star]]
     var_signal: signal
     var_inv_mass: inv_mass
 
@@ -118,12 +160,12 @@ LcpK0s3050_2018:
     max_ncand_merge: 4000000 # if < 0, use default merging. Otherwise process_mergeforml_max (with merge_method_max2)
     data:
       #lowered for day time
-      nprocessesparallel: 4
-      chunksizeunp: [4] #list of periods
-      chunksizeskim: [4] #list of periods
-      fracmerge: [[0.04, 0.04, 0.04, 0.2, 0.4, 0.5]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
+      nprocessesparallel: 30
+      chunksizeunp: [30] #list of periods
+      chunksizeskim: [30] #list of periods
+      fracmerge: [[0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.2, 0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.5]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
                         #if max_ncand_merge > 0, this will only be used for significance calculation
-      max_frac_merge: [0.04, 0.04, 0.04, 0.2, 0.4, 0.5] #list of pT bins
+      max_frac_merge: [0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.2, 0.2, 0.2, 0.2, 0.4, 0.4, 0.4, 0.4, 0.5, 0.5, 0.5, 0.5] #list of pT bins
       period: [LHC18qr] #list of periods
       unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_LcPbPb/TTree/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data/533_20201124-0804/merged] #list of periods
       pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/pkl] #list of periods
@@ -135,8 +177,8 @@ LcpK0s3050_2018:
     mc:
       nprocessesparallel: 50
       chunksizeskim: [1000] #list of periods
-      fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
-      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
+      fracmerge : [[1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0]] #list of pT bin in list of periods.
+      max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       #period: [PbPb_sim_pK0s_pass3] #list of periods
       #select_children: [["child_2"]] # select children explicitly
       #531_20201120-1844   ->   529_20201120-1842
@@ -164,19 +206,19 @@ LcpK0s3050_2018:
     sampletagforsignal: 1
     sampletagforbkg: 0
     sel_sigml: ismcprompt == 1
-    sel_bkgml: inv_mass<2.2 or inv_mass>2.36 #ensure to set the cuts as multiples of the bin_width, i.e. left_limit + K * bin_width
+    sel_bkgml: inv_mass<2.24 or inv_mass>2.34 #ensure to set the cuts as multiples of the bin_width, i.e. left_limit + K * bin_width
     nkfolds: 5
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
-    binmin: [1,2,4,6,8,12] #list of nbins sel_skim_binmin bins
-    binmax: [2,4,6,8,12,24] #list of nbins sel_skim_binmin bins
+    binmin: [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 9, 10, 11, 12, 15, 18, 21] #list of nbins sel_skim_binmin bins
+    binmax: [1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 9, 10, 11, 12, 15, 18, 21, 24] #list of nbins sel_skim_binmin bins
+    binminsk: [1,1,2,2,2,2,4,4,4,4,6,6,6,6,8,8,8,8,12,12,12,12] #list of nbins sel_skim_binmin bins
+    binmaxsk: [2,2,4,4,4,4,6,6,6,6,8,8,8,8,12,12,12,12,24,24,24,24] #list of nbins sel_skim_binmin bins
     mltype: BinaryClassification
     ncorescrossval: 10
-    mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlplot_binary_applied_3050_Cts_Bayes200k # to be removed
-    mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlout_binary_applied_3050_Cts_Bayes200k # to be removed
-    #mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlplot_binary_applied_3050_signd0 # to be removed
-    #mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlout_binary_applied_3050_signd0 # to be removed
+    mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlplot_binary_applied_3050_finebins_BayesOptCoarse_merged # to be removed
+    mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/mlout_binary_applied_3050_finebins_BayesOptCoarse_merged # to be removed
     opt:
       isFONLLfromROOT: true
       filename_fonll: 'InputAnalyses/Analysis_LcPbPb/fonll/DmesonLcPredictions_502TeV_y05_FFptDepLHCb_BRpythia8.root' # file with FONLL predictions
@@ -191,7 +233,7 @@ LcpK0s3050_2018:
       num_steps: 111 # number of steps used in efficiency and signif. estimation
       bkg_function: pol1 # fit function for bkg (among TH1 predefined fit functions, e.g. expo, pol1, pol2, ...)
       save_fit: True # save bkg fits with the various cuts on ML output
-      raahp: [1,1,1,1,1,1] #list of nbins
+      raahp: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] #list of nbins
       presel_gen_eff: "abs(y_cand) < 0.5 and abs(z_vtx_gen) < 10"
       mass_fit_lim: [2.14, 2.48] # region for the fit of the invariant mass distribution [GeV/c^2]
       bin_width: 0.001 # bin width of the invariant mass histogram
@@ -201,20 +243,36 @@ LcpK0s3050_2018:
     roc_auc_average: 'macro' # 'macro' or 'weighted'
     roc_auc_approach: 'ovo'  # 'ovo' or 'ovr'
     train_test_log: True     # use log scale for plots of train and test distributions
-    hipe4ml_hyper_pars: [{'max_depth': 3, 'learning_rate': 0.029110519961044856, 'n_estimators': 665, 'min_child_weight': 3, 'subsample': 0.9049512863264476, 'colsample_bytree': 0.9664885281600843},#, 'n_jobs': 10},
-                         {'max_depth': 4, 'learning_rate': 0.035925332857633094, 'n_estimators': 651, 'min_child_weight': 2, 'subsample': 0.8736142303338376, 'colsample_bytree': 0.8877766409961241},#, 'n_jobs': 10},
-                         {'max_depth': 5, 'learning_rate': 0.018790490260574548, 'n_estimators': 446, 'min_child_weight': 5, 'subsample': 0.8990353820222541, 'colsample_bytree': 0.8609227538346742},#, 'n_jobs': 10},
-                         {'max_depth': 4, 'learning_rate': 0.04923500111203905, 'n_estimators': 1429, 'min_child_weight': 5, 'subsample': 0.801478072158921, 'colsample_bytree': 0.8834481103820994},#, 'n_jobs': 10},
-                         {'max_depth': 6, 'learning_rate': 0.0266817267976818, 'n_estimators': 1427, 'min_child_weight': 8, 'subsample': 0.9787787324953962, 'colsample_bytree': 0.9092918254142481},#, 'n_jobs': 10},
-                         {'max_depth': 6, 'learning_rate': 0.026636900997297437, 'n_estimators': 1427, 'min_child_weight': 8, 'subsample': 0.9789654700855298, 'colsample_bytree': 0.9093420558686559}]#, 'n_jobs': 10}]
+    hipe4ml_hyper_pars: [{'max_depth': 5, 'learning_rate': 0.034, 'n_estimators': 650, 'min_child_weight': 2.0, 'subsample': 0.88, 'colsample_bytree': 0.86, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.034, 'n_estimators': 650, 'min_child_weight': 2.0, 'subsample': 0.88, 'colsample_bytree': 0.86, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.026, 'n_estimators': 1427, 'min_child_weight': 8.0, 'subsample': 0.98, 'colsample_bytree': 0.91, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.026, 'n_estimators': 1427, 'min_child_weight': 8.0, 'subsample': 0.98, 'colsample_bytree': 0.91, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.026, 'n_estimators': 1427, 'min_child_weight': 8.0, 'subsample': 0.98, 'colsample_bytree': 0.91, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.026, 'n_estimators': 1427, 'min_child_weight': 8.0, 'subsample': 0.98, 'colsample_bytree': 0.91, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.065, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.065, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.065, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.065, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.058, 'n_estimators': 807, 'min_child_weight': 5.1, 'subsample': 0.93, 'colsample_bytree': 0.96, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.058, 'n_estimators': 807, 'min_child_weight': 5.1, 'subsample': 0.93, 'colsample_bytree': 0.96, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.058, 'n_estimators': 807, 'min_child_weight': 5.1, 'subsample': 0.93, 'colsample_bytree': 0.96, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 6, 'learning_rate': 0.058, 'n_estimators': 807, 'min_child_weight': 5.1, 'subsample': 0.93, 'colsample_bytree': 0.96, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.064, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.064, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.064, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 5, 'learning_rate': 0.064, 'n_estimators': 1428, 'min_child_weight': 7.1, 'subsample': 0.84, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 4, 'learning_rate': 0.081, 'n_estimators': 987, 'min_child_weight': 4.5, 'subsample': 0.81, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 4, 'learning_rate': 0.081, 'n_estimators': 987, 'min_child_weight': 4.5, 'subsample': 0.81, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 4, 'learning_rate': 0.081, 'n_estimators': 987, 'min_child_weight': 4.5, 'subsample': 0.81, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist},
+                         {'max_depth': 4, 'learning_rate': 0.081, 'n_estimators': 987, 'min_child_weight': 4.5, 'subsample': 0.81, 'colsample_bytree': 0.95, 'n_jobs':2, 'tree_method':hist}]
                          # list of dicts of hyperparameters (one for each pT bin)
 
     hyper_par_opt:
-      do_hyp_opt: True # whether to do the parameter optimization
-      njobs: 10        # number of parallel jobs used in hyper-parameter optimization, -1. to use all
-      nfolds: 5        # number of folds used in cross validation
-      initpoints: 10   # steps of random exploration you want to perform
-      niter: 10        # steps for bayesian optimization
+      do_hyp_opt: False # whether to do the parameter optimization
+      njobs: -1        # number of parallel jobs used in hyper-parameter optimization, -1. to use all
+      nfolds: 3        # number of folds used in cross validation
+      initpoints: 5   # steps of random exploration you want to perform
+      niter: 5        # steps for bayesian optimization
       bayes_opt_config: {'max_depth': !!python/tuple [2, 6],
                          'learning_rate': !!python/tuple [0.01, 0.1],
                          'n_estimators': !!python/tuple [300, 1500],
@@ -225,33 +283,61 @@ LcpK0s3050_2018:
 
   mlapplication:
     data:
-      #pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldec] #list of periods
-      #pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldecmerged] #list of periods
-      pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldec_Cts_Bayes200k] #list of periods
-      pkl_skimmed_decmerged: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldecmerged_Cts_Bayes200k] #list of periods
+      pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldec_BayesOptCoarse_finebins] #list of periods
+      pkl_skimmed_decmerged: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201123_ROOT6-1/PbPb_data_3050/533_20201124-0804/model_binary_applied_261120/skpkldecmerged_BayesOptCoarse_finebins] #list of periods
     mc:
-      #pkl_skimmed_dec: [/data/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldec] #list of periods
-      #pkl_skimmed_decmerged: [/data/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldecmerged] #list of periods
-      pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldec_Cts_Bayes200k] #list of periods
-      pkl_skimmed_decmerged: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldecmerged_Cts_Bayes200k] #list of periods
+      pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldec_BayesOptCoarse_finebins] #list of periods
+      pkl_skimmed_decmerged: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201119_ROOT6-1/PbPb_sim_3050/529_20201120-1842/model_binary_applied_261120/skpkldecmerged_BayesOptCoarse_finebins] #list of periods
     modelname: xgboost
-    modelsperptbin: [Model_pT_1_2.model,
-                     Model_pT_2_4.model,
-                     Model_pT_4_6.model,
-                     Model_pT_6_8.model,
-                     Model_pT_8_12.model,
-                     Model_pT_12_24.model]
-    modelsperptbin_hipe4ml: [ModelHandler_pT_1_2.pkl,
-                             ModelHandler_pT_2_4.pkl,
-                             ModelHandler_pT_4_6.pkl, 
-                             ModelHandler_pT_6_8.pkl, 
-                             ModelHandler_pT_8_12.pkl, 
-                             ModelHandler_pT_12_24.pkl]
+    modelsperptbin: [Model_pT_10_15.model,
+                     Model_pT_15_20.model,
+                     Model_pT_20_25.model,
+                     Model_pT_25_30.model,
+                     Model_pT_30_35.model,
+                     Model_pT_35_40.model,
+                     Model_pT_40_45.model,
+                     Model_pT_45_50.model,
+                     Model_pT_50_55.model,
+                     Model_pT_55_60.model,
+                     Model_pT_60_65.model,
+                     Model_pT_65_70.model,
+                     Model_pT_70_75.model,
+                     Model_pT_75_80.model,
+                     Model_pT_8_9.model,
+                     Model_pT_9_10.model,
+                     Model_pT_10_11.model,
+                     Model_pT_11_12.model,
+                     Model_pT_12_15.model,
+                     Model_pT_15_18.model,
+                     Model_pT_18_21.model,
+                     Model_pT_21_24.model]
+    modelsperptbin_hipe4ml: [ModelHandler_pT_10_15.pkl,
+                             ModelHandler_pT_15_20.pkl,
+                             ModelHandler_pT_20_25.pkl,
+                             ModelHandler_pT_25_30.pkl,
+                             ModelHandler_pT_30_35.pkl,
+                             ModelHandler_pT_35_40.pkl,
+                             ModelHandler_pT_40_45.pkl,
+                             ModelHandler_pT_45_50.pkl,
+                             ModelHandler_pT_50_55.pkl,
+                             ModelHandler_pT_55_60.pkl,
+                             ModelHandler_pT_60_65.pkl,
+                             ModelHandler_pT_65_70.pkl,
+                             ModelHandler_pT_70_75.pkl,
+                             ModelHandler_pT_75_80.pkl,
+                             ModelHandler_pT_8_9.pkl,
+                             ModelHandler_pT_9_10.pkl,
+                             ModelHandler_pT_10_11.pkl,
+                             ModelHandler_pT_11_12.pkl,
+                             ModelHandler_pT_12_15.pkl,
+                             ModelHandler_pT_15_18.pkl,
+                             ModelHandler_pT_18_21.pkl,
+                             ModelHandler_pT_21_24.pkl]
     ml_prefilter_probcut: [0.2, 0.2, 0.2, 0.2, 0.2, 0.2]
     probcutpresel:
-      data: [0.3, 0.3, 0.2, 0.0, 0.0, 0.0]
-      mc: [0.3, 0.3, 0.2, 0.0, 0.0, 0.0]
-    probcutoptimal: [0.5, 0.5, 0.5, 0.5, 0.5, 0.5] #list of nbins
+      data: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      mc: [0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.2, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    probcutoptimal: [0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.82, 0.82, 0.82, 0.82, 0.9, 0.9, 0.9, 0.9]
 
   analysis:
     indexhptspectrum: 5 #kD0Kpi=0, kDplusKpipi=1, kDstarD0pi=2, kDsKKpi=3, kLctopKpi=4, kLcK0Sp=5

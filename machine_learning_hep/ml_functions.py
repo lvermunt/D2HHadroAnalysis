@@ -216,6 +216,21 @@ def apply(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_, 
     return test_set_
 
 
+def apply_mlprob(ml_type, names_, trainedmodels_, test_set_, mylistvariablestraining_, labels_):
+    x_values = test_set_[mylistvariablestraining_]
+    for name, model in zip(names_, trainedmodels_):
+        y_test_prob = []
+
+        y_test_prob = model.predict_proba(x_values)
+        if ml_type == "BinaryClassification":
+            df_mlprob = pd.Series(y_test_prob[:, 1], name='ml_prob', index=test_set_.index)
+            test_set_.update(df_mlprob)
+        if ml_type == "MultiClassification" and labels_ is not None:
+            for pred, lab in enumerate(labels_):
+                test_set_['ml_prob2_' + lab] = pd.Series(y_test_prob[:, pred], index=test_set_.index)
+    return test_set_
+
+
 def savemodels(names_, trainedmodels_, folder_, suffix_):
     for name, model in zip(names_, trainedmodels_):
         #if "keras" in name:

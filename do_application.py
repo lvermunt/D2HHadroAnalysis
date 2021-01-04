@@ -17,7 +17,9 @@ main script for doing data processing, machine learning and analysis
 """
 
 import os
-os.environ['OMP_NUM_THREADS'] = "40"
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = "1"
 from CreateProcessTTree.steer_application import main
 
 main()

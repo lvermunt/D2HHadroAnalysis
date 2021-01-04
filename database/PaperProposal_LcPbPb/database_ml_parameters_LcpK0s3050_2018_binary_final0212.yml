@@ -91,8 +91,18 @@ LcpK0s3050_2018:
     ##Pre apply variables, w/o PID and Lc variables
     ##var_training: [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s]
     ##2nd training after GRID application
-    var_training: [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
-                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star] #, inv_mass_K0s, cos_t_star, signd0
+    var_training: [[dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star],
+                   [dca_K0s, imp_par_K0s, d_len_K0s, armenteros_K0s, ctau_K0s, cos_p_K0s,
+                   imp_par_prong0, nsigTPC_Pr_0, nsigTOF_Pr_0, cos_t_star]]
     var_signal: signal
     var_inv_mass: inv_mass
 

@@ -32,7 +32,7 @@ class Optimiserhipe4mltree:
     # Class Attribute
     species = "optimiser_hipe4mltree"
 
-    def __init__(self, data_param, binmin, binmax, training_var, hyper_pars):
+    def __init__(self, data_param, binmin, binmax, training_var, bkg_sel, hyper_pars):
 
         self.logger = get_logger()
 
@@ -54,7 +54,7 @@ class Optimiserhipe4mltree:
         self.p_binmax = binmax
 
         self.s_selsigml = ""
-        self.s_selbkgml = "inv_mass < 1.82 or 1.92 < inv_mass < 2.00"
+        self.s_selbkgml = bkg_sel #"inv_mass < 1.82 or 1.92 < inv_mass < 2.00"
         self.v_bkgoversigfrac = 3
         self.v_sig = 1
         self.v_bkg = 0

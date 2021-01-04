@@ -90,6 +90,9 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
     training_vars = data_param[case]["variables"]["var_training"]
     if not isinstance(training_vars[0], list):
         training_vars = [training_vars for _ in range(len(binminarray))]
+    bkg_sel = data_param[case]["ml"]["sel_bkgml"]
+    if not isinstance(bkg_sel[0], list):
+        bkg_sel = [bkg_sel for _ in range(len(binminarray))]
 
     domlprefilterstep_indb = data_param[case].get("doml_asprefilter", None)
     if domlprefilterstep is True and domlprefilterstep_indb is not None:
@@ -139,7 +142,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
 #        for binmin, binmax in zip(binminarray, binmaxarray):
 #            myopt = Optimiser(data_param[case], case, typean,
 #                              data_model[mltype], binmin, binmax,
-#                              raahp[index], training_vars[index])
+#                              raahp[index], training_vars[index], bkg_sel[index])
 #            if docorrelation is True:
 #                myopt.do_corr()
 #            if dotraining is True:
@@ -178,7 +181,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
             myopthipe4ml = Optimiserhipe4ml(data_param[case], case, typean,
                                             binmin, binmax,
                                             binmintr, binmaxtr,
-                                            training_vars[index],
+                                            training_vars[index], bkg_sel[index],
                                             hipe4ml_hyper_pars[index],
                                             raahp[index])
 
@@ -202,7 +205,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
         index = 0
         for binmin, binmax in zip([2], [3]):
             myopthipe4ml = Optimiserhipe4mltree(data_param[case], binmin, binmax,
-                                                training_vars[index],
+                                                training_vars[index], bkg_sel[index],
                                                 hipe4ml_hyper_pars[index])
 
             if opti_hyperpar_hipe4ml is True:
