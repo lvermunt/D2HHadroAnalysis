@@ -47,6 +47,9 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
         self.overwrite_mlprob_mc = None
         if self.mcordata == "mc":
             self.overwrite_mlprob_mc = datap.get("overwrite_mlprob_mc", None)
+        self.overwrite_mlprob_data = None
+        if self.mcordata == "data":
+            self.overwrite_mlprob_data = datap.get("overwrite_mlprob_data", None)
 
         #directories
         self.dlper_root = datap["multi"][self.mcordata]["unmerged_tree_dir"]
@@ -150,6 +153,8 @@ class MultiProcesser: # pylint: disable=too-many-instance-attributes, too-many-s
     def multi_apply_hipe4ml_allperiods(self):
         for indexp in range(self.prodnumber):
             if self.overwrite_mlprob_mc and self.mcordata == "mc":
+                self.process_listsample[indexp].process_applymodel_hipe4ml_mlprob_par()
+            elif self.overwrite_mlprob_data and self.mcordata == "data":
                 self.process_listsample[indexp].process_applymodel_hipe4ml_mlprob_par()
             else:
                 self.process_listsample[indexp].process_applymodel_hipe4ml_par()

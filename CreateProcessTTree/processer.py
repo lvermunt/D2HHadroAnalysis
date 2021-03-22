@@ -200,6 +200,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
 
         #Variables for ML applying
         self.do_mlprefilter = datap.get("doml_asprefilter", None)
+        self.apply_w_pkl_layout = datap.get("apply_with_pkl_layout", None)
         self.overwrite_mlprob_mc = None
         if self.mcordata == "mc":
             self.overwrite_mlprob_mc = datap.get("overwrite_mlprob_mc", None)
@@ -208,11 +209,11 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.lpt_model = datap["mlapplication"]["modelsperptbin"]
         self.lpt_modhandler_hipe4ml = datap["mlapplication"]["modelsperptbin_hipe4ml"]
         self.dirmodel = datap["ml"]["mlout"]
-        if self.do_mlprefilter is True:
-            self.dirmodel = self.dirmodel + "/prefilter"
-            self.p_modelname = self.p_modelname + "prefilter"
-        if self.do_mlprefilter is False:
-            self.dirmodel = self.dirmodel + "/analysis"
+        #if self.do_mlprefilter is True:
+        #    self.dirmodel = self.dirmodel + "/prefilter"
+        #    self.p_modelname = self.p_modelname + "prefilter"
+        #if self.do_mlprefilter is False:
+        #    self.dirmodel = self.dirmodel + "/analysis"
         self.lpt_model = appendmainfoldertolist(self.dirmodel, self.lpt_model)
         self.lpt_modhandler_hipe4ml = appendmainfoldertolist(self.dirmodel, self.lpt_modhandler_hipe4ml)
 
@@ -238,8 +239,8 @@ class Processer: # pylint: disable=too-many-instance-attributes
         #if self.do_mlprefilter is True:
         #    self.d_pkl_dec = d_pkl_dec + "/prefilter"
         #    self.d_pkl_decmerged = d_pkl_decmerged + "/prefilter"
-        if self.do_mlprefilter is False:
-            inputdir_forapply = d_pkl_dec.replace("/analysis", "/prefilter")
+        #if self.do_mlprefilter is False:
+        #    inputdir_forapply = d_pkl_dec.replace("/analysis", "/prefilter")
         #    self.d_pkl_dec = d_pkl_dec + "/analysis"
         #    self.d_pkl_decmerged = d_pkl_decmerged + "/analysis"
 
@@ -252,7 +253,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
                                                         self.lpt_recosk[ipt]) for ipt in range(self.p_nptbins)]
         self.lpt_recodec = None
         if self.doml is True:
-            if self.do_mlprefilter is True or self.overwrite_mlprob_mc is True:
+            if self.do_mlprefilter is True or self.overwrite_mlprob_mc is True or self.apply_w_pkl_layout is True:
                 self.lpt_recodec = self.lpt_recosk
             else:
                 if not isinstance(self.lpt_probcutpre[0], list):
@@ -282,6 +283,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
 
     def unpack(self, file_index):
 
+        print(self.l_reco[file_index])
         file_exists = True
         if self.first_check_if_file_exists is True:
             file_exists = self.check_if_file_exists(self.l_reco[file_index])
@@ -332,9 +334,31 @@ class Processer: # pylint: disable=too-many-instance-attributes
         try:
             dfreco = treereco.pandas.df(branches=self.v_all)
         except Exception as e: # pylint: disable=broad-except
-            print('Missing variable in the candidate root tree')
+            print('Missing variable in the candidate root tree', str(e))
             print('I am sorry, I am dying ...\n \n \n')
-            sys.exit()
+            #try:
+            #    self.v_all.remove("armenteros_K0s")
+            #    print("Try with removing armenteros_K0s, can have too large values")
+            #    dfreco = treereco.pandas.df(branches=self.v_all)
+            #except Exception as e: # pylint: disable=broad-except
+            #    print('Didnt work... Exiting', str(e))
+            #    sys.exit()
+            #print("Worked, adding default value for 0.20")
+            #arr_arm = [0.20] * len(dfreco)
+            #dfreco["armenteros_K0s"] = arr_arm
+            #pass
+            try:
+                self.v_all.remove("its_refit_prong2")
+                print("Try with removing its_refit_prong2, can be truncated")
+                dfreco = treereco.pandas.df(branches=self.v_all)
+            except Exception as e: # pylint: disable=broad-except
+                print('Didnt work... Exiting', str(e))
+                sys.exit()
+            print("Worked, adding default value for 0")
+            arr_itsrefit2 = [0.] * len(dfreco)
+            dfreco["its_refit_prong2"] = arr_itsrefit2
+            pass
+
 
         dfreco = selectdfrunlist(dfreco, self.runlist, "run_number")
         dfreco = selectdfquery(dfreco, self.s_reco_unp)
@@ -500,6 +524,10 @@ class Processer: # pylint: disable=too-many-instance-attributes
                 dfrecoskml = dfrecosk.query("isstd == 1")
             pickle.dump(dfrecoskml, openfile(self.mptfiles_recoskmldec[ipt][file_index], "wb"),
                         protocol=4)
+            if (self.do_mlprefilter is True or self.apply_w_pkl_layout is True) and self.mcordata == "mc":
+                dfgensk = pickle.load(openfile(self.mptfiles_gensk[ipt][file_index], "rb"))
+                pickle.dump(dfgensk, openfile(self.mptfiles_genskmldec[ipt][file_index], "wb"),
+                            protocol=4)
 
     def applymodel_hipe4ml_mlprob(self, file_index):
         for ipt in range(self.p_nptbins):

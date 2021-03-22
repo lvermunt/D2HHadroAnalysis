@@ -195,6 +195,8 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
                 myopthipe4ml.do_hipe4mlplot()
             elif domlplots is True and dotraining is False:
                 myopthipe4ml.do_hipe4mlplot(False)
+                if dosignifopt is True:
+                    myopthipe4ml.get_hipe4mlmodel()
             else:
                 myopthipe4ml.get_hipe4mlmodel()
             if dosignifopt is True:

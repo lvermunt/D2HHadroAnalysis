@@ -4,14 +4,14 @@ run_only_unprocessed_files: false # set to true to resume interrupted processing
 
 conversion: # pkl
   mc:
-    activate: false
-  data:
     activate: true
+  data:
+    activate: false
 skimming: # pkl_skimmed (pklsk), pkl_evtcounter_all
   mc:
-    activate: false
-  data:
     activate: true
+  data:
+    activate: false
 merging: # pkl_skimmed_merge_for_ml (pklskml)
   mc:
     activate: false
@@ -30,6 +30,6 @@ mlapplication:
     doapplymodelhandler: false #for hipe4ml package
     domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)
   mc:
-    doapply: false # pkl_skimmed_dec (pklskdec)
-    doapplymodelhandler: false #for hipe4ml package
+    doapply: true # pkl_skimmed_dec (pklskdec)
+    doapplymodelhandler: true #for hipe4ml package
     domergeapply: false # pkl_skimmed_decmerged (pklskdecmerged)
