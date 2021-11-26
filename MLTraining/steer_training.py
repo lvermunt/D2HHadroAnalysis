@@ -199,6 +199,7 @@ def do_training(data_config: dict, data_param: dict, data_model: dict): # pylint
                     myopthipe4ml.get_hipe4mlmodel()
             else:
                 myopthipe4ml.get_hipe4mlmodel()
+                myopthipe4ml.do_hipe4mlplot()
             if dosignifopt is True:
                 myopthipe4ml.do_significance(index)
             index = index + 1

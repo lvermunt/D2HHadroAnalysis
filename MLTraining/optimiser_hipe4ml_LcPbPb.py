@@ -395,11 +395,6 @@ class Optimiserhipe4ml:
         self.p_hipe4ml_model = pickle.load(openfile(modelhandlerfile, 'rb'))
         self.p_hipe4ml_origmodel = self.p_hipe4ml_model.get_original_model()
 
-        self.ypredtrain_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[0],
-                                                               self.raw_output_hipe4ml)
-        self.ypredtest_hipe4ml = self.p_hipe4ml_model.predict(self.traintestdata[2],
-                                                               self.raw_output_hipe4ml)
-
     def do_hipe4mlplot(self, didtraining = True):
         self.logger.info("Plotting hipe4ml model")
 
@@ -428,19 +423,63 @@ class Optimiserhipe4ml:
                 self.df_sig_applied = self.df_sig_applied.query("y_test_probxgboost>%s" % selml)
                 listdf = [self.df_bkg_applied, self.df_sig_applied]
 
-                plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand"] + self.v_train, 100, leglabels, figsize=(12, 7),
+                plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "cos_t_star", "signd0"] + self.v_train, 100, leglabels, figsize=(12, 7),
                                       alpha=0.3, log=True, grid=False, density=True)
                 plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
                 figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
                 plt.savefig(figname)
                 plt.close('all')
 
-                corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand"] + self.v_train, leglabels)
+                corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "cos_t_star", "signd0"] + self.v_train, leglabels)
                 for figg, labb in zip(corrmatrixfig, outputlabels):
                     plt.figure(figg.number)
                     plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
                     figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_CorrMatrix{labb}_pT_{self.p_binmin}_{self.p_binmax}.pdf'
                     figg.savefig(figname)
+
+                htofsig = TH2F(f'htofsig_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}', 'Signal;#it{p}_{T} (GeV/#it{c});nsigTOF', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_sig_applied['pt_prong0'].values
+                nsigarray = self.df_sig_applied['nsigTOF_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htofsig.Fill(pt, nsig)
+                ctofsig = TCanvas(f'ctofsig_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctofsig.cd()
+                htofsig.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_nsigTOF_signal_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctofsig.SaveAs(figname)
+
+                htofbkg = TH2F(f'htofbkg_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}', 'Background;#it{p}_{T} (GeV/#it{c});nsigTOF', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_bkg_applied['pt_prong0'].values
+                nsigarray = self.df_bkg_applied['nsigTOF_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htofbkg.Fill(pt, nsig)
+                ctofbkg = TCanvas(f'ctofbkg_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctofbkg.cd()
+                htofbkg.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_nsigTOF_background_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctofbkg.SaveAs(figname)
+
+                htpcsig = TH2F(f'htpcsig_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}', 'Signal;#it{p}_{T} (GeV/#it{c});nsigTPC', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_sig_applied['pt_prong0'].values
+                nsigarray = self.df_sig_applied['nsigTPC_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htpcsig.Fill(pt, nsig)
+                ctpcsig = TCanvas(f'ctpcsig_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctpcsig.cd()
+                htpcsig.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_nsigTPC_signal_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctpcsig.SaveAs(figname)
+
+                htpcbkg = TH2F(f'htpcbkg_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}', 'Background;#it{p}_{T} (GeV/#it{c});nsigTPC', 200, 0, 20, 80, -4, 4)
+                ptarray = self.df_bkg_applied['pt_prong0'].values
+                nsigarray = self.df_bkg_applied['nsigTPC_Pr_0'].values
+                for pt, nsig in zip(ptarray, nsigarray):
+                    htpcbkg.Fill(pt, nsig)
+                ctpcbkg = TCanvas(f'ctpcbkg_Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_pT{self.p_binmin}_{self.p_binmax}', '', 640, 540)
+                ctpcbkg.cd()
+                htpcbkg.Draw("colz")
+                figname = f'{self.dirmlplot}/Scan_pT_{self.p_binmin}_{self.p_binmax}_0{100*selml}_nsigTPC_background_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+                ctpcbkg.SaveAs(figname)
 
         listdf = [self.df_bkgtrain, self.df_sigtrain]
 
@@ -450,15 +489,38 @@ class Optimiserhipe4ml:
             listdf = [self.df_bkgtrain, self.df_sigtrain, self.df_bkgfdtrain]
 
         # _____________________________________________
-        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand"] + self.v_train, 100, leglabels, figsize=(12, 7),
+        plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "inv_mass_K0s"] + self.v_train, 100, leglabels, figsize=(12, 7),
+        #plot_utils.plot_distr(listdf, ["inv_mass", "pt_cand"] + self.v_train, 100, leglabels, figsize=(12, 7),
                               alpha=0.3, log=True, grid=True, density=True)
         plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
         figname = f'{self.dirmlplot}/DistributionsAll_pT_{self.p_binmin}_{self.p_binmax}.pdf'
         plt.savefig(figname)
         plt.close('all')
 
+#Some code for checks pass1, can be removed later
+        vars1 = ["ml_prob", "cos_t_star", "inv_mass", "pt_cand", "phi_cand", "eta_cand", "y_cand", "cand_type", "dca_K0s", "imp_par_K0s", "d_len_K0s", "armenteros_K0s", "ctau_K0s", "cos_p_K0s", "inv_mass_K0s", "pt_K0s"]
+        vars2 = ["signd0", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "its_refit_prong1", "its_refit_prong2", "nsigComb_Pr_0", "pt_prong0", "pt_prong1", "pt_prong2", "imp_par_prong0", "imp_par_prong1", "imp_par_prong2"] #, "trigger_hasbit_INT7", "trigger_hasbit_Central", "trigger_hasbit_SemiCentral"]
+        vars3 = ["spdhits_prong0", "spdhits_prong1", "spdhits_prong2", "run_number", "ev_id", "ev_id_ext", "centrality", "z_vtx_reco", "n_vtx_contributors", "n_tracks", "is_ev_rej", "n_tracklets", "V0Amult", "n_tpc_cls"]
+
+        plot_utils.plot_distr(listdf, vars1, 100, leglabels, figsize=(12, 7), alpha=0.3, log=False, grid=True, density=True)
+        plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
+        figname = f'{self.dirmlplot}/DistributionsFORCHECK_Vars1_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+        plt.savefig(figname)
+        plt.close('all')
+        plot_utils.plot_distr(listdf, vars2, 100, leglabels, figsize=(12, 7), alpha=0.3, log=False, grid=True, density=True)
+        plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
+        figname = f'{self.dirmlplot}/DistributionsFORCHECK_Vars2_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+        plt.savefig(figname)
+        plt.close('all')
+        plot_utils.plot_distr(listdf, vars3, 100, leglabels, figsize=(12, 7), alpha=0.3, log=False, grid=True, density=True)
+        plt.subplots_adjust(left=0.06, bottom=0.06, right=0.99, top=0.96, hspace=0.55, wspace=0.55)
+        figname = f'{self.dirmlplot}/DistributionsFORCHECK_Vars3_pT_{self.p_binmin}_{self.p_binmax}.pdf'
+        plt.savefig(figname)
+        plt.close('all')
+
         # _____________________________________________
-        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand"] + self.v_train, leglabels)
+        corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand", "pt_prong0", "pt_prong1", "pt_prong2", "nsigTPC_Pr_0", "nsigTOF_Pr_0", "inv_mass_K0s"] + self.v_train, leglabels)
+        #corrmatrixfig = plot_utils.plot_corr(listdf, ["inv_mass", "pt_cand"] + self.v_train, leglabels)
         for figg, labb in zip(corrmatrixfig, outputlabels):
             plt.figure(figg.number)
             plt.subplots_adjust(left=0.2, bottom=0.25, right=0.95, top=0.9)
@@ -469,8 +531,7 @@ class Optimiserhipe4ml:
             # _____________________________________________
             plt.rcParams["figure.figsize"] = (10, 7)
             mloutputfig = plot_utils.plot_output_train_test(self.p_hipe4ml_model, self.traintestdata,
-#                                                            80, self.raw_output_hipe4ml,
-                                                            40, self.raw_output_hipe4ml,
+                                                            80, self.raw_output_hipe4ml,
                                                             leglabels, self.train_test_log_hipe4ml,
                                                             density=True)
             if self.n_classes > 2:
@@ -480,9 +541,6 @@ class Optimiserhipe4ml:
             else:
                 figname = f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pdf'
                 mloutputfig.savefig(figname)
-                with open(f'{self.dirmlplot}/MLOutputDistr_pT_{self.p_binmin}_{self.p_binmax}.pickle', 'wb') as out:
-                    pickle.dump(mloutputfig, out)
-
             # _____________________________________________
             plt.rcParams["figure.figsize"] = (10, 9)
             roccurvefig = plot_utils.plot_roc(self.traintestdata[3], self.ypredtest_hipe4ml,
@@ -500,8 +558,6 @@ class Optimiserhipe4ml:
                                                            self.roc_method_hipe4ml)
             figname = f'{self.dirmlplot}/ROCCurveTrainTest_pT_{self.p_binmin}_{self.p_binmax}.pdf'
             roccurvettfig.savefig(figname)
-            with open(f'{self.dirmlplot}/ROCCurveTrainTest_pT_{self.p_binmin}_{self.p_binmax}.pickle', 'wb') as out:
-                pickle.dump(roccurvettfig, out)
             # _____________________________________________
             precisionrecallfig = plot_utils.plot_precision_recall(self.traintestdata[3],
                                                                   self.ypredtest_hipe4ml,
@@ -667,18 +723,6 @@ class Optimiserhipe4ml:
                 plt.savefig(f'{self.dirmlplot}/Significance_{self.s_suffix}.png')
                 with open(f'{self.dirmlplot}/Significance_{self.s_suffix}.pickle', 'wb') as out:
                     pickle.dump(fig_signif, out)
-
-                hsignfvscut = TH1F(f'hsignfvscut_pT{self.p_binmin}_{self.p_binmax}',
-                                   f';MLprob;Expected Significance',
-                                   len(x_axis) - 1, array("d", x_axis))
-                for i, thr in enumerate(x_axis):
-                    binvar = hsignfvscut.GetXaxis().FindBin(thr)
-                    hsignfvscut.SetBinContent(binvar, signif_array[i])
-                fout = TFile(f'{self.dirmlplot}/Significance_{self.s_suffix}.root', "RECREATE")
-                fout.cd()
-                hsignfvscut.Write()
-                fout.Close()
-
             else:
                 hsignfvscut = TH2F(f'hsignfvscut_pT{self.p_binmin}_{self.p_binmax}',
                                    f';{self.multiclass_labels[0]};{self.multiclass_labels[1]};Expected Significance',

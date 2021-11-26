@@ -255,7 +255,7 @@ LcpK0s080_2018:
     #pp_reference: data/ppref/LcPtSpectrumAverage_pp5_RelativeStatPlusSyst_StatUncorr_PbPbReference_1_2_4_6_8_12_24.root #prel
     pp_reference: data/ppref/Lc_ppreference_pp5TeV_noyshift_pt_1_2_4_6_8_12_LcD013TeVscaling_pt_12_24.root
     indexhptspectrumraa: 6 #pK0s
-    sigmaraa: 0.0109 #BR pK0s, since BR is in pp ref file
+    sigmaraa: 0.0110 #BR pK0s, since BR is in pp ref file
     fd_method_raa: 1 #kNb
     cctype_raa: 3 #k010
     cctype_comp: 0 #k010

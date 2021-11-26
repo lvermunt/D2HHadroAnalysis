@@ -8,8 +8,8 @@ ml_study:
   dohipe4ml: 2 #1 default MLHEP, 2 is hipe4ml, 3 = hipe4ml_fromttrees
   domlprefilterstep: false
 
-  dotraining: true
-  dosignifopt: true
+  dotraining: false
+  dosignifopt: false
   domlplots: false
 
   dopca: false

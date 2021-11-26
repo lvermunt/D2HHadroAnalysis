@@ -155,6 +155,7 @@ class Processer: # pylint: disable=too-many-instance-attributes
         self.v_dsfdbs = datap["bitmap_sel"].get("var_isdsfdbs", None)
         self.v_var_binning = datap["var_binning"]
         self.nprongs = datap["nprongs"]
+        self.prongformultsub = datap.get("prongformultsub", [0] * self.nprongs)
 
         #list of files names
         self.l_path = None
@@ -370,19 +371,30 @@ class Processer: # pylint: disable=too-many-instance-attributes
         if self.b_trackcuts is not None:
             dfreco = filter_bit_df(dfreco, self.v_bitvar, self.b_trackcuts)
 
+        arraysub = [0 for ival in range(len(dfreco))]
+        for iprong in range(self.nprongs):
+            if self.prongformultsub[iprong] == 0:
+                continue
+            #print("considering prong %d for sub" % iprong)
+            spdhits_thisprong = dfreco["spdhits_prong%s" % iprong].values
+            ntrackletsthisprong = [1 if spdhits_thisprong[index] == 3 else 0 \
+                                   for index in range(len(dfreco))]
+            arraysub = np.add(ntrackletsthisprong, arraysub)
+        if "n_tracklets" in self.v_evt:
+            n_tracklets = dfreco["n_tracklets"].values
+            n_tracklets_sub = None
+            n_tracklets_sub = np.subtract(n_tracklets, arraysub)
+            dfreco["n_tracklets_sub"] = n_tracklets_sub
         if "n_tracklets_corr" in self.v_evt:
-            arraysub = [0 for ival in range(len(dfreco))]
             n_tracklets_corr = dfreco["n_tracklets_corr"].values
-            # n_tracklets_corr_shm = dfreco["n_tracklets_corr_shm"].values
-            for iprong in range(self.nprongs):
-                spdhits_thisprong = dfreco["spdhits_prong%s" % iprong].values
-                ntrackletsthisprong = [1 if spdhits_thisprong[index] == 3 else 0
-                                       for index in range(len(dfreco))]
-                arraysub = np.add(ntrackletsthisprong, arraysub)
+            n_tracklets_corr_sub = None
             n_tracklets_corr_sub = np.subtract(n_tracklets_corr, arraysub)
-            # n_tracklets_corr_shm_sub = np.subtract(n_tracklets_corr_shm, arraysub)
             dfreco["n_tracklets_corr_sub"] = n_tracklets_corr_sub
-            # dfreco["n_tracklets_corr_shm_sub"] = n_tracklets_corr_shm_sub
+        if "n_tracklets_corr_shm" in self.v_evt:
+            n_tracklets_corr_shm = dfreco["n_tracklets_corr_shm"].values
+            n_tracklets_corr_shm_sub = None
+            n_tracklets_corr_shm_sub = np.subtract(n_tracklets_corr_shm, arraysub)
+            dfreco["n_tracklets_corr_shm_sub"] = n_tracklets_corr_shm_sub
 
         dfreco[self.v_isstd] = np.array(tag_bit_df(dfreco, self.v_bitvar,
                                                    self.b_std), dtype=int)
