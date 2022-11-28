@@ -9,8 +9,8 @@ ml_study:
   domlprefilterstep: false
 
   dotraining: false
-  dosignifopt: false
-  domlplots: false
+  dosignifopt: true
+  domlplots: true
 
   dopca: false
   docorrelation: false

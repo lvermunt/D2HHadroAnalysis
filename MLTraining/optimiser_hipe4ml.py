@@ -673,7 +673,8 @@ class Optimiserhipe4ml:
                                    len(x_axis) - 1, array("d", x_axis))
                 for i, thr in enumerate(x_axis):
                     binvar = hsignfvscut.GetXaxis().FindBin(thr)
-                    hsignfvscut.SetBinContent(binvar, signif_array[i])
+                    hsignfvscut.SetBinContent(binvar, signif_array_tot[i])
+                    hsignfvscut.SetBinError(binvar, signif_err_array_tot[i])
                 fout = TFile(f'{self.dirmlplot}/Significance_{self.s_suffix}.root', "RECREATE")
                 fout.cd()
                 hsignfvscut.Write()

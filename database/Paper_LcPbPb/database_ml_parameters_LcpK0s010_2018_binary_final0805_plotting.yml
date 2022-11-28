@@ -126,22 +126,22 @@ LcpK0s010_2018:
                         #if max_ncand_merge > 0, this will only be used for significance calculation
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [LHC18qr] #list of periods
-      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_LcPbPb/TTree/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data/610_20210406-1720/merged] #list of periods
-      pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pkl] #list of periods
-      pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pklsk] #list of periods
-      pkl_skimmed_merge_for_ml: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pp_data_mltot
-      pkl_evtcounter_all: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pp_data_evttot
+      unmerged_tree_dir: [/mnt/temp/Paper_LcPbPb/TTree/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data/610_20210406-1720/merged] #list of periods
+      pkl: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pkl] #list of periods
+      pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pklsk] #list of periods
+      pkl_skimmed_merge_for_ml: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pp_data_mltot
+      pkl_evtcounter_all: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/PbPb_data_010/610_20210406-1720/pp_data_evttot
 
       #applied pass3
       #fracmerge: [[0.05, 0.01, 0.05, 0.01, 0.15, 0.2]] #list of pT bin in list of periods. Only used in default merging, with process_mergeforml (with merge_method)
       #                  #if max_ncand_merge > 0, this will only be used for significance calculation
       #max_frac_merge: [0.05, 0.01, 0.05, 0.01, 0.15, 0.2] #list of pT bins
       #period: [LHC18qr] #list of periods
-      #unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_LcPbPb/TTree/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data/629_20210510-2302/merged] #list of periods
-      #pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pkl] #list of periods
+      #unmerged_tree_dir: [/mnt/temp/Paper_LcPbPb/TTree/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data/629_20210510-2302/merged] #list of periods
+      #pkl: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pkl] #list of periods
       ##pkl: [/data/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pkl] #list of periods
-      #pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pklsk] #list of periods
+      #pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pklsk] #list of periods
       ##pkl_skimmed: [/data/Derived/LcPbPb/vAN-20210510_ROOT6-1/PbPb_data_010/629_20210510-2302/pklsk] #list of periods
       #pkl_skimmed_merge_for_ml: [~/NOTNEEDED/pklskml] #list of periods
       #pkl_skimmed_merge_for_ml_all: ~/NOTNEEDED/pp_data_mltot
@@ -153,13 +153,13 @@ LcpK0s010_2018:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [PbPb_sim_pK0s_pass3] #list of periods
       select_children: [["child_1"]] # select children explicitly
-      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_LcPbPb/TTree/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim/621_20210426-2053/merged]
-      pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pkl] #list of periods
-      pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pklsk] #list of periods
-      #pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/mlprob_applied/pklsk]
-      pkl_skimmed_merge_for_ml: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pklskml] #list of periods
-      pkl_skimmed_merge_for_ml_all: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pp_mc_prodD2H_mltot
-      pkl_evtcounter_all: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pp_mrc_prodD2H_evttot
+      unmerged_tree_dir: [/mnt/temp/Paper_LcPbPb/TTree/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim/621_20210426-2053/merged]
+      pkl: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pkl] #list of periods
+      pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pklsk] #list of periods
+      #pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/mlprob_applied/pklsk]
+      pkl_skimmed_merge_for_ml: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pklskml] #list of periods
+      pkl_skimmed_merge_for_ml_all: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pp_mc_prodD2H_mltot
+      pkl_evtcounter_all: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/621_20210426-2053/pp_mrc_prodD2H_evttot
     mc_D2H_pass3: # mc:
       nprocessesparallel: 50
       chunksizeskim: [1000] #list of periods
@@ -167,12 +167,12 @@ LcpK0s010_2018:
       max_frac_merge: [1.0, 1.0, 1.0, 1.0, 1.0, 1.0] #list of pT bins
       period: [PbPb_sim_D2H_pass3] #list of periods
       select_children: [["child_1"]] # select children explicitly
-      unmerged_tree_dir: [/mnt/temp/OngoingAnalysis_LcPbPb/TTree/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim/622_20210426-2053/merged]
-      #pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/pkl]
-      #pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/pklsk]
-      pkl: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/pkl]
-      pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/pklsk]
-      #pkl_skimmed: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/mlprob_applied/pklsk]
+      unmerged_tree_dir: [/mnt/temp/Paper_LcPbPb/TTree/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim/622_20210426-2053/merged]
+      #pkl: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/pkl]
+      #pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/pklsk]
+      pkl: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/pkl]
+      pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/pklsk]
+      #pkl_skimmed: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/mlprob_applied/pklsk]
       pkl_skimmed_merge_for_ml: [~/NOTNEEDED/pklskml_prodD2Hp3] #list of periods
       pkl_skimmed_merge_for_ml_all: ~/NOTNEEDED/pp_mc_prodD2Hp3_mltot
       pkl_evtcounter_all: ~/NOTNEEDED/pp_mrc_prodD2Hp3_evttot
@@ -196,12 +196,12 @@ LcpK0s010_2018:
     rnd_shuffle: 12
     rnd_splt: 12
     test_frac: 0.2
-    binmin: [1,2,4,6,8,12] #list of nbins sel_skim_binmin bins
-    binmax: [2,4,6,8,12,24] #list of nbins sel_skim_binmin bins
+    binmin: [2,8,12] #[1,2,4,6,8,12] #list of nbins sel_skim_binmin bins
+    binmax: [4,12,24] #[2,4,6,8,12,24] #list of nbins sel_skim_binmin bins
     mltype: BinaryClassification
     ncorescrossval: 10
-    mlplot: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/mlplot_binary_010_final0805_plotting # to be removed
-    mlout: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/mlout_binary_010_final0805_plotting # to be removed
+    mlplot: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/mlplot_binary_010_final0805_plotting2 # to be removed
+    mlout: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210405_ROOT6-1/mlout_binary_010_final0805_plotting2 # to be removed
     opt:
       isFONLLfromROOT: true
       filename_fonll: 'InputAnalyses/Analysis_LcPbPb/fonll/DmesonLcPredictions_502TeV_y05_FFptDepLHCb_BRpythia8_PDG2020.root' # file with FONLL predictions
@@ -249,47 +249,47 @@ LcpK0s010_2018:
 
   mlapplication:
     data:
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/560_20210108-0803/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/mlwCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/560_20210108-0803/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/mlwCts_final1001/skpkldec] #list of periods
       pkl_skimmed_dec: [~/NOTNEEDED/skpkldec] #list of periods
       pkl_skimmed_decmerged: [~/NOTNEEDED/skpkldecmerged] #list of periods
     mc_pK0s_pass1:
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/pklsk] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/pklsk] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/561_20210108-0711/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
       #pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_pK0sp1] #list of periods
       pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_pK0sp1] #list of periods
       pkl_skimmed_decmerged: [~/NOTNEEDED/skpkldecmerged_pK0sp1] #list of periods
     mc_pK0s_pass3:
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/pklsk] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/pklsk] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/574_20210202-0838/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
       #pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_pK0sp1] #list of periods
       pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_pK0sp3] #list of periods
       pkl_skimmed_decmerged: [~/NOTNEEDED/skpkldecmerged_pK0sp3] #list of periods
     mc_D2H_pass1:
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/pklsk] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN_20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/pklsk] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN_20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/562_20210108-1440/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
       #pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_D2Hp1] #list of periods
       pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_D2Hp1] #list of periods
       pkl_skimmed_decmerged: [~/NOTNEEDED/skpkldecmerged_D2Hp1] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/587_20210216-0838/no_centrality/pklskdec]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/603_20210305-1429/mlprob_applied/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/605_20210305-1430/mlprob_applied/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/587_20210216-0838/no_centrality/pklskdec]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/603_20210305-1429/mlprob_applied/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/605_20210305-1430/mlprob_applied/pklsk]
     mc: #mc_D2H_pass3:
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/pklsk] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20201125_ROOT6-1/PbPb_sim_010/539_20201201-1213/mlprob_applied_1001/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210201_ROOT6-1/PbPb_sim_010/573_20210202-0756/mlprob_applied/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/584_20210216-0826/mlprob_applied/no_centrality/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/584_20210216-0826/mlprob_applied/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/pklsk] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/mlwoCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201221_ROOT6-1/PbPb_sim_010/558_20210108-0734/mlprob_applied/mlwCts_final1001/skpkldec] #list of periods
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20201125_ROOT6-1/PbPb_sim_010/539_20201201-1213/mlprob_applied_1001/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210201_ROOT6-1/PbPb_sim_010/573_20210202-0756/mlprob_applied/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/584_20210216-0826/mlprob_applied/no_centrality/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210207_ROOT6-1/PbPb_sim_010/584_20210216-0826/mlprob_applied/pklsk]
       #pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_D2Hp3] #list of periods
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210305_ROOT6-1/PbPb_sim_010/604_20210305-1628/mlprob_applied/no_centrality/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210305_ROOT6-1/PbPb_sim_010/606_20210305-1648/mlprob_applied/no_centrality/pklsk]
-      #pkl_skimmed_dec: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/mlprob_applied/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210305_ROOT6-1/PbPb_sim_010/604_20210305-1628/mlprob_applied/no_centrality/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210305_ROOT6-1/PbPb_sim_010/606_20210305-1648/mlprob_applied/no_centrality/pklsk]
+      #pkl_skimmed_dec: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210426_ROOT6-1/PbPb_sim_010/622_20210426-2053/no_centrality/mlprob_applied/pklsk]
       pkl_skimmed_dec: [~/NOTNEEDED/skpkldec_D2Hp3] #list of periods
       pkl_skimmed_decmerged: [~/NOTNEEDED/skpkldecmerged_D2Hp3] #list of periods
     modelname: xgboost
@@ -318,7 +318,7 @@ LcpK0s010_2018:
     #TO CHECK IF THERE ARE NO ROUNDING ISSUES HERE
     sigmav0: 1.e-12 #NB: multiplied by 1e12 before giving to HFPtSpectrum!
     inputfonllpred: data/fonll/DmesonLcPredictions_502TeV_y05_FFptDepLHCb_BRpythia8.root
-    dir_general_plots: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/analysis_plots
+    dir_general_plots: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210110_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/analysis_plots
 
     MBvspt:
       proc_type: Dhadrons
@@ -357,12 +357,12 @@ LcpK0s010_2018:
 
       data:
         runselection: [null]
-        results: [/mnt/temp/OngoingAnalysis_LcPbPb/DerivedResults/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/resultsMBvspt_opti1_pt3] #list of periods
-        resultsallp: /mnt/temp/OngoingAnalysis_LcPbPb/DerivedResults/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/applied_grid/resultsMBvspt_opti1_pt3
+        results: [/mnt/temp/Paper_LcPbPb/DerivedResults/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/566_20210117-1935/applied_grid/resultsMBvspt_opti1_pt3] #list of periods
+        resultsallp: /mnt/temp/Paper_LcPbPb/DerivedResults/LcPbPb/vAN-20210107_ROOT6-1/PbPb_data_010/applied_grid/resultsMBvspt_opti1_pt3
       mc:
         runselection: [null]
-        results: [/mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/538_20201201-1213/applied_grid/resultsMBvspt_MC_opti1_pt3] #list of periods
-        resultsallp: /mnt/temp/OngoingAnalysis_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/applied_grid/resultsMBvspt_MC_opti1_pt3
+        results: [/mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/538_20201201-1213/applied_grid/resultsMBvspt_MC_opti1_pt3] #list of periods
+        resultsallp: /mnt/temp/Paper_LcPbPb/Derived/LcPbPb/vAN-20210107_ROOT6-1/PbPb_sim_010/applied_grid/resultsMBvspt_MC_opti1_pt3
 
       # The global mass limits
       mass_fit_lim: [2.14, 2.48]  # region for the fit of the invariant mass distribution [GeV/c^2]
